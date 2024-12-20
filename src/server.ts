@@ -7,7 +7,6 @@ import config from './configs'
  */
 
 export async function startApp () {
-    console.log("confog", config)
   const port = config.nodePort
   const server = http.createServer(app)
   server.listen(port)

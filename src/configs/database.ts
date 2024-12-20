@@ -1,7 +1,6 @@
 import { DataSource } from 'typeorm';
 import config from './index'
 import { Shape } from '../entities/shape.entity';
-console.log("sjapeeeeee", Shape)
 
 export const AppDataSource = new DataSource({
     type: 'mongodb',

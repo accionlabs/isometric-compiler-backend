@@ -7,7 +7,6 @@ import { AppDataSource } from '../configs/database';
 export class ShapeService extends BaseService<Shape> {
 
   constructor() {
-    console.log("xxxxxxxxxxxxxxxxxx",AppDataSource.entityMetadatas.map(metadata => metadata.name));
     super(AppDataSource.getMongoRepository(Shape));
   }
 }
