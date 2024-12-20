@@ -7,7 +7,9 @@ const config = {
         host: process.env.DB_HOST,
         port: process.env.DB_PORT,
         name: process.env.DB_NAME
-    }
+    },
+    logLocation: process.env.LOG_LOCATION,
+    microserviceName: process.env.MICROSERVICE_NAME
 }
 
 export default config;
