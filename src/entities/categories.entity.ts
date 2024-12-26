@@ -13,7 +13,7 @@ class Metadata {
     icon?: string;  // Store SVG content as a string
 
     @IsOptional()
-    @IsJSON()
+    @Column({type: 'json'})
     customProperties?: Record<string, any>;  // Flexible custom properties
 }
 
@@ -36,7 +36,7 @@ export class Category extends BaseEntity {
     path: string;
 
     // Define metadata as a subdocument with class validation and nesting
-    @Column(type => Metadata)
+    @Column({type: 'json'})
     metadata: Metadata;
 
     @Column({ type: 'array' })
