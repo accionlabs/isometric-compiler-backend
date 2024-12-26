@@ -13,16 +13,14 @@ export class CategoryService extends BaseService<Category> {
   
 
 
-  async getCategoryPath(parentId: string, name: string): Promise<string>{
+  async getCategoryPath(parentId: string, name: string): Promise<{path: string, ancestors: ObjectId[]}>{
     const parentCategory = await this.findOneById(parentId);
     if(!parentCategory) {
       throw new ApiError('Parent Cateory not found', 404)
     }
-    console.log("parentCategory", parentCategory)
     const path = `${parentCategory.path ?? ''}/${name}`
-    console.log("path", path)
-    
-    console.log("now path", path)
-    return path;
+    const ancestors = parentCategory.ancestors ?? []
+    ancestors.unshift(new ObjectId(parentId))
+    return { path, ancestors};
   }
 }

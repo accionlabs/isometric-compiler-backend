@@ -1,4 +1,4 @@
-import { Entity, Column, Index, ManyToOne } from 'typeorm';
+import { Entity, Column, Index, ManyToOne, ObjectId } from 'typeorm';
 import { IsOptional, IsString, IsInt, IsJSON } from 'class-validator';
 import { BaseEntity } from './base.entity';
 
@@ -38,4 +38,7 @@ export class Category extends BaseEntity {
     // Define metadata as a subdocument with class validation and nesting
     @Column(type => Metadata)
     metadata: Metadata;
+
+    @Column({ type: 'array' })
+    ancestors: ObjectId[]
 }
