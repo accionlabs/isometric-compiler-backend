@@ -41,3 +41,29 @@ export class CategoryValidation {
     @Type(() => Metadata) // Ensure the Type for Metadata is applied for validation
     metadata: Metadata;
 }
+
+export class CategoryUpadteValidation {
+  
+    @IsOptional()
+    @IsString()
+    @MinLength(1)  // Ensure name is not empty
+    name: string;
+
+    @IsOptional()
+    @IsString()
+    @MinLength(0)  // Optional field, but if provided, should be a string
+    description?: string;
+
+    @IsOptional()
+    @IsMongoId()  // Validate that parent (if present) is a valid MongoDB ObjectId
+    parent?: ObjectId;
+
+    @IsString()
+    @IsOptional()
+    path: string;
+
+    @IsOptional()
+    @ValidateNested() // Validate nested Metadata object
+    @Type(() => Metadata) // Ensure the Type for Metadata is applied for validation
+    metadata: Metadata;
+}

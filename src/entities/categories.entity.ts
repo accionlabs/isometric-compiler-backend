@@ -1,4 +1,4 @@
-import { Entity, Column, Index, ManyToOne, ObjectId } from 'typeorm';
+import { Entity, Column, Index, ManyToOne, ObjectId, ObjectIdColumn } from 'typeorm';
 import { IsOptional, IsString, IsInt, IsJSON } from 'class-validator';
 import { BaseEntity } from './base.entity';
 
@@ -29,8 +29,8 @@ export class Category extends BaseEntity {
     description?: string;
 
     // MongoDB does not enforce foreign keys, but you can use ObjectId references manually
-    @ManyToOne(() => Category, { nullable: true })
-    parent?: Category;
+    @ObjectIdColumn({nullable: true})
+    parent?: ObjectId;
 
     @Column()
     path: string;

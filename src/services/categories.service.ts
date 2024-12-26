@@ -23,4 +23,16 @@ export class CategoryService extends BaseService<Category> {
     ancestors.unshift(new ObjectId(parentId))
     return { path, ancestors};
   }
+
+  async getPathOnParentChange(_id: string, parentId: string, name?: string): Promise<{path: string, ancestors: ObjectId[]}> {
+    const existingCategory = await this.findOneById(_id);
+    if(!existingCategory) {
+      throw new ApiError('Parent not found', 404)
+    }
+
+    if(parentId == (existingCategory.parent ?? '')) {
+      return { path: existingCategory.path, ancestors: existingCategory.ancestors }
+    }
+    return this.getCategoryPath(parentId, name ?? existingCategory.name)
+  }
 }

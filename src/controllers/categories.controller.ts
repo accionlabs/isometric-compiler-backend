@@ -1,9 +1,9 @@
 import { Inject, Service } from "typedi"
-import { Controller, Post } from "../core"
+import { Controller, Post, Put } from "../core"
 import { CategoryService } from "../services/categories.service"
-import { CategoryValidation } from "../validations/category.validation";
+import { CategoryUpadteValidation, CategoryValidation } from "../validations/category.validation";
 import { NextFunction, Request, Response } from 'express';
-import { ObjectId } from "typeorm";
+import { ObjectId } from "mongodb";
 
 
 @Service()
@@ -27,7 +27,27 @@ export default class CategoriesController{
                 path = catPath.path;
                 ancestors = catPath.ancestors
             }
-            const newShape = await this.categoryService.create({...req.body, path, ancestors });
+            const newShape = await this.categoryService.create({...req.body, path, ancestors, ...(parent && { parent: new ObjectId(parent) }) });
+            res.status(201).json(newShape);
+        } catch(e) {
+            next(e)
+        }
+      }
+
+      @Put('/:id', CategoryUpadteValidation, { 
+        authorizedRole: 'all',
+        isAuthenticated: false
+       })
+      async updateCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const categoryId = req.params.id
+            const { parent, name } = req.body;
+            let reqBody = { ...req.body, ...(parent && { parent: new ObjectId(parent) }) }
+            if(parent) {
+                const catPath = await this.categoryService.getPathOnParentChange(categoryId, parent, name)
+                reqBody = { ...reqBody, path: catPath.path, ancestors: catPath.ancestors }
+            }
+            const newShape = await this.categoryService.update(categoryId, { ...reqBody })
             res.status(201).json(newShape);
         } catch(e) {
             next(e)
