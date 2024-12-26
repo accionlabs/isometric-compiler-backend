@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsArray, IsInt, IsJSON, ValidateNested, IsNotEmpty, IsMongoId, MinLength } from 'class-validator';
+import { IsString, IsOptional, IsArray, IsInt, IsJSON, ValidateNested, IsNotEmpty, IsMongoId, MinLength, isObject, IsObject } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ObjectId } from 'typeorm';
 
@@ -13,7 +13,7 @@ class Metadata {
     icon?: string;  // Store SVG content as a string
 
     @IsOptional()
-    @IsJSON()
+    @IsObject()
     customProperties?: Record<string, any>;  // Flexible custom properties
 }
 
