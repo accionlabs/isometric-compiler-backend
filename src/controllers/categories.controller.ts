@@ -18,7 +18,14 @@ export default class CategoriesController{
        })
       async createCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const newShape = await this.categoryService.create(req.body);
+            const { parent, name } = req.body;
+            let path: string
+            if(!parent) {
+                path = name
+            } else {
+                path = await this.categoryService.getCategoryPath(parent, name)
+            }
+            const newShape = await this.categoryService.create({...req.body, path });
             res.status(201).json(newShape);
         } catch(e) {
             next(e)

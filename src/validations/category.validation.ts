@@ -33,10 +33,9 @@ export class CategoryValidation {
     @IsMongoId()  // Validate that parent (if present) is a valid MongoDB ObjectId
     parent?: ObjectId;
 
-    @IsArray()
-    @IsString({ each: true })
+    @IsString()
     @IsOptional()
-    path: string[];
+    path: string;
 
     @ValidateNested() // Validate nested Metadata object
     @Type(() => Metadata) // Ensure the Type for Metadata is applied for validation

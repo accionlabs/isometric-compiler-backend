@@ -32,8 +32,8 @@ export class Category extends BaseEntity {
     @ManyToOne(() => Category, { nullable: true })
     parent?: Category;
 
-    @Column({ type: 'array' })
-    path: string[];
+    @Column()
+    path: string;
 
     // Define metadata as a subdocument with class validation and nesting
     @Column(type => Metadata)

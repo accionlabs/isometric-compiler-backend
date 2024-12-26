@@ -1,20 +1,20 @@
-import { MongoError } from 'mongodb';
-import { DeepPartial, Repository, ObjectLiteral } from 'typeorm';
+import { MongoError, ObjectId } from 'mongodb';
+import { DeepPartial, ObjectLiteral, MongoRepository } from 'typeorm';
 import ApiError from '../utils/apiError';
 
 export abstract class BaseService<T extends ObjectLiteral> {
-  constructor(private readonly repository: Repository<T>) { }
+  constructor(private readonly repository: MongoRepository<T>) { }
 
   async findAll(): Promise<T[]> {
     return this.repository.find({});
   }
 
-  getRepository(): Repository<T> {
+  getRepository(): MongoRepository<T> {
     return this.repository
   }
 
   async findOneById(id: string): Promise<T | null> {
-    return this.repository.findOneBy({ id } as any);
+    return this.repository.findOneBy({ _id: new ObjectId(id) } as any);
   }
 
   async create(data: DeepPartial<T>): Promise<T> {
