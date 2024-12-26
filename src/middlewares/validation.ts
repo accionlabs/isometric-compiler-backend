@@ -9,8 +9,7 @@ export function validateRequest (validSchema: any) {
       .then((errs: ValidationError[]) => {
         if (errs.length > 0) {
           errs[0].constraints
-          // @ts-ignore
-          const errMessage = errs.map((err: ValidationError) => Object.values(err.constraints))
+          const errMessage = errs.map((err: ValidationError) => Object.values(err.constraints || {}))
             .join(',')
           next(new ApiError(errMessage, 400))
         } else {

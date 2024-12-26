@@ -3,10 +3,14 @@ import { DeepPartial, Repository, ObjectLiteral } from 'typeorm';
 import ApiError from '../utils/apiError';
 
 export abstract class BaseService<T extends ObjectLiteral> {
-  constructor(private readonly repository: Repository<T>) {}
+  constructor(private readonly repository: Repository<T>) { }
 
   async findAll(): Promise<T[]> {
     return this.repository.find({});
+  }
+
+  getRepository(): Repository<T> {
+    return this.repository
   }
 
   async findOneById(id: string): Promise<T | null> {
@@ -15,16 +19,16 @@ export abstract class BaseService<T extends ObjectLiteral> {
 
   async create(data: DeepPartial<T>): Promise<T> {
     try {
-        const entity = this.repository.create(data); // Now correctly typed
-        return await this.repository.save(entity);
+      const entity = this.repository.create(data); // Now correctly typed
+      return await this.repository.save(entity);
     }
-    catch(e) {
-        console.log("in catch create")
-        if (this.isDuplicateError(e)) {
-            const duplicateInfo = this.getDuplicateKeyInfo(e);
-            throw new ApiError( `Duplicate entry found for key: ${duplicateInfo.key}, value: ${duplicateInfo.value}`, 409); // Customize the error message
-          }
-        throw e
+    catch (e) {
+      console.log("in catch create")
+      if (this.isDuplicateError(e)) {
+        const duplicateInfo = this.getDuplicateKeyInfo(e);
+        throw new ApiError(`Duplicate entry found for key: ${duplicateInfo.key}, value: ${duplicateInfo.value}`, 409); // Customize the error message
+      }
+      throw e
     }
   }
 
@@ -40,16 +44,16 @@ export abstract class BaseService<T extends ObjectLiteral> {
       const value = error.keyValue[key];
       return { key, value };
     }
-  
+
     // Fallback to parsing the error message if keyPattern and keyValue are missing
     const match = error.errmsg?.match(/index: (\w+).*dup key: { : "(.*?)" }/);
     if (match) {
       return { key: match[1], value: match[2] };
     }
-  
+
     return { key: 'unknown', value: 'unknown' };
   }
-  
+
 
   async update(id: string, data: DeepPartial<T>): Promise<T | null> {
     const entity = await this.findOneById(id);
@@ -62,6 +66,6 @@ export abstract class BaseService<T extends ObjectLiteral> {
 
   async delete(id: string): Promise<boolean> {
     const result = await this.repository.delete(id);
-    return result?.affected ?  result.affected > 0 : false;
+    return result?.affected ? result.affected > 0 : false;
   }
 }
