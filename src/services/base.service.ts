@@ -7,7 +7,7 @@ export abstract class BaseService<T extends ObjectLiteral> {
   constructor(private readonly repository: MongoRepository<T>) { }
 
   async findWithFilters(
-    filters: FindOptionsWhere<T>,
+    filters: FindOptionsWhere<T>, 
     page: number = 1,
     limit: number = 10,
     sort: Record<string, 1 | -1> = { createdAt: -1 }

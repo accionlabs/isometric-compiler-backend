@@ -71,7 +71,8 @@ export default class ShapeController {
         const childCategories = await this.categoryService.getChildrenCategories(categoryId)
         const categoriesTobeSearched: ObjectId[] = [new ObjectId(categoryId)]
         childCategories.forEach(chCategory => categoriesTobeSearched.push(chCategory._id))
-        const shapes = await this.shapeService.findWithFilters({});
+        const shapes = await this.shapeService.findWithFilters({ category: { '$in': categoriesTobeSearched } }
+        );
         res.json(shapes);
     } catch (e) {
         next(e)
