@@ -7,6 +7,8 @@ export const AppDataSource = new DataSource({
     host: config.database.host,
     port: Number(config.database.port),
     database: config.database.name,
+    username: config.database.username,
+    password: config.database.password,
     useUnifiedTopology: true,
     synchronize: true, // Disable in production
     logging: false,
