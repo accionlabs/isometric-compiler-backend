@@ -1,19 +1,21 @@
 import express from 'express'
 // import UserController from './controllers/user.controller'
-import { Container } from 'typedi'
+import { Container, Token } from 'typedi'
 import { IRoute } from './core'
 import { validateRequest }  from './middlewares/validation'
 import { authenticate } from './middlewares/authentication'
 import ShapeController  from './controllers/shape.controller'
+import CategoriesController from './controllers/categories.controller'
 
 var router = express.Router();
 
 [
-    ShapeController
+  ShapeController,
+    CategoriesController
 ].forEach(controller => {
 
   // create instance of the controller
-  const instance: any = Container.get(controller)
+  const instance: any = Container.get(controller as Token<any>);
   //Get Prefix route of the controller
   const prefix = Reflect.getMetadata('prefix', controller)
   //Get all the internal route of the controller
