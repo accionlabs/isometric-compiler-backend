@@ -46,6 +46,41 @@ export function Controller (prefix: string) {
       })
     }
   }
+
+  export function Put(path: string, validSchema: any, auth: IAuth) {
+    return function (target: any, propertyKey: string) {
+      if (!Reflect.hasMetadata('routes', target.constructor)) {
+        Reflect.defineMetadata('routes', [], target.constructor)
+      }
+  
+      const routes = Reflect.getMetadata('routes', target.constructor) as Array<IRoute>
+      routes.push({
+        requestMethod: 'put',
+        path: path,
+        methodName: propertyKey,
+        validSchema: validSchema,
+        isAuthenticated: auth.isAuthenticated,
+        authorizedRole: auth.authorizedRole
+      })
+    }
+  }
+
+  export function Delete(path: string, auth: IAuth) {
+    return function (target: any, propertyKey: string) {
+      if (!Reflect.hasMetadata('routes', target.constructor)) {
+        Reflect.defineMetadata('routes', [], target.constructor)
+      }
+  
+      const routes = Reflect.getMetadata('routes', target.constructor) as Array<IRoute>
+      routes.push({
+        requestMethod: 'delete',
+        path: path,
+        methodName: propertyKey,
+        authorizedRole: auth.authorizedRole,
+        isAuthenticated: auth.isAuthenticated
+      })
+    }
+  }
   
   export interface IRoute extends IAuth{ 
     requestMethod: string;

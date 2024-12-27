@@ -14,7 +14,7 @@ export abstract class BaseEntity {
   @Column({
     type: 'enum',
     enum: Status,
-    default: Status.ACTIVE, // Default value
+    default: Status.ACTIVE
   })
-  status: Status;
+  status: Status = Status.ACTIVE;
 }
