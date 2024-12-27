@@ -14,4 +14,6 @@ const config = {
     microserviceName: process.env.MICROSERVICE_NAME
 }
 
+console.log("config", config)
+
 export default config;
