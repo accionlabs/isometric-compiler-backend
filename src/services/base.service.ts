@@ -1,9 +1,33 @@
 import { MongoError, ObjectId } from 'mongodb';
-import { DeepPartial, ObjectLiteral, MongoRepository } from 'typeorm';
+import { DeepPartial, ObjectLiteral, MongoRepository,FindOptionsWhere } from 'typeorm';
 import ApiError from '../utils/apiError';
+
 
 export abstract class BaseService<T extends ObjectLiteral> {
   constructor(private readonly repository: MongoRepository<T>) { }
+
+  async findWithFilters(
+    filters: FindOptionsWhere<T>,
+    page: number = 1,
+    limit: number = 10,
+    sort: Record<string, 1 | -1> = { createdAt: -1 }
+  ): Promise<{ data: T[]; total: number }> {
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.repository.find({
+        where: filters,
+        skip,
+        take: limit,
+        order: sort,
+      }),
+      this.repository.countDocuments(filters),
+    ]);
+
+    
+    console.log(total,'total')
+    return { data, total };
+  }
 
   async findAll(): Promise<T[]> {
     return this.repository.find({});
