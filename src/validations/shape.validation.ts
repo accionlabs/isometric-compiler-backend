@@ -1,4 +1,4 @@
-import { IsString, IsEnum, IsOptional, IsArray, IsJSON, IsNotEmpty, ValidateNested } from 'class-validator';
+import { IsString, IsEnum, IsOptional, IsArray, IsJSON, IsNotEmpty, ValidateNested, IsObject } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ShapeType } from '../entities/shape.entity';
 
@@ -22,7 +22,7 @@ export class MetadataValidation {
   applicationTypes?: string[];  // Optional application types
 
   @IsOptional()
-  @IsJSON()
+  @IsObject()
   customProperties?: Record<string, any>;  // Custom properties (flexible)
 
   @IsOptional()

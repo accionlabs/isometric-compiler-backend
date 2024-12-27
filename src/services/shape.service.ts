@@ -9,4 +9,5 @@ export class ShapeService extends BaseService<Shape> {
   constructor() {
     super(AppDataSource.getMongoRepository(Shape));
   }
+
 }

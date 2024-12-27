@@ -54,7 +54,7 @@ export default class CategoriesController{
         }
       }
 
-      @Get('/', { 
+      @Get('/formated', { 
         authorizedRole: 'all',
         isAuthenticated: false
        })
