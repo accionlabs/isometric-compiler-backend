@@ -1,5 +1,5 @@
 import { Inject, Service } from "typedi"
-import { Controller, Post, Put } from "../core"
+import { Controller, Get, Post, Put } from "../core"
 import { CategoryService } from "../services/categories.service"
 import { CategoryUpadteValidation, CategoryValidation } from "../validations/category.validation";
 import { NextFunction, Request, Response } from 'express';
@@ -49,6 +49,25 @@ export default class CategoriesController{
             }
             const newShape = await this.categoryService.update(categoryId, { ...reqBody })
             res.status(201).json(newShape);
+        } catch(e) {
+            next(e)
+        }
+      }
+
+      @Get('/', { 
+        authorizedRole: 'all',
+        isAuthenticated: false
+       })
+      async getCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { format } = req.query;
+            let shapes
+            if(format === 'nested') {
+                shapes = await this.categoryService.getCategoriesNested()
+            } else {
+                shapes = await this.categoryService.getCategoriesFlat()
+            }
+            res.status(201).json(shapes);
         } catch(e) {
             next(e)
         }

@@ -35,4 +35,93 @@ export class CategoryService extends BaseService<Category> {
     }
     return this.getCategoryPath(parentId, name ?? existingCategory.name)
   }
+
+  async getCategoriesFlat() {
+    const repository = this.getRepository();
+    const pipeline = [
+      {
+        $match: {
+          parent: null
+        }
+      },
+      {
+        $graphLookup: {
+          from: "categories",
+          connectFromField: "_id",
+          connectToField: "parent",
+          as: "allDescendants",
+          depthField: "level"
+        }
+      },
+      {
+        $unwind: "$allDescendants"
+      },
+      {
+        $sort: {
+          "allDescendants.level": 1
+        }
+      },
+      {
+        $group: {
+          _id: "$_id",
+          root: { $first: "$$ROOT" },
+          sortedDescendants: { $push: "$allDescendants" }
+        }
+      },
+      {
+        $replaceRoot: {
+          newRoot: {
+            $mergeObjects: ["$root", { allDescendants: "$sortedDescendants" }]
+          }
+        }
+      }
+    ]
+    return repository.aggregate(pipeline).toArray()
+  }
+
+  async getCategoriesNested() {
+    const repository = this.getRepository();
+    const pipeline = [
+      {
+        $match: {
+          parent: null
+        }
+      },
+      {
+        $graphLookup: {
+          from: "categories",
+          startWith: "$_id",
+          connectFromField: "_id",
+          connectToField: "parent",
+          as: "descendants"
+        }
+      },
+      {
+        $addFields: {
+          children: {
+            $function: {
+              body: `function (descendants, id) {
+                const buildTree = (items, parentId) =>
+                  items
+                    .filter(item => String(item.parent) === String(parentId))
+                    .map(item => ({
+                      ...item,
+                      children: buildTree(items, item._id)
+                    }));
+                return buildTree(descendants, id);
+              }`,
+              args: ["$descendants", "$_id"],
+              lang: "js"
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          descendants: 0
+        }
+      }
+    ]
+    return repository.aggregate(pipeline).toArray()
+  }
 }
