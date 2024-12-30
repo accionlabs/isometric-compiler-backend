@@ -47,6 +47,7 @@ export class CategoryService extends BaseService<Category> {
       {
         $graphLookup: {
           from: "categories",
+          startWith: "$_id",
           connectFromField: "_id",
           connectToField: "parent",
           as: "allDescendants",
@@ -123,5 +124,26 @@ export class CategoryService extends BaseService<Category> {
       }
     ]
     return repository.aggregate(pipeline).toArray()
+  }
+
+  async getChildrenCategories(_id: string) {
+    const repository = this.getRepository();
+    const pipeline = [    {
+      $match: {
+        _id: new ObjectId(_id)
+      }
+    },
+    {
+      $graphLookup: {
+        from: "categories",
+        connectFromField: "_id",
+        startWith: "$_id",
+        connectToField: "parent",
+        as: "children",
+      }
+    }]
+    type CategoryEtention = Category & { children: Category[] }
+    const result = await repository.aggregate(pipeline).toArray() as CategoryEtention[]
+    return result[0].children
   }
 }
