@@ -27,16 +27,17 @@ export class MetadataValidation {
 
   @IsOptional()
   @ValidateNested({ each: true })
-  @Type(() => DependencyRefValidation)  // Validate nested dependencies (shapes and components)
   dependencies?: {
-    shapes: DependencyRefValidation[];
-    components: DependencyRefValidation[];
+    shapes: any;
+    components: any;
   };
 }
 
 // Validation class for Shape entity
 export class ValidShape {
-  description: string;
+  @IsString()
+  @IsOptional()
+  description?: string;
 
   @IsString()
   @IsNotEmpty()
@@ -54,7 +55,8 @@ export class ValidShape {
   svgFile?: string;  // SVG file name or path (optional)
 
   @IsString()
-  svgContent: string;  // SVG content as a string (mandatory)
+  @IsOptional()
+  svgContent: string;  // if type is 2d and 3d its mandatory  for component SVG content as a string (mandatory)
 
   @IsString()
   @IsNotEmpty()

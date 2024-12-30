@@ -137,6 +137,7 @@ export class CategoryService extends BaseService<Category> {
       $graphLookup: {
         from: "categories",
         connectFromField: "_id",
+        startWith: "$_id",
         connectToField: "parent",
         as: "children",
       }

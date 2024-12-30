@@ -16,7 +16,8 @@ export default class CategoriesController{
     @Post('/', CategoryValidation, { 
         authorizedRole: 'all',
         isAuthenticated: false
-       })
+       },
+       {responseSchema: {}})
       async createCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { parent, name } = req.body;
@@ -37,7 +38,8 @@ export default class CategoriesController{
       @Put('/:id', CategoryUpadteValidation, { 
         authorizedRole: 'all',
         isAuthenticated: false
-       })
+       },
+       {responseSchema: {}})
       async updateCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const categoryId = req.params.id
@@ -57,7 +59,8 @@ export default class CategoriesController{
       @Get('/formated', { 
         authorizedRole: 'all',
         isAuthenticated: false
-       })
+       },
+       {responseSchema: {}})
       async getCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { format } = req.query;

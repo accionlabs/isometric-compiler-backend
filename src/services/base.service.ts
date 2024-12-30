@@ -9,11 +9,10 @@ export abstract class BaseService<T extends ObjectLiteral> {
   async findWithFilters(
     filters: FindOptionsWhere<T>, 
     page: number = 1,
-    limit: number = 10,
+    limit: number = 1000,
     sort: Record<string, 1 | -1> = { createdAt: -1 }
   ): Promise<{ data: T[]; total: number }> {
     const skip = (page - 1) * limit;
-
     const [data, total] = await Promise.all([
       this.repository.find({
         where: filters,

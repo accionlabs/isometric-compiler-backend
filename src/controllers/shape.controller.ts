@@ -7,10 +7,11 @@ import { CategoryService } from '../services/categories.service';
 import { ObjectId } from 'mongodb';
 import { Shape } from '../entities/shape.entity';
 import { FilterUtils } from '../utils/filterUtils';
+import { In } from 'typeorm';
 
 
 @Service() // Marks this class as injectable
-@Controller('/shape')
+@Controller('/shapes')
 export default class ShapeController {
 
   @Inject(() => ShapeService)
@@ -22,13 +23,14 @@ export default class ShapeController {
   @Get('/', {
     isAuthenticated: true,
     authorizedRole: 'all'
-  })
+  },
+  {responseSchema: {}})
   async getAllShapes(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       // Extract query parameters
       const query = req.query;  // All query parameters as a Record<string, any>
       const page = parseInt(req.query.page as string, 10) || 1;  // Default to page 1 if not specified
-      const limit = parseInt(req.query.limit as string, 10) || 10;  // Default to limit 10 if not specified
+      const limit = parseInt(req.query.limit as string, 10) || 1000;  // Default to limit 10 if not specified
       const sort = req.query.sort ? JSON.parse(req.query.sort as string) : { createdAt: -1 };  // Default sort by createdAt
 
       // Define the fields that are allowed for filtering
@@ -50,7 +52,8 @@ export default class ShapeController {
   @Post('/', ValidShape, {
     authorizedRole: 'all',
     isAuthenticated: false
-  })
+  },
+  {responseSchema: {}})
   async createShape(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const {category,...reqBody} = req.body
@@ -64,14 +67,16 @@ export default class ShapeController {
   @Get('/category/:categoryId', {
     isAuthenticated: true,
     authorizedRole: 'all'
-  })
+  },
+  {responseSchema: {}})
   async getShapesByCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
         const { categoryId } = req.params;
         const childCategories = await this.categoryService.getChildrenCategories(categoryId)
         const categoriesTobeSearched: ObjectId[] = [new ObjectId(categoryId)]
+        console.log(categoriesTobeSearched,'categoriesTobeSearched')
         childCategories.forEach(chCategory => categoriesTobeSearched.push(chCategory._id))
-        const shapes = await this.shapeService.findWithFilters({ category: { '$in': categoriesTobeSearched } }
+        const shapes = await this.shapeService.findWithFilters({ category: In(categoriesTobeSearched) }
         );
         res.json(shapes);
     } catch (e) {
