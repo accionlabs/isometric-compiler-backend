@@ -9,6 +9,9 @@ export const AppDataSource = new DataSource({
     database: config.database.name,
     username: config.database.username,
     password: config.database.password,
+    replicaSet: 'rs0',
+    authSource: 'admin',
+    directConnection: true,
     useUnifiedTopology: true,
     synchronize: true, // Disable in production
     logging: false,
