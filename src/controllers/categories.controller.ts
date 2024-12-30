@@ -4,6 +4,7 @@ import { CategoryService } from "../services/categories.service"
 import { CategoryUpadteValidation, CategoryValidation } from "../validations/category.validation";
 import { NextFunction, Request, Response } from 'express';
 import { ObjectId } from "mongodb";
+import { Category } from "../entities/categories.entity";
 
 
 @Service()
@@ -17,7 +18,7 @@ export default class CategoriesController{
         authorizedRole: 'all',
         isAuthenticated: false
        },
-       {responseSchema: {}})
+       Category)
       async createCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { parent, name } = req.body;
@@ -39,7 +40,7 @@ export default class CategoriesController{
         authorizedRole: 'all',
         isAuthenticated: false
        },
-       {responseSchema: {}})
+       Category || null)
       async updateCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const categoryId = req.params.id
@@ -60,7 +61,7 @@ export default class CategoriesController{
         authorizedRole: 'all',
         isAuthenticated: false
        },
-       {responseSchema: {}})
+       Array<Category>)
       async getCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { format } = req.query;

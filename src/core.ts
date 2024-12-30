@@ -12,7 +12,7 @@ export function Controller (prefix: string) {
     authorizedRole: string
   }
   
-  export function Get(path: string, auth: IAuth, responseSchema: any) {
+  export function Get(path: string, auth: IAuth, responseSchema: any | any[]) {
     return function (target: any, propertyKey: string) {
       if (!Reflect.hasMetadata('routes', target.constructor)) {
         Reflect.defineMetadata('routes', [], target.constructor)

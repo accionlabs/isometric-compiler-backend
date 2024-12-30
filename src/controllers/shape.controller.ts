@@ -24,7 +24,7 @@ export default class ShapeController {
     isAuthenticated: true,
     authorizedRole: 'all'
   },
-  {responseSchema: {}})
+  {data: Array<Shape>, total: Number})
   async getAllShapes(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       // Extract query parameters
@@ -53,7 +53,7 @@ export default class ShapeController {
     authorizedRole: 'all',
     isAuthenticated: false
   },
-  {responseSchema: {}})
+  Shape)
   async createShape(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const {category,...reqBody} = req.body
@@ -68,7 +68,8 @@ export default class ShapeController {
     isAuthenticated: true,
     authorizedRole: 'all'
   },
-  {responseSchema: {}})
+  { data: Array<Shape>,
+    total: Number})
   async getShapesByCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
         const { categoryId } = req.params;
