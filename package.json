@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon",
-    "build": "tsc",
+    "build": "tsc && ts-node src/generate-swagger.ts",
     "start": "node build/index.js"
   },
   "author": "",
@@ -18,6 +18,7 @@
     "mongodb": "^5.9.2",
     "morgan": "^1.10.0",
     "reflect-metadata": "^0.2.2",
+    "swagger-ui-express": "^5.0.1",
     "typedi": "^0.10.0",
     "typeorm": "^0.3.20",
     "winston": "^3.17.0",
@@ -27,6 +28,7 @@
     "@types/express": "^5.0.0",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.10.2",
+    "@types/swagger-ui-express": "^4.1.7",
     "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"
