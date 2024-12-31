@@ -19,17 +19,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 
-if (process.env.NODE_ENV === 'development') {
-  const swaggerDoc = require('../build/swagger.json');
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
-} else {
-  const swaggerFilePath = path.resolve(__dirname, './build/swagger.json');
+
+  const swaggerFilePath = path.resolve(__dirname, '../swagger.json');
   console.log("swaggerFilePath", swaggerFilePath)
   app.get('/swagger.json', (req, res) => {
     res.sendFile(swaggerFilePath);
   });
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(undefined, { swaggerUrl: '/swagger.json' }));
-}
+
 
 app.use('/', router);
 // app.use('/users', usersRouter);
