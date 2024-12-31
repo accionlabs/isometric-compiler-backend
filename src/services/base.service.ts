@@ -22,9 +22,6 @@ export abstract class BaseService<T extends ObjectLiteral> {
       }),
       this.repository.countDocuments(filters),
     ]);
-
-    
-    console.log(total,'total')
     return { data, total };
   }
 
@@ -42,12 +39,10 @@ export abstract class BaseService<T extends ObjectLiteral> {
 
   async create(data: DeepPartial<T>): Promise<T> {
     try {
-      console.log("data", data)
       const entity = this.repository.create(data); // Now correctly typed
       return await this.repository.save(entity);
     }
     catch (e) {
-      console.log("in catch create")
       if (this.isDuplicateError(e)) {
         const duplicateInfo = this.getDuplicateKeyInfo(e);
         throw new ApiError(`Duplicate entry found for key: ${duplicateInfo.key}, value: ${duplicateInfo.value}`, 409); // Customize the error message
@@ -57,7 +52,6 @@ export abstract class BaseService<T extends ObjectLiteral> {
   }
 
   private isDuplicateError(error: any): boolean {
-    console.log("error.code", error)
     // Check if the error is a MongoDB duplicate key error
     return error instanceof MongoError && error.code === 11000;
   }
