@@ -1,79 +1,119 @@
 import { Inject, Service } from "typedi"
-import { Controller, Get, Post, Put } from "../core"
+import { Controller, Delete, Get, Post, Put } from "../core"
 import { CategoryService } from "../services/categories.service"
 import { CategoryUpadteValidation, CategoryValidation } from "../validations/category.validation";
 import { NextFunction, Request, Response } from 'express';
 import { ObjectId } from "mongodb";
 import { Category } from "../entities/categories.entity";
+import ApiError from "../utils/apiError";
 
 
 @Service()
 @Controller('/categories')
-export default class CategoriesController{
+export default class CategoriesController {
     @Inject(() => CategoryService)
     private readonly categoryService: CategoryService
 
 
-    @Post('/', CategoryValidation, { 
+    @Post('/', CategoryValidation, {
         authorizedRole: 'all',
         isAuthenticated: false
-       },
-       Category)
-      async createCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
+    },
+        Category)
+    async createCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { parent, name } = req.body;
             let path: string = name;
             let ancestors: ObjectId[] = []
-            if(parent) {
+            if (parent) {
                 const catPath = await this.categoryService.getCategoryPath(parent, name)
                 path = catPath.path;
                 ancestors = catPath.ancestors
             }
-            const newShape = await this.categoryService.create({...req.body, path, ancestors, ...(parent && { parent: new ObjectId(parent) }) });
+            const newShape = await this.categoryService.create({ ...req.body, path, ancestors, ...(parent && { parent: new ObjectId(parent) }) });
             res.status(201).json(newShape);
-        } catch(e) {
+        } catch (e) {
             next(e)
         }
-      }
+    }
 
-      @Put('/:id', CategoryUpadteValidation, { 
+
+    @Delete('/:id', {
+        isAuthenticated: true,
+        authorizedRole: 'all'
+    },
+        {})
+    async deleteCategoryById(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const category = await this.categoryService.findOneById(req.params.id);
+            if (!category) {
+                throw new ApiError('Category not found', 404)
+            }
+            await this.categoryService.delete(req.params.id);
+            res.status(200).json({ message: 'Category deleted successfully' });
+        } catch (e) {
+            next(e)
+        }
+
+    }
+
+
+    @Put('/:id', CategoryUpadteValidation, {
         authorizedRole: 'all',
         isAuthenticated: false
-       },
-       Category || null)
-      async updateCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
+    },
+        Category || null)
+    async updateCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const categoryId = req.params.id
             const { parent, name } = req.body;
             let reqBody = { ...req.body, ...(parent && { parent: new ObjectId(parent) }) }
-            if(parent) {
+            if (parent) {
                 const catPath = await this.categoryService.getPathOnParentChange(categoryId, parent, name)
                 reqBody = { ...reqBody, path: catPath.path, ancestors: catPath.ancestors }
             }
-            const newShape = await this.categoryService.update(categoryId, { ...reqBody })
+            const newShape = await this.categoryService.update(categoryId, { ...reqBody, ...(parent && { parent: new ObjectId(parent) }) })
             res.status(201).json(newShape);
-        } catch(e) {
+        } catch (e) {
             next(e)
         }
-      }
+    }
 
-      @Get('/formated', { 
+    @Get('/formated', {
         authorizedRole: 'all',
         isAuthenticated: false
-       },
-       Array<Category>)
-      async getCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
+    },
+        Array<Category>)
+    async getCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { format } = req.query;
             let shapes
-            if(format === 'nested') {
+            if (format === 'nested') {
                 shapes = await this.categoryService.getCategoriesNested()
             } else {
                 shapes = await this.categoryService.getCategoriesFlat()
             }
             res.status(201).json(shapes);
-        } catch(e) {
+        } catch (e) {
             next(e)
         }
-      }
+    }
+
+    @Get('/:id', {
+        isAuthenticated: true,
+        authorizedRole: 'all'
+    },
+        Category)
+    async getCategoryById(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const category = await this.categoryService.findOneById(req.params.id);
+            if (!category) {
+                throw new ApiError('Category not found', 404)
+            }
+            res.status(200).json(category);
+        } catch (e) {
+            next(e)
+        }
+
+    }
 }
