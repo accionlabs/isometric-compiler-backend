@@ -47,6 +47,23 @@ export default class ShapeController {
 
   }
 
+  @Get('/:id', {
+    isAuthenticated: true,
+    authorizedRole: 'all'
+  },
+  {data: Array<Shape>, total: Number})
+  async getShapeById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+   
+      const shape = await this.shapeService.findOneById(req.params.id);
+      console.log("shape",shape?.category)
+      res.status(200).json(shape);
+    } catch (e) {
+      next(e)
+    }
+
+  }
+
 
   @Post('/', ValidShape, {
     authorizedRole: 'all',

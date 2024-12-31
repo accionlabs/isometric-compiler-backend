@@ -34,7 +34,7 @@ export abstract class BaseService<T extends ObjectLiteral> {
   }
 
   async findOneById(id: string): Promise<T | null> {
-    return this.repository.findOneBy({ _id: new ObjectId(id) } as any);
+    return this.repository.findOneBy({ _id: new ObjectId(id) });
   }
 
   async create(data: DeepPartial<T>): Promise<T> {
