@@ -1,26 +1,17 @@
 import { plainToInstance } from 'class-transformer';
-import { validateSync, ValidationError } from 'class-validator';
+// import { validateSync, ValidationError } from 'class-validator';
 import { IRoute } from "../core"
+import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
+const { defaultMetadataStorage } = require('class-transformer/cjs/storage')
 
-function generateSwaggerSchema(validationClass: any): any {
-  if (!validationClass) return null;
-
-  const testData: any = {}
-  const instance = plainToInstance(validationClass, testData);
-  const validationErrors: ValidationError[] = validateSync(instance, {
-    skipMissingProperties: true,
-  });
-
-  const schema: Record<string, any> = {};
-  validationErrors.forEach((error) => {
-    schema[error.property] = {
-      type: error.constraints ? 'string' : 'object', // Assuming basic type, expand for complex types
-      description: Object.values(error.constraints || {}).join('. '),
-    };
-  });
-
-  return schema;
+function generateSwaggerSchema() {
+    const schema = validationMetadatasToSchemas({
+        classTransformerMetadataStorage: defaultMetadataStorage, // 2) Define class-transformer metadata in options
+      })
+    console.log("schema", schema)
+    return schema
 }
+
 
 export function generateSwaggerDoc(controllers: any[]): any {
   const paths: Record<string, any> = {};
@@ -31,35 +22,44 @@ export function generateSwaggerDoc(controllers: any[]): any {
     //Get all the internal route of the controller
     const routes: Array<IRoute> = Reflect.getMetadata('routes', controller)
 
-    console.log("routes", routes)
-    routes.forEach(({ path,  requestMethod: method, validSchema: validationClass, responseSchema }) => {
-    console.log(`Swagger Document created for: ${prefix + path} method: ${method}`)
-      const fullPath = `${prefix}${path}`;
-      const requestBody = generateSwaggerSchema(validationClass);
+    const jsonValidataionSchema = generateSwaggerSchema()
 
-      console.log("requestBody", requestBody)
+    routes.forEach(({ path,  requestMethod: method, validSchema: validationClass, responseSchema }) => {
+    console.log(`Swagger Document created for: ${prefix + path} method: ${method},,`)
+      const fullPath = `${prefix}${path}`;
+      let requestBody: any = {};
+      if(validationClass) {
+        const myClassInstance = new validationClass();
+        console.log("classname", myClassInstance.constructor.name)
+        requestBody = jsonValidataionSchema[myClassInstance.constructor.name];
+      }
       paths[fullPath] = paths[fullPath] || {};
-      paths[fullPath][method.toLowerCase()] = {
-        summary: `${method} ${fullPath}`,
+      paths[fullPath][method.toLowerCase()] =       {
+        summary: `Endpoint for ${method.toUpperCase()} ${path}`,
         requestBody: requestBody
           ? {
               content: {
                 'application/json': {
-                  schema: { type: 'object', properties: requestBody },
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                   schema: requestBody,
                 },
               },
             }
           : undefined,
-        responses: responseSchema || {
-          200: {
-            description: 'Success',
+        responses: {
+          '200': {
+            description: 'Successful Response',
+            content: {
+              'application/json': {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                schema: {},
+              },
+            },
           },
         },
-      };
+      }
     });
   });
-
-  console.log("paths", paths)
 
   return {
     openapi: '3.0.0',
