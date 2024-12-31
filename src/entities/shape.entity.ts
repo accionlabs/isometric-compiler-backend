@@ -58,7 +58,7 @@ export class Shape extends BaseEntity {
   svgContent: string;  // SVG content as a string (mandatory)
 
   @Column({ default: '1.0.0', nullable: false })
-  version: string;  // Version field (optional)
+  version: string = '1.0.0';  // Version field (optional)
 
   @ObjectIdColumn()
   @IsMongoId()

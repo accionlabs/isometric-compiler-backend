@@ -14,6 +14,7 @@ export class DependencyRefValidation {
 // Define Metadata validation class
 export class MetadataValidation {
   @IsString()
+  @IsOptional()
   description: string;  // Description of the shape
 
   @IsOptional()
@@ -59,8 +60,8 @@ export class ValidShape {
   svgContent: string;  // if type is 2d and 3d its mandatory  for component SVG content as a string (mandatory)
 
   @IsString()
-  @IsNotEmpty()
-  version: string;  // Version field (optional)
+  @IsOptional()
+  version?: string;  // Version field (optional)
 
   @IsOptional()
   @ValidateNested()
@@ -69,8 +70,10 @@ export class ValidShape {
 
   @IsArray()
   @IsString({ each: true })
+  @IsOptional()
   tags: string[];  // Tags for the shape
 
   @IsString()
+  @IsOptional()
   author: string;  // Author of the shape
 }

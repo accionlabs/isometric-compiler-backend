@@ -7,7 +7,6 @@ import { CategoryService } from '../services/categories.service';
 import { ObjectId } from 'mongodb';
 import { Shape } from '../entities/shape.entity';
 import { FilterUtils } from '../utils/filterUtils';
-import { In } from 'typeorm';
 
 
 @Service() // Marks this class as injectable
@@ -75,9 +74,9 @@ export default class ShapeController {
         const { categoryId } = req.params;
         const childCategories = await this.categoryService.getChildrenCategories(categoryId)
         const categoriesTobeSearched: ObjectId[] = [new ObjectId(categoryId)]
-        console.log(categoriesTobeSearched,'categoriesTobeSearched')
         childCategories.forEach(chCategory => categoriesTobeSearched.push(chCategory._id))
-        const shapes = await this.shapeService.findWithFilters({ category: In(categoriesTobeSearched) }
+        // @ts-ignore
+        const shapes = await this.shapeService.findWithFilters({ category: { '$in': categoriesTobeSearched } }
         );
         res.json(shapes);
     } catch (e) {
