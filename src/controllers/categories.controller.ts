@@ -1,10 +1,11 @@
 import { Inject, Service } from "typedi"
-import { Controller, Get, Post, Put } from "../core"
+import { Controller, Delete, Get, Post, Put } from "../core"
 import { CategoryService } from "../services/categories.service"
 import { CategoryUpadteValidation, CategoryValidation } from "../validations/category.validation";
 import { NextFunction, Request, Response } from 'express';
 import { ObjectId } from "mongodb";
 import { Category } from "../entities/categories.entity";
+import ApiError from "../utils/apiError";
 
 
 @Service()
@@ -35,6 +36,44 @@ export default class CategoriesController{
             next(e)
         }
       }
+
+        @Get('/:id', {
+          isAuthenticated: true,
+          authorizedRole: 'all'
+        },
+        Category)
+        async getCategoryById(req: Request, res: Response, next: NextFunction): Promise<void> {
+          try {
+            const category = await this.categoryService.findOneById(req.params.id);
+            if(!category) {
+                throw new ApiError('Category not found', 404)
+            }
+            res.status(200).json(category);
+          } catch (e) {
+            next(e)
+          }
+      
+        }
+      
+        @Delete('/:id', {
+          isAuthenticated: true,
+          authorizedRole: 'all'
+        },
+        {})
+        async deleteCategoryById(req: Request, res: Response, next: NextFunction): Promise<void> {
+          try {
+            const category = await this.categoryService.findOneById(req.params.id);
+            if(!category) {
+                throw new ApiError('Category not found', 404)
+            }
+            await this.categoryService.delete(req.params.id);
+            res.status(200).json({ message: 'Category deleted successfully' });
+          } catch (e) {
+            next(e)
+          }
+      
+        }
+      
 
       @Put('/:id', CategoryUpadteValidation, { 
         authorizedRole: 'all',

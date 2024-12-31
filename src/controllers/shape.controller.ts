@@ -1,12 +1,13 @@
 import { Inject, Service } from 'typedi';
 import { ShapeService } from '../services/shape.service';
 import { NextFunction, Request, Response } from 'express';
-import { Controller, Get, Post } from '../core'
+import { Controller, Delete, Get, Post } from '../core'
 import { ValidShape } from '../validations/shape.validation';
 import { CategoryService } from '../services/categories.service';
 import { ObjectId } from 'mongodb';
 import { Shape } from '../entities/shape.entity';
 import { FilterUtils } from '../utils/filterUtils';
+import ApiError from '../utils/apiError';
 
 
 @Service() // Marks this class as injectable
@@ -51,13 +52,33 @@ export default class ShapeController {
     isAuthenticated: true,
     authorizedRole: 'all'
   },
-  {data: Array<Shape>, total: Number})
+  Shape)
   async getShapeById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-   
       const shape = await this.shapeService.findOneById(req.params.id);
-      console.log("shape",shape?.category)
+      if(!shape) {
+        throw new ApiError('Shape not found', 404)
+      }
       res.status(200).json(shape);
+    } catch (e) {
+      next(e)
+    }
+
+  }
+
+  @Delete('/:id', {
+    isAuthenticated: true,
+    authorizedRole: 'all'
+  },
+  {})
+  async deleteShapeById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const shape = await this.shapeService.findOneById(req.params.id);
+      if(!shape) {
+        throw new ApiError('Shape not found', 404)
+      }
+      await this.shapeService.delete(req.params.id);
+      res.status(200).json({ message: 'Shape deleted successfully' });
     } catch (e) {
       next(e)
     }
