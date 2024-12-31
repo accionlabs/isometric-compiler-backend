@@ -84,9 +84,18 @@ export class CategoryService extends BaseService<Category> {
     return repository.aggregate(pipeline).toArray()
   }
 
+  private buildTree(categories: Category[], parentId: ObjectId | null = null): Category[] {
+    return categories
+      .filter(category => String(category.parent) === String(parentId))
+      .map(category => ({
+        ...category,
+        children: this.buildTree(categories, category._id)
+      }));
+  }
+
   async getCategoriesNested() {
     const repository = this.getRepository();
-    const pipeline =[
+    const pipeline = [
       {
         $match: {
           parent: null
@@ -98,50 +107,43 @@ export class CategoryService extends BaseService<Category> {
           startWith: "$_id",
           connectFromField: "_id",
           connectToField: "parent",
-          as: "descendants"
+          as: "children",
+          depthField: "level"
         }
       },
       {
-        $addFields: {
-          children: {
-            $function: {
-              body: `function (descendants, id) {
-                const buildTree = (items, parentId) =>
-                  items
-                    .filter(item => String(item.parent) === String(parentId))
-                    .map(item => ({
-                      ...item,
-                      children: buildTree(items, item._id)
-                    }));
-                const result = buildTree(descendants, id);
-                // Ensure that the root node has a 'children' array even if it's empty
-                return result.length > 0 ? result : [];
-              }`,
-              args: ["$descendants", "$_id"],
-              lang: "js"
-            }
+        $unwind: {
+          path: "$children",
+          preserveNullAndEmptyArrays: true
+        },
+       
+      },
+      {
+        $sort: {
+          "children.level": 1
+        }
+      },
+      {
+        $group: {
+          _id: "$_id",
+          root: { $first: "$$ROOT" },
+          sortedDescendants: { $push: "$children" }
+        }
+      },
+      {
+        $replaceRoot: {
+          newRoot: {
+            $mergeObjects: ["$root", { children: "$sortedDescendants" }]
           }
-        }
-      },
-      {
-        $set: {
-          children: {
-            $cond: {
-              if: { $eq: [{ $size: "$children" }, 0] },
-              then: [],
-              else: "$children"
-            }
-          }
-        }
-      },
-      {
-        $project: {
-          descendants: 0
         }
       }
     ]
     
-    return repository.aggregate(pipeline).toArray()
+    const rootCategories = await repository.aggregate(pipeline).toArray() as any[]
+    return rootCategories.map(root => ({
+      ...root,
+      children: this.buildTree(root.children, root._id)
+    }));
   }
 
   async getChildrenCategories(_id: string) {
