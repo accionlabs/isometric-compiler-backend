@@ -1,8 +1,8 @@
 import { Inject, Service } from 'typedi';
 import { ShapeService } from '../services/shape.service';
 import { NextFunction, Request, Response } from 'express';
-import { Controller, Delete, Get, Post } from '../core'
-import { ValidShape } from '../validations/shape.validation';
+import { Controller, Delete, Get, Post, Put } from '../core'
+import { ShapeUpdateValidation, ValidShape } from '../validations/shape.validation';
 import { CategoryService } from '../services/categories.service';
 import { ObjectId } from 'mongodb';
 import { Shape } from '../entities/shape.entity';
@@ -79,6 +79,23 @@ export default class ShapeController {
       }
       await this.shapeService.delete(req.params.id);
       res.status(200).json({ message: 'Shape deleted successfully' });
+    } catch (e) {
+      next(e)
+    }
+
+  }
+
+  @Put('/:id', ShapeUpdateValidation, {
+    isAuthenticated: true,
+    authorizedRole: 'all'
+  },
+  Shape)
+  async updateShape(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const shapeId = req.params.id;
+      const { category, ...reqBody } = req.body;
+      const updatedShape = await this.shapeService.update(shapeId, { ...reqBody, category: new ObjectId(category) });
+      res.status(200).json(updatedShape);
     } catch (e) {
       next(e)
     }

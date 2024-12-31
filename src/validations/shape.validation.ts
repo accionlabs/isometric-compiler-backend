@@ -77,3 +77,48 @@ export class ValidShape {
   @IsOptional()
   author: string;  // Author of the shape
 }
+
+
+export class ShapeUpdateValidation {
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsString()
+  @IsOptional()
+  name: string;  // Shape name
+
+  @IsEnum(ShapeType)
+  @IsOptional()
+  type: ShapeType;  // Shape type (2D, 3D, COMPONENT)
+
+  @IsOptional()
+  @IsString()
+  attachTo?: string;  // Field to attach the shape to another entity or category
+
+  @IsOptional()
+  @IsString()
+  svgFile?: string;  // SVG file name or path (optional)
+
+  @IsString()
+  @IsOptional()
+  svgContent: string;  // if type is 2d and 3d its mandatory  for component SVG content as a string (mandatory)
+
+  @IsString()
+  @IsOptional()
+  version?: string;  // Version field (optional)
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => MetadataValidation)
+  metadata?: MetadataValidation;  // Metadata field with nested validation
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  tags: string[];  // Tags for the shape
+
+  @IsString()
+  @IsOptional()
+  author: string;  // Author of the shape
+}

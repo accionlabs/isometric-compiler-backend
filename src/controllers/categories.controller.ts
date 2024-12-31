@@ -89,7 +89,7 @@ export default class CategoriesController{
                 const catPath = await this.categoryService.getPathOnParentChange(categoryId, parent, name)
                 reqBody = { ...reqBody, path: catPath.path, ancestors: catPath.ancestors }
             }
-            const newShape = await this.categoryService.update(categoryId, { ...reqBody })
+            const newShape = await this.categoryService.update(categoryId, { ...reqBody, ...(parent && { parent: new ObjectId(parent) }) })
             res.status(201).json(newShape);
         } catch(e) {
             next(e)
