@@ -55,7 +55,11 @@ export class CategoryService extends BaseService<Category> {
         }
       },
       {
-        $unwind: "$allDescendants"
+        $unwind: {
+          path: "$allDescendants",
+          preserveNullAndEmptyArrays: true
+        },
+       
       },
       {
         $sort: {
@@ -82,7 +86,7 @@ export class CategoryService extends BaseService<Category> {
 
   async getCategoriesNested() {
     const repository = this.getRepository();
-    const pipeline = [
+    const pipeline =[
       {
         $match: {
           parent: null
@@ -109,10 +113,23 @@ export class CategoryService extends BaseService<Category> {
                       ...item,
                       children: buildTree(items, item._id)
                     }));
-                return buildTree(descendants, id);
+                const result = buildTree(descendants, id);
+                // Ensure that the root node has a 'children' array even if it's empty
+                return result.length > 0 ? result : [];
               }`,
               args: ["$descendants", "$_id"],
               lang: "js"
+            }
+          }
+        }
+      },
+      {
+        $set: {
+          children: {
+            $cond: {
+              if: { $eq: [{ $size: "$children" }, 0] },
+              then: [],
+              else: "$children"
             }
           }
         }
@@ -123,6 +140,7 @@ export class CategoryService extends BaseService<Category> {
         }
       }
     ]
+    
     return repository.aggregate(pipeline).toArray()
   }
 
