@@ -1,0 +1,448 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Shapes and Categories API",
+    "version": "1.0.0",
+    "description": "API documentation for managing categories and shapes."
+  },
+  "paths": {
+    "/categories/formated": {
+      "get": {
+        "summary": "Get all formatted categories",
+        "tags": [
+          "Categories"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of formatted categories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Category"
+                  },
+                  "example": [
+                    {
+                      "_id": "677280b9db9875cbb8a7d301",
+                      "createdAt": "2024-12-30T11:15:05.294Z",
+                      "updatedAt": "2024-12-30T11:15:05.294Z",
+                      "status": "active",
+                      "name": "default parent",
+                      "description": "new category for accion labs child",
+                      "parent": null,
+                      "path": "default parent",
+                      "metadata": null,
+                      "ancestors": [],
+                      "allDescendants": [
+                        {
+                          "_id": "6773a713db9875cbb8a7d302",
+                          "createdAt": "2024-12-31T08:10:59.911Z",
+                          "updatedAt": "2024-12-31T08:10:59.911Z",
+                          "status": "active",
+                          "name": "default parent",
+                          "description": "new category for accion labs child",
+                          "parent": "677280b9db9875cbb8a7d301",
+                          "path": "default parent/default parent",
+                          "metadata": null,
+                          "ancestors": [
+                            "677280b9db9875cbb8a7d301"
+                          ],
+                          "level": 0
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/categories": {
+      "post": {
+        "summary": "Create a new category",
+        "tags": [
+          "Categories"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Category"
+              },
+              "example": {
+                "name": "default parent",
+                "description": "new category for accion labs",
+                "parent": null
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Category created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/categories/{id}": {
+      "put": {
+        "summary": "Update a category by ID",
+        "tags": [
+          "Categories"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Category"
+              },
+              "example": {
+                "name": "default parent child v1",
+                "description": "new category for accion labs child",
+                "parent": "677280b9db9875cbb8a7d301",
+                "Metadata": {
+                  "displayOrder": "1",
+                  "icon": "default icon",
+                  "customProperties": {
+                    "name": "default parent",
+                    "value": "small"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Category updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shapes": {
+      "get": {
+        "summary": "Get all shapes",
+        "tags": [
+          "Shapes"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of shapes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Shape"
+                      },
+                      "description": "List of shapes"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "description": "Total number of shapes"
+                    }
+                  }
+                },
+                "example": {
+                  "data": [
+                    {
+                      "_id": "676e9af6c73809d1a6f04f02",
+                      "createdAt": "2024-12-27T12:17:58.424Z",
+                      "updatedAt": "2024-12-27T12:17:58.424Z",
+                      "status": "active",
+                      "name": "circle 2*2",
+                      "type": "2D",
+                      "attachTo": "categoryId latest",
+                      "svgFile": "my-shape.svg",
+                      "svgContent": "<svg>...</svg>",
+                      "version": "1.0.1",
+                      "category": "676e9af6c73809d1a6f04f02",
+                      "metadata": {
+                        "description": "A detailed description of the shape",
+                        "applicationTypes": [
+                          "website",
+                          "tab"
+                        ],
+                        "customProperties": {
+                          "name": "custom data"
+                        },
+                        "dependencies": [
+                          {
+                            "shapeId": "shapeId1",
+                            "version": "1.0.0"
+                          }
+                        ]
+                      },
+                      "tags": [
+                        "sayali",
+                        "nishat"
+                      ],
+                      "author": "authorId123"
+                    }
+                  ],
+                  "total": 1
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new shape",
+        "tags": [
+          "Shapes"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Shape"
+              },
+              "example": {
+                "name": "sayali latest",
+                "type": "2D",
+                "attachTo": "categoryId latest",
+                "svgFile": "my-shape.svg",
+                "svgContent": "<svg>...</svg>",
+                "version": "1.0.1",
+                "category": "676e9a0dc6b16c1303c76b7c",
+                "metadata": {
+                  "description": "A detailed description of the shape",
+                  "applicationTypes": [
+                    "website",
+                    "tab"
+                  ],
+                  "customProperties": {
+                    "name": "custom data"
+                  },
+                  "dependencies": [
+                    {
+                      "shapeId": "shapeId1",
+                      "version": "1.0.0"
+                    }
+                  ]
+                },
+                "tags": [
+                  "sayali",
+                  "nishat"
+                ],
+                "author": "authorId123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Shape created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Shape"
+                },
+                "example": {
+                  "_id": "676e9af6c73809d1a6f04f02",
+                  "createdAt": "2024-12-27T12:17:58.424Z",
+                  "updatedAt": "2024-12-27T12:17:58.424Z",
+                  "status": "active",
+                  "name": "sayali latest",
+                  "type": "2D",
+                  "attachTo": "categoryId latest",
+                  "svgFile": "my-shape.svg",
+                  "svgContent": "<svg>...</svg>",
+                  "version": "1.0.1",
+                  "category": "676e9a0dc6b16c1303c76b7c",
+                  "metadata": {
+                    "description": "A detailed description of the shape",
+                    "applicationTypes": [
+                      "website",
+                      "tab"
+                    ],
+                    "customProperties": {
+                      "name": "custom data"
+                    },
+                    "dependencies": [
+                      {
+                        "shapeId": "shapeId1",
+                        "version": "1.0.0"
+                      }
+                    ]
+                  },
+                  "tags": [
+                    "sayali",
+                    "nishat"
+                  ],
+                  "author": "authorId123"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Category": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "parent": {
+            "type": "string",
+            "description": "if parent id given then its a child, otherwise optional"
+          },
+          "path": {
+            "type": "string",
+            "description": "The computed path of the category. (Read-only)",
+            "readOnly": true
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "displayOrder": {
+                "type": "integer"
+              },
+              "icon": {
+                "type": "string"
+              },
+              "customProperties": {
+                "type": "object"
+              }
+            },
+            "description": "Additional metadata for the category. (Optional)"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": " (Read-only)",
+            "readOnly": true
+          }
+        }
+      },
+      "Shape": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the shape (required)"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "2D",
+              "3D",
+              "COMPONENT"
+            ],
+            "description": "The type of the shape (required). Can be 2D, 3D, or COMPONENT."
+          },
+          "attachTo": {
+            "type": "string",
+            "description": "An optional field to attach the shape to another entity or category (optional)."
+          },
+          "svgFile": {
+            "type": "string",
+            "description": "An optional SVG file name or path (optional)"
+          },
+          "svgContent": {
+            "type": "string",
+            "description": "The content of the SVG (required for 2D and 3D shapes). It is a string representation of the SVG content."
+          },
+          "version": {
+            "type": "string",
+            "default": "1.0.0",
+            "description": "The version of the shape (optional). This is useful to track different versions of the same shape."
+          },
+          "category": {
+            "type": "string",
+            "description": "A reference to the category to which the shape belongs (optional)."
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "description": {
+                "type": "string",
+                "description": "A detailed description of the shape (optional)."
+              },
+              "applicationTypes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Optional application types."
+              },
+              "customProperties": {
+                "type": "object",
+                "description": "Custom properties that allow for flexible, user-defined data (optional)."
+              },
+              "dependencies": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "shapeId": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Metadata for the shape, including description, application types, custom properties, and dependencies (optional)."
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "A list of tags associated with the shape, useful for categorization or filtering (optional)."
+          },
+          "author": {
+            "type": "string",
+            "description": "The author of the shape (required). This identifies who created the shape."
+          }
+        }
+      }
+    }
+  }
+}
