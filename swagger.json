@@ -563,7 +563,7 @@
                       { "shapeId": "shapeId1", "version": "1.0.0" }
                     ]
                   },
-                  "tags": ["sayali", "nishat"],
+                  "tags": ["accionConnect", "breeze"],
                   "author": "authorId123"
                 }
               }
@@ -640,7 +640,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ShapeUpdate"
+                "$ref": "#/components/schemas/Shape"
               },
               "example": {
                 "name": "Updated Shape",
