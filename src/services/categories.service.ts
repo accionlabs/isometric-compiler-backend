@@ -36,7 +36,7 @@ export class CategoryService extends BaseService<Category> {
     return this.getCategoryPath(parentId, name ?? existingCategory.name)
   }
 
-  async getCategoriesFlat() {
+  async  getCategoriesFlat() {
     const repository = this.getRepository();
     const pipeline = [
       {
