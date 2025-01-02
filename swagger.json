@@ -12,6 +12,19 @@
         "tags": [
           "Categories"
         ],
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "description": "Optional. Specifies the response format. By default, the response is formatted. Use 'nested' for a nested category structure.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["nested"]
+            },
+            "example": "nested"
+          }
+        ],
         "responses": {
           "200": {
             "description": "List of formatted categories",
@@ -907,9 +920,10 @@
             "enum": [
               "2D",
               "3D",
+              "Layers ",
               "COMPONENT"
             ],
-            "description": "The type of the shape (required). Can be 2D, 3D, or COMPONENT."
+            "description": "The type of the shape (required). Can be 2D, 3D, Layers, or COMPONENT."
           },
           "attachTo": {
             "type": "string",

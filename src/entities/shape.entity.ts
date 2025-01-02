@@ -9,6 +9,7 @@ export enum ShapeType {
   '2D' = '2D',
   '3D' = '3D',
   'COMPONENT' = 'COMPONENT',
+  "LAYERS" = 'LAYERS'
 }
 
 // Define DependencyRef class for dependencies
@@ -43,34 +44,34 @@ class Metadata {
 export class Shape extends BaseEntity {
 
   @Column({ type: 'string' })
-  name: string;  // Shape name
+  name: string;  
 
   @Column({ type: 'enum', enum: ShapeType })
-  type: ShapeType;  // Shape type (2D, 3D, COMPONENT)
+  type: ShapeType;  
 
   @Column({ type: 'string', nullable: true })
-  attachTo?: string;  // Field to attach the shape to another entity or category
+  attachTo?: string;  
 
   @Column({ nullable: true })
-  svgFile?: string;  // SVG file name or path (optional)
+  svgFile?: string;  
 
   @Column({})
-  svgContent: string;  // SVG content as a string (mandatory)
+  svgContent: string;  
 
   @Column({ default: '1.0.0', nullable: false })
-  version: string = '1.0.0';  // Version field (optional)
+  version: string = '1.0.0';  
 
   @IsMongoId()
   @Column({ type: 'string' })
-  category: ObjectId;  // Reference to Category (parent-child relation)
+  category: ObjectId;  
 
   @Column({type: 'json'})
-  metadata: Metadata;  // Metadata field with default empty object
+  metadata: Metadata;  
 
   @Column({ type: 'array' })
-  tags: string[];  // Tags for the shape
+  tags: string[];  
 
   @Column({ type: 'string' })
-  author: string;  // Author of the shape
+  author: string;  
 
 }
