@@ -920,10 +920,10 @@
             "enum": [
               "2D",
               "3D",
-              "Layers ",
+              "LAYERS ",
               "COMPONENT"
             ],
-            "description": "The type of the shape (required). Can be 2D, 3D, Layers, or COMPONENT."
+            "description": "The type of the shape (required). Can be 2D, 3D, LAYERS, or COMPONENT."
           },
           "attachTo": {
             "type": "string",
