@@ -6,7 +6,8 @@
     "description": "API documentation for managing categories and shapes."
   },
   "paths": {
-    "/categories/formated": {
+   
+    "/categories": {
       "get": {
         "summary": "Get all formatted categories",
         "tags": [
@@ -20,9 +21,10 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["nested"]
+              "enum": ["formatted", "nested"],
+              "default": "formatted"
             },
-            "example": "nested"
+            "example": "formatted"
           }
         ],
         "responses": {
@@ -71,9 +73,7 @@
             }
           }
         }
-      }
-    },
-    "/categories": {
+      },
       "post": {
         "summary": "Create a new category",
         "tags": [
@@ -372,6 +372,35 @@
         "summary": "Get all shapes",
         "tags": [
           "Shapes"
+        ],
+        "parameters": [
+          {
+            "name": "filters",
+            "in": "query",
+            "description": "Dynamic filters for querying shapes. Use dot notation to specify filters (e.g., `filters[field][$operator]=value`).",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "examples": {
+              "Example 1": {
+                "value": {
+                  "filters[name][$eq]": "MyShapeName4",
+                  "filters[type][$ne]": "3D",
+                  "filters[category][$in]": "676d21530b21683093603bdb"
+                }
+              },
+              "Example 2": {
+                "value": {
+                  "filters[author][$eq]": "authorId123",
+                  "filters[tags][$in]": "design"
+                }
+              }
+            }
+          }
         ],
         "responses": {
           "200": {
