@@ -70,11 +70,11 @@ export class ValidShape {
   author: string;  
 
   @IsOptional()
-  @IsJSON()
+  @IsObject()
   diagram_components?: Record<string, any>; 
 
   @IsOptional()
-  @IsJSON()
+  @IsObject()
   attachment_points?: Record<string, any>; 
 }
 
