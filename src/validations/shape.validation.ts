@@ -1,4 +1,4 @@
-import { IsString, IsEnum, IsOptional, IsArray, IsJSON, IsNotEmpty, ValidateNested, IsObject } from 'class-validator';
+import { IsString, IsEnum, IsOptional, IsArray, IsJSON, IsNotEmpty, ValidateNested, IsObject, isArray } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ShapeType } from '../entities/shape.entity';
 
@@ -70,12 +70,14 @@ export class ValidShape {
   author: string;  
 
   @IsOptional()
-  @IsObject()
-  diagram_components?: Record<string, any>; 
+  @IsArray()
+  @IsObject({ each: true })
+  diagram_components?:  Record<string, any>[]; 
 
   @IsOptional()
-  @IsObject()
-  attachment_points?: Record<string, any>; 
+  @IsArray()
+  @IsObject({ each: true })
+  attachment_points?: Record<string, any>[];
 }
 
 
@@ -123,10 +125,12 @@ export class ShapeUpdateValidation {
   author: string;  
 
   @IsOptional()
-  @IsJSON()
-  diagram_components?: Record<string, any>; 
+  @IsArray()
+  @IsObject({ each: true })
+  diagram_components?:  Record<string, any>[]; 
 
   @IsOptional()
-  @IsJSON()
-  attachment_points?: Record<string, any>;
+  @IsArray()
+  @IsObject({ each: true })
+  attachment_points?: Record<string, any>[];
 }
