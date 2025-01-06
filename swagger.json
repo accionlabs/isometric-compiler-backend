@@ -6,11 +6,28 @@
     "description": "API documentation for managing categories and shapes."
   },
   "paths": {
-    "/categories/formated": {
+    "/categories": {
       "get": {
         "summary": "Get all formatted categories",
         "tags": [
           "Categories"
+        ],
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "description": "Optional. Specifies the response format. By default, the response is formatted. Use 'nested' for a nested category structure.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "formatted",
+                "nested"
+              ],
+              "default": "formatted"
+            },
+            "example": "formatted"
+          }
         ],
         "responses": {
           "200": {
@@ -58,9 +75,7 @@
             }
           }
         }
-      }
-    },
-    "/categories": {
+      },
       "post": {
         "summary": "Create a new category",
         "tags": [
@@ -146,6 +161,214 @@
             }
           }
         }
+      },
+      "get": {
+        "summary": "Get category by ID",
+        "description": "Retrieve a specific category by its unique ID.",
+        "tags": [
+          "Categories"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the category",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "12345abcde"
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "Category Name"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Detailed description of the category"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "example": "2024-12-31T12:00:00Z"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "example": "2024-12-31T12:00:00Z"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Category not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Category not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid ID format"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Something went wrong"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a category by ID",
+        "description": "Deletes a category based on the provided ID. The ID must be a valid ObjectId.",
+        "tags": [
+          "Categories"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the category to delete",
+            "schema": {
+              "type": "string",
+              "example": "64b2bfe47f3f1a7bfa2d1234"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category successfully deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Category deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid ID format"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Category not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Category not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Something went wrong"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/shapes": {
@@ -153,6 +376,35 @@
         "summary": "Get all shapes",
         "tags": [
           "Shapes"
+        ],
+        "parameters": [
+          {
+            "name": "filters",
+            "in": "query",
+            "description": "Dynamic filters for querying shapes. Use dot notation to specify filters (e.g., `filters[field][$operator]=value`).The following fields are supported for filtering:\n\n **`name`**, **`type`**, **`author`**, **`tags`**, **`category`**, **`version`**",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "examples": {
+              "Example 1": {
+                "value": {
+                  "filters[name][$eq]": "MyShapeName4",
+                  "filters[type][$ne]": "3D",
+                  "filters[category][$in]": "676d21530b21683093603bdb"
+                }
+              },
+              "Example 2": {
+                "value": {
+                  "filters[author][$eq]": "authorId123",
+                  "filters[tags][$in]": "design"
+                }
+              }
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -206,10 +458,12 @@
                         ]
                       },
                       "tags": [
-                        "sayali",
-                        "nishat"
+                        "2d layer",
+                        "component specific"
                       ],
-                      "author": "authorId123"
+                      "author": "authorId123",
+                      "diagram_components": "[{\"componentId\": \"component1\", \"type\": \"visual\", \"position\": \"top-left\"}]",
+                      "attachment_points": "[{\"pointId\": \"point1\", \"coordinates\": [10, 20], \"type\": \"connection\"}]"
                     }
                   ],
                   "total": 1
@@ -232,7 +486,7 @@
                 "$ref": "#/components/schemas/Shape"
               },
               "example": {
-                "name": "sayali latest",
+                "name": "layer shape",
                 "type": "2D",
                 "attachTo": "categoryId latest",
                 "svgFile": "my-shape.svg",
@@ -256,10 +510,12 @@
                   ]
                 },
                 "tags": [
-                  "sayali",
-                  "nishat"
+                  "2d layer",
+                  "component specific"
                 ],
-                "author": "authorId123"
+                "author": "authorId123",
+                "diagram_components": "[{\"componentId\": \"component1\", \"type\": \"visual\", \"position\": \"center\"}]",
+                "attachment_points": "[{\"pointId\": \"point1\", \"coordinates\": [30, 40], \"type\": \"attachment\"}]"
               }
             }
           }
@@ -277,7 +533,7 @@
                   "createdAt": "2024-12-27T12:17:58.424Z",
                   "updatedAt": "2024-12-27T12:17:58.424Z",
                   "status": "active",
-                  "name": "sayali latest",
+                  "name": "2d layer latest",
                   "type": "2D",
                   "attachTo": "categoryId latest",
                   "svgFile": "my-shape.svg",
@@ -301,10 +557,386 @@
                     ]
                   },
                   "tags": [
-                    "sayali",
-                    "nishat"
+                    "2d layer",
+                    "component specific"
                   ],
-                  "author": "authorId123"
+                  "author": "authorId123",
+                  "diagram_components": "[{\"componentId\": \"component1\", \"type\": \"visual\", \"position\": \"center\"}]",
+                  "attachment_points": "[{\"pointId\": \"point1\", \"coordinates\": [30, 40], \"type\": \"attachment\"}]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shapes/{id}": {
+      "get": {
+        "summary": "Get a shape by ID",
+        "description": "Retrieves a shape's details based on the provided ID. The ID must be a valid ObjectId.",
+        "tags": [
+          "Shapes"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the shape to retrieve",
+            "schema": {
+              "type": "string",
+              "example": "64b2bfe47f3f1a7bfa2d1234"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Shape retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Shape"
+                },
+                "example": {
+                  "_id": "64b2bfe47f3f1a7bfa2d1234",
+                  "createdAt": "2024-12-27T12:17:58.424Z",
+                  "updatedAt": "2024-12-27T12:17:58.424Z",
+                  "status": "active",
+                  "name": "circle 2*2",
+                  "type": "2D",
+                  "attachTo": "categoryId latest",
+                  "svgFile": "my-shape.svg",
+                  "svgContent": "<svg>...</svg>",
+                  "version": "1.0.1",
+                  "category": "676e9af6c73809d1a6f04f02",
+                  "metadata": {
+                    "description": "A detailed description of the shape",
+                    "applicationTypes": [
+                      "website",
+                      "tab"
+                    ],
+                    "customProperties": {
+                      "name": "custom data"
+                    },
+                    "dependencies": [
+                      {
+                        "shapeId": "shapeId1",
+                        "version": "1.0.0"
+                      }
+                    ]
+                  },
+                  "tags": [
+                    "accionConnect",
+                    "breeze"
+                  ],
+                  "author": "authorId123",
+                  "diagram_components": "[{\"componentId\": \"comp1\", \"name\": \"Circle Component\", \"position\": {\"x\": 10, \"y\": 20}}]",
+                  "attachment_points": "[{\"pointId\": \"att1\", \"name\": \"Attachment Point A\", \"coordinates\": {\"x\": 15, \"y\": 25}}]"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid ID format"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Shape not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Shape not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Something went wrong"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a shape by ID",
+        "description": "Updates the details of an existing shape using its ID. The ID must be a valid ObjectId.",
+        "tags": [
+          "Shapes"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the shape to update",
+            "schema": {
+              "type": "string",
+              "example": "64b2bfe47f3f1a7bfa2d1234"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Shape"
+              },
+              "example": {
+                "name": "Updated Shape",
+                "type": "3D",
+                "attachTo": "updatedCategoryId",
+                "svgFile": "updated-shape.svg",
+                "svgContent": "<svg>Updated content</svg>",
+                "version": "2.0.0",
+                "category": "676e9af6c73809d1a6f04f02",
+                "metadata": {
+                  "description": "An updated description of the shape",
+                  "applicationTypes": [
+                    "mobile",
+                    "tablet"
+                  ],
+                  "customProperties": {
+                    "updatedProperty": "updated value"
+                  },
+                  "dependencies": [
+                    {
+                      "shapeId": "updatedShapeId1",
+                      "version": "2.0.0"
+                    }
+                  ]
+                },
+                "tags": [
+                  "updatedTag1",
+                  "updatedTag2"
+                ],
+                "author": "updatedAuthorId",
+                "diagram_components": "[{\"componentId\": \"comp1\", \"name\": \"Updated Component\", \"position\": {\"x\": 15, \"y\": 30}}]",
+                "attachment_points": "[{\"pointId\": \"att2\", \"name\": \"Updated Attachment Point\", \"coordinates\": {\"x\": 20, \"y\": 35}}]"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Shape updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Shape"
+                },
+                "example": {
+                  "_id": "64b2bfe47f3f1a7bfa2d1234",
+                  "createdAt": "2024-12-27T12:17:58.424Z",
+                  "updatedAt": "2024-12-31T13:00:00.000Z",
+                  "status": "active",
+                  "name": "Updated Shape",
+                  "type": "3D",
+                  "attachTo": "updatedCategoryId",
+                  "svgFile": "updated-shape.svg",
+                  "svgContent": "<svg>Updated content</svg>",
+                  "version": "2.0.0",
+                  "category": "676e9af6c73809d1a6f04f02",
+                  "metadata": {
+                    "description": "An updated description of the shape",
+                    "applicationTypes": [
+                      "mobile",
+                      "tablet"
+                    ],
+                    "customProperties": {
+                      "updatedProperty": "updated value"
+                    },
+                    "dependencies": [
+                      {
+                        "shapeId": "updatedShapeId1",
+                        "version": "2.0.0"
+                      }
+                    ]
+                  },
+                  "tags": [
+                    "updatedTag1",
+                    "updatedTag2"
+                  ],
+                  "author": "updatedAuthorId",
+                  "diagram_components": "[{\"componentId\": \"comp1\", \"name\": \"Updated Component\", \"position\": {\"x\": 15, \"y\": 30}}]",
+                  "attachment_points": "[{\"pointId\": \"att2\", \"name\": \"Updated Attachment Point\", \"coordinates\": {\"x\": 20, \"y\": 35}}]"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or ID format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid ID format or request body"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Shape not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Shape not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Something went wrong"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a shape",
+        "description": "Delete a specific shape by its ID.",
+        "tags": [
+          "Shapes"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the shape to delete",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Shape deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Shape deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Shape not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Shape not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid ID format"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Something went wrong"
+                    }
+                  }
                 }
               }
             }
@@ -370,9 +1002,10 @@
             "enum": [
               "2D",
               "3D",
+              "LAYERS ",
               "COMPONENT"
             ],
-            "description": "The type of the shape (required). Can be 2D, 3D, or COMPONENT."
+            "description": "The type of the shape (required). Can be 2D, 3D, LAYERS, or COMPONENT."
           },
           "attachTo": {
             "type": "string",
@@ -440,7 +1073,9 @@
           "author": {
             "type": "string",
             "description": "The author of the shape (required). This identifies who created the shape."
-          }
+          },
+          "diagram_components": "[{\"componentId\": \"component1\", \"type\": \"visual\", \"position\": \"top-right\"}]",
+          "attachment_points": "[{\"pointId\": \"point1\", \"coordinates\": [50, 60], \"type\": \"connection\"}]"
         }
       }
     }

@@ -63,7 +63,7 @@ export class CategoryService extends BaseService<Category> {
           path: "$allDescendants",
           preserveNullAndEmptyArrays: true
         },
-       
+
       },
       {
         $sort: {
@@ -74,19 +74,35 @@ export class CategoryService extends BaseService<Category> {
         $group: {
           _id: "$_id",
           root: { $first: "$$ROOT" },
-          sortedDescendants: { $push: "$allDescendants" }
-        }
+          sortedDescendants: { $push: "$allDescendants" },
+        },
+      },
+      {
+        $addFields: {
+         
+          totalCount: {
+            $add: [
+              { $size: "$sortedDescendants" },
+              1,
+            ],
+          },
+        },
       },
       {
         $replaceRoot: {
           newRoot: {
-            $mergeObjects: ["$root", { allDescendants: "$sortedDescendants" }]
-          }
-        }
-      }
-    ]
-    return repository.aggregate(pipeline).toArray()
-  }
+            $mergeObjects: [
+              "$root", // Keep root category fields
+              { allDescendants: "$sortedDescendants" }, // Include all descendants
+              { count: "$totalCount" }, // Add the total count
+            ],
+          },
+        },
+      },
+    ];
+  
+    return repository.aggregate(pipeline).toArray();
+  }  
 
   private buildTree(categories: Category[], parentId: ObjectId | null = null): Category[] {
     return categories
@@ -119,8 +135,7 @@ export class CategoryService extends BaseService<Category> {
         $unwind: {
           path: "$children",
           preserveNullAndEmptyArrays: true
-        },
-       
+        }
       },
       {
         $sort: {
@@ -135,13 +150,42 @@ export class CategoryService extends BaseService<Category> {
         }
       },
       {
+        $addFields: {
+          "root.children": {
+            $map: {
+              input: "$sortedDescendants",
+              as: "child",
+              in: {
+                $mergeObjects: [
+                  "$$child",
+                  {
+                    totalChildrenCount: {
+                      $size: {
+                        $filter: {
+                          input: "$sortedDescendants",
+                          as: "descendant",
+                          cond: { $eq: ["$$descendant.parent", "$$child._id"] }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "root.totalChildrenCount": {
+            $size: "$sortedDescendants"
+          }
+        }
+      },
+      {
         $replaceRoot: {
           newRoot: {
-            $mergeObjects: ["$root", { children: "$sortedDescendants" }]
+            $mergeObjects: ["$root", { children: "$root.children" }]
           }
         }
       }
-    ]
+    ];
     
     const rootCategories = await repository.aggregate(pipeline).toArray() as any[]
     return rootCategories.map(root => ({
@@ -168,7 +212,7 @@ export class CategoryService extends BaseService<Category> {
     }]
     type CategoryEtention = Category & { children: Category[] }
     const result = await repository.aggregate(pipeline).toArray() as CategoryEtention[]
-    return result[0].children
+    return result[0]?.children || []
   }
 
   async search(

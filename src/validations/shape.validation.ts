@@ -2,29 +2,21 @@ import { IsString, IsEnum, IsOptional, IsArray, IsJSON, IsNotEmpty, ValidateNest
 import { Type } from 'class-transformer';
 import { ShapeType } from '../entities/shape.entity';
 
-// Define DependencyRef class for validating dependencies
-export class DependencyRefValidation {
-  @IsString()
-  shapeId: string;  // Reference to the dependent shape's ID
-
-  @IsString()
-  version: string;  // Version of the dependent shape or component
-}
 
 // Define Metadata validation class
 export class MetadataValidation {
   @IsString()
   @IsOptional()
-  description: string;  // Description of the shape
+  description: string;  
 
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  applicationTypes?: string[];  // Optional application types
+  applicationTypes?: string[];  
 
   @IsOptional()
   @IsObject()
-  customProperties?: Record<string, any>;  // Custom properties (flexible)
+  customProperties?: Record<string, any>;  
 
   @IsOptional()
   @ValidateNested({ each: true })
@@ -42,40 +34,48 @@ export class ValidShape {
 
   @IsString()
   @IsNotEmpty()
-  name: string;  // Shape name
+  name: string;  
 
   @IsEnum(ShapeType)
-  type: ShapeType;  // Shape type (2D, 3D, COMPONENT)
+  type: ShapeType;  
 
   @IsOptional()
   @IsString()
-  attachTo?: string;  // Field to attach the shape to another entity or category
+  attachTo?: string;  
 
   @IsOptional()
   @IsString()
-  svgFile?: string;  // SVG file name or path (optional)
+  svgFile?: string;  
 
   @IsString()
   @IsOptional()
-  svgContent: string;  // if type is 2d and 3d its mandatory  for component SVG content as a string (mandatory)
+  svgContent: string;  
 
   @IsString()
   @IsOptional()
-  version?: string;  // Version field (optional)
+  version?: string;  
 
   @IsOptional()
   @ValidateNested()
   @Type(() => MetadataValidation)
-  metadata?: MetadataValidation;  // Metadata field with nested validation
+  metadata?: MetadataValidation;  
 
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
-  tags: string[];  // Tags for the shape
+  tags: string[];  
 
   @IsString()
   @IsOptional()
-  author: string;  // Author of the shape
+  author: string;  
+
+  @IsOptional()
+  @IsJSON()
+  diagram_components?: Record<string, any>; 
+
+  @IsOptional()
+  @IsJSON()
+  attachment_points?: Record<string, any>; 
 }
 
 
@@ -86,39 +86,47 @@ export class ShapeUpdateValidation {
 
   @IsString()
   @IsOptional()
-  name: string;  // Shape name
+  name: string;  
 
   @IsEnum(ShapeType)
   @IsOptional()
-  type: ShapeType;  // Shape type (2D, 3D, COMPONENT)
+  type: ShapeType;  
 
   @IsOptional()
   @IsString()
-  attachTo?: string;  // Field to attach the shape to another entity or category
+  attachTo?: string;  
 
   @IsOptional()
   @IsString()
-  svgFile?: string;  // SVG file name or path (optional)
+  svgFile?: string;  
 
   @IsString()
   @IsOptional()
-  svgContent: string;  // if type is 2d and 3d its mandatory  for component SVG content as a string (mandatory)
+  svgContent: string;  
 
   @IsString()
   @IsOptional()
-  version?: string;  // Version field (optional)
+  version?: string;  
 
   @IsOptional()
   @ValidateNested()
   @Type(() => MetadataValidation)
-  metadata?: MetadataValidation;  // Metadata field with nested validation
+  metadata?: MetadataValidation;  
 
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
-  tags: string[];  // Tags for the shape
+  tags: string[];  
 
   @IsString()
   @IsOptional()
-  author: string;  // Author of the shape
+  author: string;  
+
+  @IsOptional()
+  @IsJSON()
+  diagram_components?: Record<string, any>; 
+
+  @IsOptional()
+  @IsJSON()
+  attachment_points?: Record<string, any>;
 }
