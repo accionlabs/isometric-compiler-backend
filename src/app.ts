@@ -8,13 +8,14 @@ import { LoggerService } from "./services/logger.service";
 import morganLogger from 'morgan'
 import swaggerUi from 'swagger-ui-express';
 import path from 'path'
+import cors from "cors";
 
 // import './dbconnection'
 
 const app = express()
 
 app.use(morganLogger('dev'));
-
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
