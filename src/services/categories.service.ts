@@ -4,11 +4,15 @@ import { AppDataSource } from '../configs/database';
 import { Category } from '../entities/categories.entity';
 import { ObjectId } from 'mongodb'
 import ApiError from '../utils/apiError';
+import { FindOptionsWhere } from 'typeorm';
 
 @Service()
 export class CategoryService extends BaseService<Category> {
   constructor() {
     super(AppDataSource.getMongoRepository(Category));
+    setTimeout(() => { 
+      this.getRepository().createCollectionIndex({ path: 'text' });
+    }, 10000);
   }
   
 
@@ -166,4 +170,20 @@ export class CategoryService extends BaseService<Category> {
     const result = await repository.aggregate(pipeline).toArray() as CategoryEtention[]
     return result[0].children
   }
+
+  async search(
+      text: string, 
+      { filters = {}, limit = 1000, page = 1 }: {
+      filters?: FindOptionsWhere<Category> | FindOptionsWhere<Category>[] | undefined, 
+      limit?: number, 
+      page?: number}
+    ): Promise<Category[]> {
+      const skip = (page - 1) * limit;
+      const repository = this.getRepository();
+      return repository.find({
+          where: { $or: [ filters, { $text: { $search: text } } ] },
+          skip,
+          take: limit
+        })
+    }
 }

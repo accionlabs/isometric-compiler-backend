@@ -138,4 +138,26 @@ export default class ShapeController {
         next(e)
     }
   }
+
+  @Get('/search/:text', {
+    isAuthenticated: true,
+    authorizedRole: 'all'
+  },
+  { data: Array<Shape>,
+    total: Number})
+  async searchShapes(req: Request, res: Response, next: NextFunction): Promise<void> {  
+    try {
+      const { text } = req.params;
+      const { page = 1, limit = 10 } = req.query;
+      
+      const allowedFields: (keyof Shape)[] = ['name', 'type', 'author', 'tags', 'category', 'version'];
+
+      const filters = FilterUtils.buildMongoFilters<Shape>(req.query, allowedFields);
+
+      const { data, total } = await this.shapeService.search(text as string, {  filters, limit: parseInt(limit as string, 10), page: parseInt(page as string, 10) });
+      res.status(200).json({ data, total });
+    } catch (e) {
+      next(e)
+    }
+  }
 }

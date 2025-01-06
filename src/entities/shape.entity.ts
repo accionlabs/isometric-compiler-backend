@@ -60,6 +60,7 @@ export class Shape extends BaseEntity {
   @Column({ default: '1.0.0', nullable: false })
   version: string = '1.0.0';  // Version field (optional)
 
+  @Index()
   @IsMongoId()
   @Column({ type: 'string' })
   category: ObjectId;  // Reference to Category (parent-child relation)
