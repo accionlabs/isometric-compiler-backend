@@ -74,4 +74,10 @@ export class Shape extends BaseEntity {
   @Column({ type: 'string' })
   author: string;  
 
+  @Column({ type: 'json', nullable: true })
+  diagram_components?: Record<string, any>; 
+
+  @Column({ type: 'json', nullable: true })
+  attachment_points?: Record<string, any>; 
+
 }

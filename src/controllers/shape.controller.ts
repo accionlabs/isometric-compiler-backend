@@ -127,6 +127,10 @@ export default class ShapeController {
   async getShapesByCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
         const { categoryId } = req.params;
+        if(!ObjectId.isValid(categoryId)){
+          throw new ApiError("incorrect category ID", 404)
+        }
+
         const childCategories = await this.categoryService.getChildrenCategories(categoryId)
         const categoriesTobeSearched: ObjectId[] = [new ObjectId(categoryId)]
         childCategories.forEach(chCategory => categoriesTobeSearched.push(chCategory._id))

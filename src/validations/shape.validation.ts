@@ -68,6 +68,14 @@ export class ValidShape {
   @IsString()
   @IsOptional()
   author: string;  
+
+  @IsOptional()
+  @IsJSON()
+  diagram_components?: Record<string, any>; 
+
+  @IsOptional()
+  @IsJSON()
+  attachment_points?: Record<string, any>; 
 }
 
 
@@ -113,4 +121,12 @@ export class ShapeUpdateValidation {
   @IsString()
   @IsOptional()
   author: string;  
+
+  @IsOptional()
+  @IsJSON()
+  diagram_components?: Record<string, any>; 
+
+  @IsOptional()
+  @IsJSON()
+  attachment_points?: Record<string, any>;
 }

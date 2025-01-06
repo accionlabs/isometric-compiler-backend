@@ -6,7 +6,6 @@
     "description": "API documentation for managing categories and shapes."
   },
   "paths": {
-   
     "/categories": {
       "get": {
         "summary": "Get all formatted categories",
@@ -21,7 +20,10 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["formatted", "nested"],
+              "enum": [
+                "formatted",
+                "nested"
+              ],
               "default": "formatted"
             },
             "example": "formatted"
@@ -286,7 +288,9 @@
       "delete": {
         "summary": "Delete a category by ID",
         "description": "Deletes a category based on the provided ID. The ID must be a valid ObjectId.",
-        "tags": ["Categories"],
+        "tags": [
+          "Categories"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -377,7 +381,7 @@
           {
             "name": "filters",
             "in": "query",
-            "description": "Dynamic filters for querying shapes. Use dot notation to specify filters (e.g., `filters[field][$operator]=value`).",
+            "description": "Dynamic filters for querying shapes. Use dot notation to specify filters (e.g., `filters[field][$operator]=value`).The following fields are supported for filtering:\n\n **`name`**, **`type`**, **`author`**, **`tags`**, **`category`**, **`version`**",
             "required": false,
             "schema": {
               "type": "object",
@@ -457,7 +461,9 @@
                         "2d layer",
                         "component specific"
                       ],
-                      "author": "authorId123"
+                      "author": "authorId123",
+                      "diagram_components": "[{\"componentId\": \"component1\", \"type\": \"visual\", \"position\": \"top-left\"}]",
+                      "attachment_points": "[{\"pointId\": \"point1\", \"coordinates\": [10, 20], \"type\": \"connection\"}]"
                     }
                   ],
                   "total": 1
@@ -507,7 +513,9 @@
                   "2d layer",
                   "component specific"
                 ],
-                "author": "authorId123"
+                "author": "authorId123",
+                "diagram_components": "[{\"componentId\": \"component1\", \"type\": \"visual\", \"position\": \"center\"}]",
+                "attachment_points": "[{\"pointId\": \"point1\", \"coordinates\": [30, 40], \"type\": \"attachment\"}]"
               }
             }
           }
@@ -552,7 +560,9 @@
                     "2d layer",
                     "component specific"
                   ],
-                  "author": "authorId123"
+                  "author": "authorId123",
+                  "diagram_components": "[{\"componentId\": \"component1\", \"type\": \"visual\", \"position\": \"center\"}]",
+                  "attachment_points": "[{\"pointId\": \"point1\", \"coordinates\": [30, 40], \"type\": \"attachment\"}]"
                 }
               }
             }
@@ -564,7 +574,9 @@
       "get": {
         "summary": "Get a shape by ID",
         "description": "Retrieves a shape's details based on the provided ID. The ID must be a valid ObjectId.",
-        "tags": ["Shapes"],
+        "tags": [
+          "Shapes"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -599,14 +611,27 @@
                   "category": "676e9af6c73809d1a6f04f02",
                   "metadata": {
                     "description": "A detailed description of the shape",
-                    "applicationTypes": ["website", "tab"],
-                    "customProperties": { "name": "custom data" },
+                    "applicationTypes": [
+                      "website",
+                      "tab"
+                    ],
+                    "customProperties": {
+                      "name": "custom data"
+                    },
                     "dependencies": [
-                      { "shapeId": "shapeId1", "version": "1.0.0" }
+                      {
+                        "shapeId": "shapeId1",
+                        "version": "1.0.0"
+                      }
                     ]
                   },
-                  "tags": ["accionConnect", "breeze"],
-                  "author": "authorId123"
+                  "tags": [
+                    "accionConnect",
+                    "breeze"
+                  ],
+                  "author": "authorId123",
+                  "diagram_components": "[{\"componentId\": \"comp1\", \"name\": \"Circle Component\", \"position\": {\"x\": 10, \"y\": 20}}]",
+                  "attachment_points": "[{\"pointId\": \"att1\", \"name\": \"Attachment Point A\", \"coordinates\": {\"x\": 15, \"y\": 25}}]"
                 }
               }
             }
@@ -664,7 +689,9 @@
       "put": {
         "summary": "Update a shape by ID",
         "description": "Updates the details of an existing shape using its ID. The ID must be a valid ObjectId.",
-        "tags": ["Shapes"],
+        "tags": [
+          "Shapes"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -694,14 +721,27 @@
                 "category": "676e9af6c73809d1a6f04f02",
                 "metadata": {
                   "description": "An updated description of the shape",
-                  "applicationTypes": ["mobile", "tablet"],
-                  "customProperties": { "updatedProperty": "updated value" },
+                  "applicationTypes": [
+                    "mobile",
+                    "tablet"
+                  ],
+                  "customProperties": {
+                    "updatedProperty": "updated value"
+                  },
                   "dependencies": [
-                    { "shapeId": "updatedShapeId1", "version": "2.0.0" }
+                    {
+                      "shapeId": "updatedShapeId1",
+                      "version": "2.0.0"
+                    }
                   ]
                 },
-                "tags": ["updatedTag1", "updatedTag2"],
-                "author": "updatedAuthorId"
+                "tags": [
+                  "updatedTag1",
+                  "updatedTag2"
+                ],
+                "author": "updatedAuthorId",
+                "diagram_components": "[{\"componentId\": \"comp1\", \"name\": \"Updated Component\", \"position\": {\"x\": 15, \"y\": 30}}]",
+                "attachment_points": "[{\"pointId\": \"att2\", \"name\": \"Updated Attachment Point\", \"coordinates\": {\"x\": 20, \"y\": 35}}]"
               }
             }
           }
@@ -728,14 +768,27 @@
                   "category": "676e9af6c73809d1a6f04f02",
                   "metadata": {
                     "description": "An updated description of the shape",
-                    "applicationTypes": ["mobile", "tablet"],
-                    "customProperties": { "updatedProperty": "updated value" },
+                    "applicationTypes": [
+                      "mobile",
+                      "tablet"
+                    ],
+                    "customProperties": {
+                      "updatedProperty": "updated value"
+                    },
                     "dependencies": [
-                      { "shapeId": "updatedShapeId1", "version": "2.0.0" }
+                      {
+                        "shapeId": "updatedShapeId1",
+                        "version": "2.0.0"
+                      }
                     ]
                   },
-                  "tags": ["updatedTag1", "updatedTag2"],
-                  "author": "updatedAuthorId"
+                  "tags": [
+                    "updatedTag1",
+                    "updatedTag2"
+                  ],
+                  "author": "updatedAuthorId",
+                  "diagram_components": "[{\"componentId\": \"comp1\", \"name\": \"Updated Component\", \"position\": {\"x\": 15, \"y\": 30}}]",
+                  "attachment_points": "[{\"pointId\": \"att2\", \"name\": \"Updated Attachment Point\", \"coordinates\": {\"x\": 20, \"y\": 35}}]"
                 }
               }
             }
@@ -1020,7 +1073,9 @@
           "author": {
             "type": "string",
             "description": "The author of the shape (required). This identifies who created the shape."
-          }
+          },
+          "diagram_components": "[{\"componentId\": \"component1\", \"type\": \"visual\", \"position\": \"top-right\"}]",
+          "attachment_points": "[{\"pointId\": \"point1\", \"coordinates\": [50, 60], \"type\": \"connection\"}]"
         }
       }
     }
