@@ -25,6 +25,11 @@ export abstract class BaseService<T extends ObjectLiteral> {
     return { data, total };
   }
 
+
+  async getCount(filters: FindOptionsWhere<T>): Promise<number> { 
+    return this.repository.countDocuments(filters);
+   }
+
   async findAll(): Promise<T[]> {
     return this.repository.find({});
   }
@@ -85,5 +90,15 @@ export abstract class BaseService<T extends ObjectLiteral> {
   async delete(id: string): Promise<boolean> {
     const result = await this.repository.delete(id);
     return result?.affected ? result.affected > 0 : false;
+  }
+
+  async deleteMany(query: ObjectLiteral): Promise<number> {
+    const result = await this.repository.deleteMany(query);
+    return result?.deletedCount || 0;
+  }
+
+  async updateMany(query: ObjectLiteral, data: DeepPartial<T>): Promise<number> {
+    const result = await this.repository.updateMany(query, { $set: data }); 
+    return result?.modifiedCount || 0;
   }
 }

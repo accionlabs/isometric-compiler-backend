@@ -6,6 +6,7 @@ import { NextFunction, Request, Response } from 'express';
 import { ObjectId } from "mongodb";
 import { Category } from "../entities/categories.entity";
 import ApiError from "../utils/apiError";
+import { ShapeService } from "../services/shape.service";
 
 
 @Service()
@@ -13,6 +14,9 @@ import ApiError from "../utils/apiError";
 export default class CategoriesController {
     @Inject(() => CategoryService)
     private readonly categoryService: CategoryService
+
+    @Inject(() => ShapeService)
+    private readonly shapeService: ShapeService
 
 
     @Post('/', CategoryValidation, {
@@ -45,9 +49,21 @@ export default class CategoriesController {
         {})
     async deleteCategoryById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+            const { categoryIdForExistingShapes } = req.query
+
             const category = await this.categoryService.findOneById(req.params.id);
             if (!category) {
                 throw new ApiError('Category not found', 404)
+            }
+
+            const shapesCountInCategory = await this.shapeService.getCount({ category: new ObjectId(req.params.id) })
+
+            if(shapesCountInCategory > 0) { 
+                const categoryForShapes = await this.categoryService.findOneById(categoryIdForExistingShapes as string)
+                if (!categoryForShapes) {
+                    throw new ApiError('Shape Category not found', 404)
+                }
+                await this.shapeService.updateMany({ category: new ObjectId(req.params.id) }, { category: new ObjectId(categoryIdForExistingShapes as string) })
             }
             await this.categoryService.delete(req.params.id);
             res.status(200).json({ message: 'Category deleted successfully' });
