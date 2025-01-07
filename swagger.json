@@ -462,8 +462,21 @@
                         "component specific"
                       ],
                       "author": "authorId123",
-                      "diagram_components": "[{\"componentId\": \"component1\", \"type\": \"visual\", \"position\": \"top-left\"}]",
-                      "attachment_points": "[{\"pointId\": \"point1\", \"coordinates\": [10, 20], \"type\": \"connection\"}]"
+                      "diagram_components": {
+                        "component1": {
+                          "type": "visual",
+                          "position": "top-left"
+                        }
+                      },
+                      "attachment_points": {
+                        "point1": {
+                          "coordinates": [
+                            10,
+                            20
+                          ],
+                          "type": "connection"
+                        }
+                      }
                     }
                   ],
                   "total": 1
@@ -514,8 +527,21 @@
                   "component specific"
                 ],
                 "author": "authorId123",
-                "diagram_components": "[{\"componentId\": \"component1\", \"type\": \"visual\", \"position\": \"center\"}]",
-                "attachment_points": "[{\"pointId\": \"point1\", \"coordinates\": [30, 40], \"type\": \"attachment\"}]"
+                "diagram_components": {
+                  "component1": {
+                    "type": "visual",
+                    "position": "top-left"
+                  }
+                },
+                "attachment_points": {
+                  "point1": {
+                    "coordinates": [
+                      10,
+                      20
+                    ],
+                    "type": "connection"
+                  }
+                }
               }
             }
           }
@@ -561,8 +587,21 @@
                     "component specific"
                   ],
                   "author": "authorId123",
-                  "diagram_components": "[{\"componentId\": \"component1\", \"type\": \"visual\", \"position\": \"center\"}]",
-                  "attachment_points": "[{\"pointId\": \"point1\", \"coordinates\": [30, 40], \"type\": \"attachment\"}]"
+                  "diagram_components": {
+                    "component1": {
+                      "type": "visual",
+                      "position": "top-left"
+                    }
+                  },
+                  "attachment_points": {
+                    "point1": {
+                      "coordinates": [
+                        10,
+                        20
+                      ],
+                      "type": "connection"
+                    }
+                  }
                 }
               }
             }
@@ -630,8 +669,21 @@
                     "breeze"
                   ],
                   "author": "authorId123",
-                  "diagram_components": "[{\"componentId\": \"comp1\", \"name\": \"Circle Component\", \"position\": {\"x\": 10, \"y\": 20}}]",
-                  "attachment_points": "[{\"pointId\": \"att1\", \"name\": \"Attachment Point A\", \"coordinates\": {\"x\": 15, \"y\": 25}}]"
+                  "diagram_components": {
+                    "component1": {
+                      "type": "visual",
+                      "position": "top-left"
+                    }
+                  },
+                  "attachment_points": {
+                    "point1": {
+                      "coordinates": [
+                        10,
+                        20
+                      ],
+                      "type": "connection"
+                    }
+                  }
                 }
               }
             }
@@ -740,8 +792,21 @@
                   "updatedTag2"
                 ],
                 "author": "updatedAuthorId",
-                "diagram_components": "[{\"componentId\": \"comp1\", \"name\": \"Updated Component\", \"position\": {\"x\": 15, \"y\": 30}}]",
-                "attachment_points": "[{\"pointId\": \"att2\", \"name\": \"Updated Attachment Point\", \"coordinates\": {\"x\": 20, \"y\": 35}}]"
+                "diagram_components": {
+                  "component1": {
+                    "type": "visual",
+                    "position": "top-left"
+                  }
+                },
+                "attachment_points": {
+                  "point1": {
+                    "coordinates": [
+                      10,
+                      20
+                    ],
+                    "type": "connection"
+                  }
+                }
               }
             }
           }
@@ -787,8 +852,21 @@
                     "updatedTag2"
                   ],
                   "author": "updatedAuthorId",
-                  "diagram_components": "[{\"componentId\": \"comp1\", \"name\": \"Updated Component\", \"position\": {\"x\": 15, \"y\": 30}}]",
-                  "attachment_points": "[{\"pointId\": \"att2\", \"name\": \"Updated Attachment Point\", \"coordinates\": {\"x\": 20, \"y\": 35}}]"
+                  "diagram_components": {
+                    "component1": {
+                      "type": "visual",
+                      "position": "top-left"
+                    }
+                  },
+                  "attachment_points": {
+                    "point1": {
+                      "coordinates": [
+                        10,
+                        20
+                      ],
+                      "type": "connection"
+                    }
+                  }
                 }
               }
             }
@@ -943,6 +1021,124 @@
           }
         }
       }
+    },
+    "/shapes/search/{searchText}": {
+      "get": {
+        "summary": "Search for parent shapes",
+        "tags": [
+          "Shapes"
+        ],
+        "description": "This endpoint allows you to search for parent shapes based on dynamic filters. Use dot notation to specify filters (e.g., `filters[field][$operator]=value`). The following fields are supported for filtering:\n\n **`name`**, **`type`**, **`author`**, **`tags`**, **`category`**, **`version`**",
+        "parameters": [
+          {
+            "name": "searchText",
+            "in": "path",
+            "required": true,
+            "description": "text to be search ",
+            "schema": {
+              "type": "string",
+              "example": "3 level child"
+            }
+          },
+        
+          {
+            "name": "filters",
+            "in": "query",
+            "description": "Dynamic filters for querying shapes. You can use dot notation to specify filters. The following fields are supported for filtering:\n\n **`name`**, **`type`**, **`author`**, **`tags`**, **`category`**, **`version`**",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "examples": {
+              "Example 1": {
+                "value": {
+                  "filters[type][$eq]": "2D"
+                }
+              },
+              "Example 2": {
+                "value": {
+                  "filters[name][$eq]": "MyShapeName",
+                  "filters[category][$in]": "676d21530b21683093603bdb"
+                }
+              },
+              "Example 3": {
+                "value": {
+                  "filters[author][$eq]": "authorId123",
+                  "filters[tags][$in]": "design"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of parent shapes matching the filters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Shape"
+                      },
+                      "description": "List of parent shapes"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "description": "Total number of shapes matching the filter"
+                    }
+                  }
+                },
+                "example": {
+                  "data": [
+                    {
+                      "_id": "676e9af6c73809d1a6f04f02",
+                      "name": "circle 2*2",
+                      "type": "2D",
+                      "category": "676e9af6c73809d1a6f04f02",
+                      "author": "authorId123",
+                      "tags": [
+                        "2d layer",
+                        "component specific"
+                      ],
+                      "version": "1.0.1",
+                      "svgFile": "circle.svg",
+                      "svgContent": "<svg>...</svg>",
+                      "diagram_components": {
+                        "component1": {
+                          "type": "visual",
+                          "position": "top-left"
+                        }
+                      },
+                      "attachment_points": {
+                        "point1": {
+                          "coordinates": [
+                            10,
+                            20
+                          ],
+                          "type": "connection"
+                        }
+                      }
+                    }
+                  ],
+                  "total": 1
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters or filter format"
+          },
+          "404": {
+            "description": "No shapes found matching the filter"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1074,8 +1270,16 @@
             "type": "string",
             "description": "The author of the shape (required). This identifies who created the shape."
           },
-          "diagram_components": "[{\"componentId\": \"component1\", \"type\": \"visual\", \"position\": \"top-right\"}]",
-          "attachment_points": "[{\"pointId\": \"point1\", \"coordinates\": [50, 60], \"type\": \"connection\"}]"
+          "diagram_components": {
+            "type": "object",
+            "description": "A JSON object representing the components of the diagram associated with the shape. This can include visual representations, connections, and other diagram-related properties.",
+            "additionalProperties": true
+          },
+          "attachment_points": {
+            "type": "object",
+            "description": "A JSON object representing the attachment points for the shape. This may include coordinates or locations for attaching the shape to other entities or components.",
+            "additionalProperties": true
+          }
         }
       }
     }
