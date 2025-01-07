@@ -58,8 +58,8 @@ export default class CategoriesController {
             }
 
             const shapesCountInCategory = await this.shapeService.getCount({ category: new ObjectId(req.params.id) })
-            if(shapesCountInCategory > 0) { 
-                if(!categoryIdForExistingShapes){
+            if (shapesCountInCategory > 0) {
+                if (!categoryIdForExistingShapes) {
                     throw new ApiError('categoryIdForExistingShapes for moving existing shape is required!', 400)
                 }
                 const categoryForShapes = await this.categoryService.findOneById(categoryIdForExistingShapes as string)
@@ -105,22 +105,20 @@ export default class CategoriesController {
         Array<Category>)
     async getCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { format, ...restQuery } = req.query;
-            
+            const { format, page = 1, limit = 10, sortName = 'createdAt', sortOrder = 'asc', ...restQuery } = req.query;
+
             let shapes
             if (format === 'nested') {
                 shapes = await this.categoryService.getCategoriesNested()
             } else if (format === 'formatted') {
                 shapes = await this.categoryService.getCategoriesFlat()
-            } else { 
+            } else {
                 const allowedFields: (keyof Category)[] = ['name', 'parent', 'path'];
-            
+
                 const filters = FilterUtils.buildMongoFilters<Category>(restQuery, allowedFields);
 
-                const page = parseInt(req.query.page as string, 10) || 1;
-                const limit = parseInt(req.query.limit as string, 10) || 1000;
-                const sort = req.query.sort ? JSON.parse(req.query.sort as string) : { createdAt: -1 };
-                shapes = await this.shapeService.findWithFilters(filters, page, limit, sort);
+                const sort: Record<string, 1 | -1> = { [sortName as string]: sortOrder === 'asc' ? 1 : -1 };
+                shapes = await this.shapeService.findWithFilters(filters, parseInt(page as string, 10), parseInt(limit as string, 10), sort);
             }
             res.status(201).json(shapes);
         } catch (e) {
