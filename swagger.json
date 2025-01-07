@@ -8,7 +8,7 @@
   "paths": {
     "/categories": {
       "get": {
-        "summary": "Get all formatted categories",
+        "summary": "Get all categories with optional formatting and filtering",
         "tags": [
           "Categories"
         ],
@@ -16,7 +16,7 @@
           {
             "name": "format",
             "in": "query",
-            "description": "Optional. Specifies the response format. By default, the response is formatted. Use 'nested' for a nested category structure.",
+            "description": "Optional. Specifies the response format. By default, the response is formatted. Use 'nested' for a nested category structure.filters and sorting will not work if any format is selected",
             "required": false,
             "schema": {
               "type": "string",
@@ -27,11 +27,64 @@
               "default": "formatted"
             },
             "example": "formatted"
+          },
+          {
+            "name": "sortName",
+            "in": "query",
+            "description": "Optional. The field to sort by. Defaults to 'createdAt'.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "createdAt"
+            },
+            "example": "createdAt"
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "description": "Optional. The sort order, either 'asc' for ascending or 'desc' for descending. Defaults to 'asc'.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "asc"
+            },
+            "example": "asc"
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "description": "Dynamic filters for querying categories. Use dot notation to specify filters (e.g., `filters[name][$operator]=value`). The following fields are supported for filtering: **`name`**, **`parent`**, **`path`**. Allowed operators: `$eq`, `$ne`, `$in`, `$gte`, `$lte`, `$gt`, `$lt`.",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "examples": {
+              "Example 1": {
+                "value": {
+                  "filters[name][$eq]": "default parent",
+                  "filters[parent][$ne]": "null",
+                  "filters[path][$in]": "default parent"
+                }
+              },
+              "Example 2": {
+                "value": {
+                  "filters[name][$gte]": "layer shape 3",
+                  "filters[path][$lt]": "path2"
+                }
+              }
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "List of formatted categories",
+            "description": "List of formatted categories or nested categories",
             "content": {
               "application/json": {
                 "schema": {
@@ -74,7 +127,8 @@
               }
             }
           }
-        }
+        },
+        "note": "Filters will work when no format is selected. Filters can be applied to fields like 'name', 'parent', and 'path' using the following operators: '$eq', '$ne', '$in', '$gte', '$lte', '$gt', '$lt'. Example: categories?filters[name][$eq]=layer shape 3"
       },
       "post": {
         "summary": "Create a new category",
@@ -287,7 +341,7 @@
       },
       "delete": {
         "summary": "Delete a category by ID",
-        "description": "Deletes a category based on the provided ID. The ID must be a valid ObjectId.",
+        "description": "Deletes a category based on the provided ID. The ID must be a valid ObjectId. Additionally, you can pass `categoryIdForExistingShapes` as a query parameter to associate the deletion with shapes under that category.",
         "tags": [
           "Categories"
         ],
@@ -299,7 +353,17 @@
             "description": "The ID of the category to delete",
             "schema": {
               "type": "string",
-              "example": "64b2bfe47f3f1a7bfa2d1234"
+              "example": "677cd8973214ab562b333a52"
+            }
+          },
+          {
+            "name": "categoryIdForExistingShapes",
+            "in": "query",
+            "required": false,
+            "description": "The ID of the category for existing shapes to be affected by the deletion",
+            "schema": {
+              "type": "string",
+              "example": "677baa5b56b727fad9a71cd8"
             }
           }
         ],
@@ -527,21 +591,125 @@
                   "component specific"
                 ],
                 "author": "authorId123",
-                "diagram_components": {
-                  "component1": {
-                    "type": "visual",
-                    "position": "top-left"
-                  }
-                },
-                "attachment_points": {
-                  "point1": {
-                    "coordinates": [
-                      10,
-                      20
+                "diagram_components": [
+                  {
+                    "id": "shape-1736157286702-iynkldxxt",
+                    "shape": "server-L",
+                    "position": "top",
+                    "source": "shape",
+                    "relativeToId": null,
+                    "attached2DShapes": [],
+                    "attachmentPoints": [
+                      {
+                        "name": "attach-front-right",
+                        "x": 226.2,
+                        "y": 159.39999
+                      },
+                      {
+                        "name": "attach-front-left",
+                        "x": 63.700001,
+                        "y": 159.39999
+                      },
+                      {
+                        "name": "attach-back-left",
+                        "x": 63.799999,
+                        "y": 65.599998
+                      },
+                      {
+                        "name": "attach-top",
+                        "x": 144.89999,
+                        "y": 76.400002
+                      },
+                      {
+                        "name": "attach-back-right",
+                        "x": 226.2,
+                        "y": 65.599998
+                      },
+                      {
+                        "name": "attach-bottom",
+                        "x": 145,
+                        "y": 148.60001
+                      }
+                    ]
+                  },
+                  {
+                    "id": "shape-1736157286703-502hkdwrk",
+                    "shape": "database-L",
+                    "position": "top",
+                    "source": "shape",
+                    "relativeToId": "shape-1736157286702-iynkldxxt",
+                    "attached2DShapes": [
+                      {
+                        "name": "react logo-L",
+                        "attachedTo": "top"
+                      }
                     ],
-                    "type": "connection"
+                    "attachmentPoints": [
+                      {
+                        "name": "attach-top",
+                        "x": 106,
+                        "y": 54
+                      },
+                      {
+                        "name": "attach-bottom",
+                        "x": 106,
+                        "y": 126.2
+                      },
+                      {
+                        "name": "attach-front-right",
+                        "x": 187.2,
+                        "y": 137
+                      },
+                      {
+                        "name": "attach-back-right",
+                        "x": 187.2,
+                        "y": 43.200001
+                      },
+                      {
+                        "name": "attach-front-left",
+                        "x": 24.700001,
+                        "y": 137
+                      },
+                      {
+                        "name": "attach-back-left",
+                        "x": 24.700001,
+                        "y": 43.200001
+                      }
+                    ]
                   }
-                }
+                ],
+                "attachment_points": [
+                  {
+                    "name": "attach-top",
+                    "x": 645,
+                    "y": 504
+                  },
+                  {
+                    "name": "attach-front-right",
+                    "x": 726,
+                    "y": 659
+                  },
+                  {
+                    "name": "attach-front-left",
+                    "x": 564,
+                    "y": 659
+                  },
+                  {
+                    "name": "attach-back-left",
+                    "x": 564,
+                    "y": 566
+                  },
+                  {
+                    "name": "attach-back-right",
+                    "x": 726,
+                    "y": 566
+                  },
+                  {
+                    "name": "attach-bottom",
+                    "x": 645,
+                    "y": 649
+                  }
+                ]
               }
             }
           }
@@ -587,21 +755,125 @@
                     "component specific"
                   ],
                   "author": "authorId123",
-                  "diagram_components": {
-                    "component1": {
-                      "type": "visual",
-                      "position": "top-left"
-                    }
-                  },
-                  "attachment_points": {
-                    "point1": {
-                      "coordinates": [
-                        10,
-                        20
+                  "diagram_components": [
+                    {
+                      "id": "shape-1736157286702-iynkldxxt",
+                      "shape": "server-L",
+                      "position": "top",
+                      "source": "shape",
+                      "relativeToId": null,
+                      "attached2DShapes": [],
+                      "attachmentPoints": [
+                        {
+                          "name": "attach-front-right",
+                          "x": 226.2,
+                          "y": 159.39999
+                        },
+                        {
+                          "name": "attach-front-left",
+                          "x": 63.700001,
+                          "y": 159.39999
+                        },
+                        {
+                          "name": "attach-back-left",
+                          "x": 63.799999,
+                          "y": 65.599998
+                        },
+                        {
+                          "name": "attach-top",
+                          "x": 144.89999,
+                          "y": 76.400002
+                        },
+                        {
+                          "name": "attach-back-right",
+                          "x": 226.2,
+                          "y": 65.599998
+                        },
+                        {
+                          "name": "attach-bottom",
+                          "x": 145,
+                          "y": 148.60001
+                        }
+                      ]
+                    },
+                    {
+                      "id": "shape-1736157286703-502hkdwrk",
+                      "shape": "database-L",
+                      "position": "top",
+                      "source": "shape",
+                      "relativeToId": "shape-1736157286702-iynkldxxt",
+                      "attached2DShapes": [
+                        {
+                          "name": "react logo-L",
+                          "attachedTo": "top"
+                        }
                       ],
-                      "type": "connection"
+                      "attachmentPoints": [
+                        {
+                          "name": "attach-top",
+                          "x": 106,
+                          "y": 54
+                        },
+                        {
+                          "name": "attach-bottom",
+                          "x": 106,
+                          "y": 126.2
+                        },
+                        {
+                          "name": "attach-front-right",
+                          "x": 187.2,
+                          "y": 137
+                        },
+                        {
+                          "name": "attach-back-right",
+                          "x": 187.2,
+                          "y": 43.200001
+                        },
+                        {
+                          "name": "attach-front-left",
+                          "x": 24.700001,
+                          "y": 137
+                        },
+                        {
+                          "name": "attach-back-left",
+                          "x": 24.700001,
+                          "y": 43.200001
+                        }
+                      ]
                     }
-                  }
+                  ],
+                  "attachment_points": [
+                    {
+                      "name": "attach-top",
+                      "x": 645,
+                      "y": 504
+                    },
+                    {
+                      "name": "attach-front-right",
+                      "x": 726,
+                      "y": 659
+                    },
+                    {
+                      "name": "attach-front-left",
+                      "x": 564,
+                      "y": 659
+                    },
+                    {
+                      "name": "attach-back-left",
+                      "x": 564,
+                      "y": 566
+                    },
+                    {
+                      "name": "attach-back-right",
+                      "x": 726,
+                      "y": 566
+                    },
+                    {
+                      "name": "attach-bottom",
+                      "x": 645,
+                      "y": 649
+                    }
+                  ]
                 }
               }
             }
@@ -792,21 +1064,125 @@
                   "updatedTag2"
                 ],
                 "author": "updatedAuthorId",
-                "diagram_components": {
-                  "component1": {
-                    "type": "visual",
-                    "position": "top-left"
-                  }
-                },
-                "attachment_points": {
-                  "point1": {
-                    "coordinates": [
-                      10,
-                      20
+                "diagram_components": [
+                  {
+                    "id": "shape-1736157286702-iynkldxxt",
+                    "shape": "server-L",
+                    "position": "top",
+                    "source": "shape",
+                    "relativeToId": null,
+                    "attached2DShapes": [],
+                    "attachmentPoints": [
+                      {
+                        "name": "attach-front-right",
+                        "x": 226.2,
+                        "y": 159.39999
+                      },
+                      {
+                        "name": "attach-front-left",
+                        "x": 63.700001,
+                        "y": 159.39999
+                      },
+                      {
+                        "name": "attach-back-left",
+                        "x": 63.799999,
+                        "y": 65.599998
+                      },
+                      {
+                        "name": "attach-top",
+                        "x": 144.89999,
+                        "y": 76.400002
+                      },
+                      {
+                        "name": "attach-back-right",
+                        "x": 226.2,
+                        "y": 65.599998
+                      },
+                      {
+                        "name": "attach-bottom",
+                        "x": 145,
+                        "y": 148.60001
+                      }
+                    ]
+                  },
+                  {
+                    "id": "shape-1736157286703-502hkdwrk",
+                    "shape": "database-L",
+                    "position": "top",
+                    "source": "shape",
+                    "relativeToId": "shape-1736157286702-iynkldxxt",
+                    "attached2DShapes": [
+                      {
+                        "name": "react logo-L",
+                        "attachedTo": "top"
+                      }
                     ],
-                    "type": "connection"
+                    "attachmentPoints": [
+                      {
+                        "name": "attach-top",
+                        "x": 106,
+                        "y": 54
+                      },
+                      {
+                        "name": "attach-bottom",
+                        "x": 106,
+                        "y": 126.2
+                      },
+                      {
+                        "name": "attach-front-right",
+                        "x": 187.2,
+                        "y": 137
+                      },
+                      {
+                        "name": "attach-back-right",
+                        "x": 187.2,
+                        "y": 43.200001
+                      },
+                      {
+                        "name": "attach-front-left",
+                        "x": 24.700001,
+                        "y": 137
+                      },
+                      {
+                        "name": "attach-back-left",
+                        "x": 24.700001,
+                        "y": 43.200001
+                      }
+                    ]
                   }
-                }
+                ],
+                "attachment_points": [
+                  {
+                    "name": "attach-top",
+                    "x": 645,
+                    "y": 504
+                  },
+                  {
+                    "name": "attach-front-right",
+                    "x": 726,
+                    "y": 659
+                  },
+                  {
+                    "name": "attach-front-left",
+                    "x": 564,
+                    "y": 659
+                  },
+                  {
+                    "name": "attach-back-left",
+                    "x": 564,
+                    "y": 566
+                  },
+                  {
+                    "name": "attach-back-right",
+                    "x": 726,
+                    "y": 566
+                  },
+                  {
+                    "name": "attach-bottom",
+                    "x": 645,
+                    "y": 649
+                  }
+                ]
               }
             }
           }
@@ -852,21 +1228,125 @@
                     "updatedTag2"
                   ],
                   "author": "updatedAuthorId",
-                  "diagram_components": {
-                    "component1": {
-                      "type": "visual",
-                      "position": "top-left"
-                    }
-                  },
-                  "attachment_points": {
-                    "point1": {
-                      "coordinates": [
-                        10,
-                        20
+                  "diagram_components": [
+                    {
+                      "id": "shape-1736157286702-iynkldxxt",
+                      "shape": "server-L",
+                      "position": "top",
+                      "source": "shape",
+                      "relativeToId": null,
+                      "attached2DShapes": [],
+                      "attachmentPoints": [
+                        {
+                          "name": "attach-front-right",
+                          "x": 226.2,
+                          "y": 159.39999
+                        },
+                        {
+                          "name": "attach-front-left",
+                          "x": 63.700001,
+                          "y": 159.39999
+                        },
+                        {
+                          "name": "attach-back-left",
+                          "x": 63.799999,
+                          "y": 65.599998
+                        },
+                        {
+                          "name": "attach-top",
+                          "x": 144.89999,
+                          "y": 76.400002
+                        },
+                        {
+                          "name": "attach-back-right",
+                          "x": 226.2,
+                          "y": 65.599998
+                        },
+                        {
+                          "name": "attach-bottom",
+                          "x": 145,
+                          "y": 148.60001
+                        }
+                      ]
+                    },
+                    {
+                      "id": "shape-1736157286703-502hkdwrk",
+                      "shape": "database-L",
+                      "position": "top",
+                      "source": "shape",
+                      "relativeToId": "shape-1736157286702-iynkldxxt",
+                      "attached2DShapes": [
+                        {
+                          "name": "react logo-L",
+                          "attachedTo": "top"
+                        }
                       ],
-                      "type": "connection"
+                      "attachmentPoints": [
+                        {
+                          "name": "attach-top",
+                          "x": 106,
+                          "y": 54
+                        },
+                        {
+                          "name": "attach-bottom",
+                          "x": 106,
+                          "y": 126.2
+                        },
+                        {
+                          "name": "attach-front-right",
+                          "x": 187.2,
+                          "y": 137
+                        },
+                        {
+                          "name": "attach-back-right",
+                          "x": 187.2,
+                          "y": 43.200001
+                        },
+                        {
+                          "name": "attach-front-left",
+                          "x": 24.700001,
+                          "y": 137
+                        },
+                        {
+                          "name": "attach-back-left",
+                          "x": 24.700001,
+                          "y": 43.200001
+                        }
+                      ]
                     }
-                  }
+                  ],
+                  "attachment_points": [
+                    {
+                      "name": "attach-top",
+                      "x": 645,
+                      "y": 504
+                    },
+                    {
+                      "name": "attach-front-right",
+                      "x": 726,
+                      "y": 659
+                    },
+                    {
+                      "name": "attach-front-left",
+                      "x": 564,
+                      "y": 659
+                    },
+                    {
+                      "name": "attach-back-left",
+                      "x": 564,
+                      "y": 566
+                    },
+                    {
+                      "name": "attach-back-right",
+                      "x": 726,
+                      "y": 566
+                    },
+                    {
+                      "name": "attach-bottom",
+                      "x": 645,
+                      "y": 649
+                    }
+                  ]
                 }
               }
             }
@@ -1040,7 +1520,6 @@
               "example": "3 level child"
             }
           },
-        
           {
             "name": "filters",
             "in": "query",
@@ -1109,21 +1588,125 @@
                       "version": "1.0.1",
                       "svgFile": "circle.svg",
                       "svgContent": "<svg>...</svg>",
-                      "diagram_components": {
-                        "component1": {
-                          "type": "visual",
-                          "position": "top-left"
-                        }
-                      },
-                      "attachment_points": {
-                        "point1": {
-                          "coordinates": [
-                            10,
-                            20
+                      "diagram_components": [
+                        {
+                          "id": "shape-1736157286702-iynkldxxt",
+                          "shape": "server-L",
+                          "position": "top",
+                          "source": "shape",
+                          "relativeToId": null,
+                          "attached2DShapes": [],
+                          "attachmentPoints": [
+                            {
+                              "name": "attach-front-right",
+                              "x": 226.2,
+                              "y": 159.39999
+                            },
+                            {
+                              "name": "attach-front-left",
+                              "x": 63.700001,
+                              "y": 159.39999
+                            },
+                            {
+                              "name": "attach-back-left",
+                              "x": 63.799999,
+                              "y": 65.599998
+                            },
+                            {
+                              "name": "attach-top",
+                              "x": 144.89999,
+                              "y": 76.400002
+                            },
+                            {
+                              "name": "attach-back-right",
+                              "x": 226.2,
+                              "y": 65.599998
+                            },
+                            {
+                              "name": "attach-bottom",
+                              "x": 145,
+                              "y": 148.60001
+                            }
+                          ]
+                        },
+                        {
+                          "id": "shape-1736157286703-502hkdwrk",
+                          "shape": "database-L",
+                          "position": "top",
+                          "source": "shape",
+                          "relativeToId": "shape-1736157286702-iynkldxxt",
+                          "attached2DShapes": [
+                            {
+                              "name": "react logo-L",
+                              "attachedTo": "top"
+                            }
                           ],
-                          "type": "connection"
+                          "attachmentPoints": [
+                            {
+                              "name": "attach-top",
+                              "x": 106,
+                              "y": 54
+                            },
+                            {
+                              "name": "attach-bottom",
+                              "x": 106,
+                              "y": 126.2
+                            },
+                            {
+                              "name": "attach-front-right",
+                              "x": 187.2,
+                              "y": 137
+                            },
+                            {
+                              "name": "attach-back-right",
+                              "x": 187.2,
+                              "y": 43.200001
+                            },
+                            {
+                              "name": "attach-front-left",
+                              "x": 24.700001,
+                              "y": 137
+                            },
+                            {
+                              "name": "attach-back-left",
+                              "x": 24.700001,
+                              "y": 43.200001
+                            }
+                          ]
                         }
-                      }
+                      ],
+                      "attachment_points": [
+                        {
+                          "name": "attach-top",
+                          "x": 645,
+                          "y": 504
+                        },
+                        {
+                          "name": "attach-front-right",
+                          "x": 726,
+                          "y": 659
+                        },
+                        {
+                          "name": "attach-front-left",
+                          "x": 564,
+                          "y": 659
+                        },
+                        {
+                          "name": "attach-back-left",
+                          "x": 564,
+                          "y": 566
+                        },
+                        {
+                          "name": "attach-back-right",
+                          "x": 726,
+                          "y": 566
+                        },
+                        {
+                          "name": "attach-bottom",
+                          "x": 645,
+                          "y": 649
+                        }
+                      ]
                     }
                   ],
                   "total": 1
@@ -1136,6 +1719,85 @@
           },
           "404": {
             "description": "No shapes found matching the filter"
+          }
+        }
+      }
+    },
+    "/shapes/category/{categoryId}": {
+      "get": {
+        "summary": "Get shapes by category ID",
+        "tags": [
+          "Shapes",
+          "Categories"
+        ],
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "description": "The ID of the category to retrieve shapes for.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "677271fbc191b99b3f4b4d6d"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of shapes in the specified category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Shape"
+                      },
+                      "example": [
+                        {
+                          "_id": "exampleShapeId1",
+                          "name": "Shape 1",
+                          "category": "677271fbc191b99b3f4b4d6d",
+                          "description": "A description of shape 1",
+                          "createdAt": "2024-12-30T11:15:05.294Z",
+                          "updatedAt": "2024-12-30T11:15:05.294Z"
+                        },
+                        {
+                          "_id": "exampleShapeId2",
+                          "name": "Shape 2",
+                          "category": "677271fbc191b99b3f4b4d6d",
+                          "description": "A description of shape 2",
+                          "createdAt": "2024-12-30T11:15:05.294Z",
+                          "updatedAt": "2024-12-30T11:15:05.294Z"
+                        }
+                      ]
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 2
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Category not found or incorrect category ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "incorrect category ID"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1271,14 +1933,22 @@
             "description": "The author of the shape (required). This identifies who created the shape."
           },
           "diagram_components": {
-            "type": "object",
-            "description": "A JSON object representing the components of the diagram associated with the shape. This can include visual representations, connections, and other diagram-related properties.",
-            "additionalProperties": true
+            "type": "array",
+            "description": "A list of components in the diagram associated with the shape. Each component can have various properties.",
+            "items": {
+              "type": "object",
+              "description": "An arbitrary object representing a diagram component. The structure can vary for each component.",
+              "additionalProperties": true
+            }
           },
           "attachment_points": {
-            "type": "object",
-            "description": "A JSON object representing the attachment points for the shape. This may include coordinates or locations for attaching the shape to other entities or components.",
-            "additionalProperties": true
+            "type": "array",
+            "description": "A list of attachment points for the shape. Each attachment point can have various properties.",
+            "items": {
+              "type": "object",
+              "description": "An arbitrary object representing an attachment point. The structure can vary for each attachment point.",
+              "additionalProperties": true
+            }
           }
         }
       }

@@ -6,6 +6,8 @@ import { NextFunction, Request, Response } from 'express';
 import { ObjectId } from "mongodb";
 import { Category } from "../entities/categories.entity";
 import ApiError from "../utils/apiError";
+import { ShapeService } from "../services/shape.service";
+import { FilterUtils } from "../utils/filterUtils";
 
 
 @Service()
@@ -13,6 +15,9 @@ import ApiError from "../utils/apiError";
 export default class CategoriesController {
     @Inject(() => CategoryService)
     private readonly categoryService: CategoryService
+
+    @Inject(() => ShapeService)
+    private readonly shapeService: ShapeService
 
 
     @Post('/', CategoryValidation, {
@@ -45,9 +50,23 @@ export default class CategoriesController {
         {})
     async deleteCategoryById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+            const { categoryIdForExistingShapes } = req.query
+
             const category = await this.categoryService.findOneById(req.params.id);
             if (!category) {
                 throw new ApiError('Category not found', 404)
+            }
+
+            const shapesCountInCategory = await this.shapeService.getCount({ category: new ObjectId(req.params.id) })
+            if (shapesCountInCategory > 0) {
+                if (!categoryIdForExistingShapes) {
+                    throw new ApiError('categoryIdForExistingShapes for moving existing shape is required!', 400)
+                }
+                const categoryForShapes = await this.categoryService.findOneById(categoryIdForExistingShapes as string)
+                if (!categoryForShapes) {
+                    throw new ApiError('Shape Category not found', 404)
+                }
+                await this.shapeService.updateMany({ category: new ObjectId(req.params.id) }, { category: new ObjectId(categoryIdForExistingShapes as string) })
             }
             await this.categoryService.delete(req.params.id);
             res.status(200).json({ message: 'Category deleted successfully' });
@@ -86,12 +105,20 @@ export default class CategoriesController {
         Array<Category>)
     async getCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { format } = req.query;
+            const { format, page = 1, limit = 10, sortName = 'createdAt', sortOrder = 'asc', ...restQuery } = req.query;
+
             let shapes
             if (format === 'nested') {
                 shapes = await this.categoryService.getCategoriesNested()
-            } else {
+            } else if (format === 'formatted') {
                 shapes = await this.categoryService.getCategoriesFlat()
+            } else {
+                const allowedFields: (keyof Category)[] = ['name', 'parent', 'path'];
+
+                const filters = FilterUtils.buildMongoFilters<Category>(restQuery, allowedFields);
+
+                const sort: Record<string, 1 | -1> = { [sortName as string]: sortOrder === 'asc' ? 1 : -1 };
+                shapes = await this.shapeService.findWithFilters(filters, parseInt(page as string, 10), parseInt(limit as string, 10), sort);
             }
             res.status(201).json(shapes);
         } catch (e) {
