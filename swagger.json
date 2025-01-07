@@ -286,83 +286,92 @@
         }
       },
       "delete": {
-        "summary": "Delete a category by ID",
-        "description": "Deletes a category based on the provided ID. The ID must be a valid ObjectId.",
-        "tags": [
-          "Categories"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "description": "The ID of the category to delete",
-            "schema": {
-              "type": "string",
-              "example": "64b2bfe47f3f1a7bfa2d1234"
+      "summary": "Delete a category by ID",
+      "description": "Deletes a category based on the provided ID. The ID must be a valid ObjectId. Additionally, you can pass `categoryIdForExistingShapes` as a query parameter to associate the deletion with shapes under that category.",
+      "tags": [
+        "Categories"
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "The ID of the category to delete",
+          "schema": {
+            "type": "string",
+            "example": "677cd8973214ab562b333a52"
+          }
+        },
+        {
+          "name": "categoryIdForExistingShapes",
+          "in": "query",
+          "required": false,
+          "description": "The ID of the category for existing shapes to be affected by the deletion",
+          "schema": {
+            "type": "string",
+            "example": "677baa5b56b727fad9a71cd8"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Category successfully deleted",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "Category deleted successfully"
+                  }
+                }
+              }
             }
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "Category successfully deleted",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Category deleted successfully"
-                    }
+        },
+        "400": {
+          "description": "Invalid ID format",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "Invalid ID format"
                   }
                 }
               }
             }
-          },
-          "400": {
-            "description": "Invalid ID format",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid ID format"
-                    }
+          }
+        },
+        "404": {
+          "description": "Category not found",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "Category not found"
                   }
                 }
               }
             }
-          },
-          "404": {
-            "description": "Category not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Category not found"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Something went wrong"
-                    }
+          }
+        },
+        "500": {
+          "description": "Internal server error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "Something went wrong"
                   }
                 }
               }
@@ -370,6 +379,7 @@
           }
         }
       }
+    }
     },
     "/shapes": {
       "get": {

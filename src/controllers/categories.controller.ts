@@ -57,8 +57,10 @@ export default class CategoriesController {
             }
 
             const shapesCountInCategory = await this.shapeService.getCount({ category: new ObjectId(req.params.id) })
-
             if(shapesCountInCategory > 0) { 
+                if(!categoryIdForExistingShapes){
+                    throw new ApiError('categoryIdForExistingShapes for moving existing shape is required!', 400)
+                }
                 const categoryForShapes = await this.categoryService.findOneById(categoryIdForExistingShapes as string)
                 if (!categoryForShapes) {
                     throw new ApiError('Shape Category not found', 404)
