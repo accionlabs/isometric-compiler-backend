@@ -225,7 +225,7 @@ export class CategoryService extends BaseService<Category> {
       const skip = (page - 1) * limit;
       const repository = this.getRepository();
       return repository.find({
-          where: { $or: [ filters, { $text: { $search: text } } ] },
+          where: { $and: [ filters, { $text: { $search: text } } ] },
           skip,
           take: limit
         })
