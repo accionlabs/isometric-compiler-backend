@@ -1502,6 +1502,84 @@
         }
       }
     },
+    "/shapes/category/{categoryId}": {
+      "get": {
+        "summary": "Get shapes by category ID",
+        "tags": [
+          "Shapes"
+        ],
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "description": "The ID of the category to retrieve shapes for.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "677271fbc191b99b3f4b4d6d"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of shapes in the specified category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Shape"
+                      },
+                      "example": [
+                        {
+                          "_id": "exampleShapeId1",
+                          "name": "Shape 1",
+                          "category": "677271fbc191b99b3f4b4d6d",
+                          "description": "A description of shape 1",
+                          "createdAt": "2024-12-30T11:15:05.294Z",
+                          "updatedAt": "2024-12-30T11:15:05.294Z"
+                        },
+                        {
+                          "_id": "exampleShapeId2",
+                          "name": "Shape 2",
+                          "category": "677271fbc191b99b3f4b4d6d",
+                          "description": "A description of shape 2",
+                          "createdAt": "2024-12-30T11:15:05.294Z",
+                          "updatedAt": "2024-12-30T11:15:05.294Z"
+                        }
+                      ]
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 2
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Category not found or incorrect category ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "incorrect category ID"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/shapes/search/{searchText}": {
       "get": {
         "summary": "Search for parent shapes",
@@ -1719,85 +1797,6 @@
           },
           "404": {
             "description": "No shapes found matching the filter"
-          }
-        }
-      }
-    },
-    "/shapes/category/{categoryId}": {
-      "get": {
-        "summary": "Get shapes by category ID",
-        "tags": [
-          "Shapes",
-          "Categories"
-        ],
-        "parameters": [
-          {
-            "name": "categoryId",
-            "in": "path",
-            "description": "The ID of the category to retrieve shapes for.",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "example": "677271fbc191b99b3f4b4d6d"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of shapes in the specified category",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Shape"
-                      },
-                      "example": [
-                        {
-                          "_id": "exampleShapeId1",
-                          "name": "Shape 1",
-                          "category": "677271fbc191b99b3f4b4d6d",
-                          "description": "A description of shape 1",
-                          "createdAt": "2024-12-30T11:15:05.294Z",
-                          "updatedAt": "2024-12-30T11:15:05.294Z"
-                        },
-                        {
-                          "_id": "exampleShapeId2",
-                          "name": "Shape 2",
-                          "category": "677271fbc191b99b3f4b4d6d",
-                          "description": "A description of shape 2",
-                          "createdAt": "2024-12-30T11:15:05.294Z",
-                          "updatedAt": "2024-12-30T11:15:05.294Z"
-                        }
-                      ]
-                    },
-                    "total": {
-                      "type": "integer",
-                      "example": 2
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Category not found or incorrect category ID",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "incorrect category ID"
-                    }
-                  }
-                }
-              }
-            }
           }
         }
       }
