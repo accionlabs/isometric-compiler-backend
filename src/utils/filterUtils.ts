@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { FindOptionsWhere } from "typeorm";
 
 export class FilterUtils {
@@ -30,6 +31,11 @@ export class FilterUtils {
     const operator = Object.keys(condition)[0];
     const value = condition[operator];
 
+     // If filtering on the 'parent' field, convert string to ObjectId
+     if ((operator === '$eq' || operator === '$in' || operator === '$ne')  && value && this.isObjectId(value)) {
+      return { $eq: new ObjectId(value) };  // Convert to ObjectId if it's a valid ObjectId string
+    }
+
     // Handle the common operators: $eq, $ne, $in, $gte, $lte, etc.
     switch (operator) {
       case '$eq':
@@ -51,6 +57,11 @@ export class FilterUtils {
       default:
         return value; // Default to equality if no known operator
     }
+  }
+
+  static isObjectId(value: string): boolean {
+    // Check if the value is a valid ObjectId string
+    return /^[a-fA-F0-9]{24}$/.test(value);
   }
 
   static buildMongoFilters<T>(
