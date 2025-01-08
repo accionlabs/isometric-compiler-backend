@@ -6,6 +6,8 @@ import { ObjectId } from 'mongodb'
 import ApiError from '../utils/apiError';
 import { FindOptionsWhere } from 'typeorm';
 
+type CategoryWithCount = Category & { shapeCount: number }
+
 @Service()
 export class CategoryService extends BaseService<Category> {
   constructor() {
@@ -104,95 +106,90 @@ export class CategoryService extends BaseService<Category> {
     return repository.aggregate(pipeline).toArray();
   }  
 
-  private buildTree(categories: Category[], parentId: ObjectId | null = null): Category[] {
-    return categories
-      .filter(category => String(category.parent) === String(parentId))
-      .map(category => ({
-        ...category,
-        children: this.buildTree(categories, category._id)
-      }));
-  }
-
   async getCategoriesNested() {
     const repository = this.getRepository();
     const pipeline = [
       {
-        $match: {
-          parent: null
-        }
-      },
-      {
-        $graphLookup: {
-          from: "categories",
-          startWith: "$_id",
-          connectFromField: "_id",
-          connectToField: "parent",
-          as: "children",
-          depthField: "level"
-        }
-      },
-      {
-        $unwind: {
-          path: "$children",
-          preserveNullAndEmptyArrays: true
-        }
-      },
-      {
-        $sort: {
-          "children.level": 1
-        }
-      },
-      {
-        $group: {
-          _id: "$_id",
-          root: { $first: "$$ROOT" },
-          sortedDescendants: { $push: "$children" }
-        }
+        $lookup: {
+          from: "shapes",
+          let: { categoryId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$category", "$$categoryId"]
+                }
+              }
+            },
+            { 
+              $project: {
+                _id: 1
+              }
+             }
+          ],
+          as: "shapes",
+        },
       },
       {
         $addFields: {
-          "root.children": {
-            $map: {
-              input: "$sortedDescendants",
-              as: "child",
-              in: {
-                $mergeObjects: [
-                  "$$child",
-                  {
-                    totalChildrenCount: {
-                      $size: {
-                        $filter: {
-                          input: "$sortedDescendants",
-                          as: "descendant",
-                          cond: { $eq: ["$$descendant.parent", "$$child._id"] }
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          },
-          "root.totalChildrenCount": {
-            $size: "$sortedDescendants"
-          }
+          shapeCount: { $size: "$shapes" }
         }
       },
       {
-        $replaceRoot: {
-          newRoot: {
-            $mergeObjects: ["$root", { children: "$root.children" }]
-          }
+        $project: {
+          shapes: 0
         }
-      }
-    ];
+      },
+    ]
     
     const rootCategories = await repository.aggregate(pipeline).toArray() as any[]
-    return rootCategories.map(root => ({
-      ...root,
-      children: this.buildTree(root.children, root._id)
-    }));
+    const buldCat: any = []
+    rootCategories.forEach((category) => { 
+      if (!category.parent) {
+        buldCat.push(category)
+      } else {
+        const parent = buldCat.find((cat: any) => String(cat._id) === String(category.parent))
+        if(parent) {
+          parent.children = parent.children || []
+          parent.children.push(category)
+        } else {
+
+        }
+      }
+     });
+    return this.createNestedStructure(rootCategories)
   }
+
+
+  private createNestedStructure(categories: CategoryWithCount[]) {
+    const categoryMap: any = {};
+    categories.forEach((category) => {
+        categoryMap[String(category._id)] = { ...category, children: [] };
+    });
+
+    let rootCategories: any = [];
+    categories.forEach((category) => {
+        const parentId = category.parent;
+        if (parentId) {
+            if (categoryMap[String(parentId)]) {
+                categoryMap[String(parentId)].children.push(categoryMap[String(category._id)]);
+            }
+        } else {
+            rootCategories.push(categoryMap[String(category._id)]);
+        }
+    });
+    function calculateShapeCount(category: any) {
+        category.shapeCount = category.shapeCount || 0; 
+        category.children.forEach((child: any) => {
+            category.shapeCount += calculateShapeCount(child);
+        });
+        return category.shapeCount;
+    }
+
+    rootCategories.forEach(calculateShapeCount);
+
+    return rootCategories;
+}
 
   async getChildrenCategories(_id: string) {
     const repository = this.getRepository();
