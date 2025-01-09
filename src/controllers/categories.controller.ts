@@ -86,6 +86,9 @@ export default class CategoriesController {
         try {
             const categoryId = req.params.id
             const { parent, name } = req.body;
+            if(categoryId == parent) {
+                throw new ApiError('Category can not be parent of itself', 400)
+            }
             let reqBody = { ...req.body, ...(parent && { parent: new ObjectId(parent) }) }
             if (parent) {
                 const catPath = await this.categoryService.getPathOnParentChange(categoryId, parent, name)
