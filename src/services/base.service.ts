@@ -81,7 +81,7 @@ export abstract class BaseService<T extends ObjectLiteral> {
   async update(id: string, data: DeepPartial<T>): Promise<T | null> {
     const entity = await this.findOneById(id);
     if (!entity) {
-      return null;
+      throw new ApiError("entity not found", 404);
     }
     Object.assign(entity, data);
     return this.repository.save(entity);

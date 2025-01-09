@@ -29,11 +29,12 @@ export class FilterUtils {
   static buildFilterGroup(condition: any): any {
     // Handle single condition in the format { $eq: value, $gte: value, etc. }
     const operator = Object.keys(condition)[0];
-    const value = condition[operator];
+    let value = condition[operator];
 
-     // If filtering on the 'parent' field, convert string to ObjectId
-     if ((operator === '$eq' || operator === '$in' || operator === '$ne')  && value && this.isObjectId(value)) {
-      return { $eq: new ObjectId(value) };  // Convert to ObjectId if it's a valid ObjectId string
+    if(value && Array.isArray(value) ){
+      value = value.map(val=>this.isObjectId(val) ? new ObjectId(val) : val )
+    }else if(value && this.isObjectId(value) ){
+      value = new ObjectId(value)
     }
 
     // Handle the common operators: $eq, $ne, $in, $gte, $lte, etc.
@@ -45,17 +46,17 @@ export class FilterUtils {
       case '$in':
         return { $in: Array.isArray(value) ? value : [value] };
       case '$gte':
-        return { $gte: new Date(value) }; // For date comparison
+        return { $gte: new Date(value) }; 
       case '$lte':
-        return { $lte: new Date(value) }; // For date comparison
+        return { $lte: new Date(value) }; 
       case '$gt':
         return { $gt: value };
       case '$lt':
         return { $lt: value };
       case '$regex':
-        return { $regex: value, $options: 'i' }; // Case-insensitive regex
+        return { $regex: value, $options: 'i' }; 
       default:
-        return value; // Default to equality if no known operator
+        return value; 
     }
   }
 

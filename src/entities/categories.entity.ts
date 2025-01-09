@@ -1,5 +1,5 @@
 import { Entity, Column, Index, ManyToOne, ObjectId, ObjectIdColumn } from 'typeorm';
-import { IsOptional, IsString, IsInt, IsJSON } from 'class-validator';
+import { IsOptional, IsString, IsInt, IsJSON, IsMongoId } from 'class-validator';
 import { BaseEntity } from './base.entity';
 
 // Define a Metadata subdocument class
@@ -28,8 +28,9 @@ export class Category extends BaseEntity {
     @Column({ type: 'text', nullable: true })
     description?: string;
 
-    // MongoDB does not enforce foreign keys, but you can use ObjectId references manually
-    @ObjectIdColumn({nullable: true})
+    @Index()
+    @IsMongoId()
+    @Column({ type: 'string', nullable: true })
     parent?: ObjectId;
 
     @Column()
