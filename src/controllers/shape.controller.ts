@@ -27,16 +27,13 @@ export default class ShapeController {
   {data: Array<Shape>, total: Number})
   async getAllShapes(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const {page = 1, limit = 10, sortName = 'createdAt', sortOrder = 'asc', ...query} = req.query
+      const {page = 1, limit = 1000, sortName = 'createdAt', sortOrder = 'asc', ...query} = req.query
       const sort: Record<string, 1 | -1> = { [sortName as string]: sortOrder === 'asc' ? 1 : -1 };
 
 
-      // Define the fields that are allowed for filtering
       const allowedFields: (keyof Shape)[] = ['name', 'type', 'author', 'tags', 'category', 'version'];
 
-      // Build dynamic filters using the utility function
       const filters = FilterUtils.buildMongoFilters<Shape>(query, allowedFields);
-      // Use BaseService's findWithFilters method to apply filters, pagination, and sorting
       const { data, total } = await this.shapeService.findWithFilters(filters, parseInt(page as string, 10), parseInt(limit as string, 10), sort);
 
       res.status(200).json({ data, total });

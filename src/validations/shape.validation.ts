@@ -36,7 +36,7 @@ export class ValidShape {
   @IsNotEmpty()
   name: string;  
 
-  @IsEnum(ShapeType)
+  @IsEnum(ShapeType, { message: 'type must be one of the following values: 2D, 3D, COMPONENT, LAYERS' })
   type: ShapeType;  
 
   @IsOptional()
