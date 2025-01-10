@@ -1,4 +1,4 @@
-import { IsString, IsEnum, IsOptional, IsArray, IsJSON, IsNotEmpty, ValidateNested, IsObject, isArray } from 'class-validator';
+import { IsString, IsEnum, IsOptional, IsArray, IsJSON, IsNotEmpty, ValidateNested, IsObject, isArray, IsMongoId } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ShapeType } from '../entities/shape.entity';
 
@@ -78,6 +78,10 @@ export class ValidShape {
   @IsArray()
   @IsObject({ each: true })
   attachment_points?: Record<string, any>[];
+  
+  @IsMongoId()
+  @IsNotEmpty({ message: 'Category is required and must be a valid MongoDB ObjectId.' })
+  category: string;
 }
 
 

@@ -62,18 +62,14 @@ export abstract class BaseService<T extends ObjectLiteral> {
   }
 
   private getDuplicateKeyInfo(error: any): { key: string; value: string } {
-    if (error.keyPattern && error.keyValue) {
-      const key = Object.keys(error.keyPattern)[0];
-      const value = error.keyValue[key];
-      return { key, value };
+    if (error.writeErrors && error.writeErrors.length > 0) {
+      const writeError = error.writeErrors[0];
+      const match = writeError.errmsg.match(/dup key: \{ (\w+): "(.*?)" \}/); // Extract key-value from errmsg
+      if (match) {
+        return { key: match[1], value: match[2] };
+      }
     }
-
-    // Fallback to parsing the error message if keyPattern and keyValue are missing
-    const match = error.errmsg?.match(/index: (\w+).*dup key: { : "(.*?)" }/);
-    if (match) {
-      return { key: match[1], value: match[2] };
-    }
-
+  
     return { key: 'unknown', value: 'unknown' };
   }
 
