@@ -22,7 +22,7 @@ export class ShapeService extends BaseService<Shape> {
 
   async search(
     text: string, 
-    { filters = {}, limit = 10, page = 1 }: {
+    { filters = {}, limit = 1000, page = 1 }: {
     filters?: FindOptionsWhere<Shape> | FindOptionsWhere<Shape>[] | undefined, 
     limit?: number, 
     page?: number}
