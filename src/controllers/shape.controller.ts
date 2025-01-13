@@ -147,7 +147,7 @@ export default class ShapeController {
   async searchShapes(req: Request, res: Response, next: NextFunction): Promise<void> {  
     try {
       const { text } = req.params;
-      const { page = 1, limit = 10 } = req.query;
+      const { page = 1, limit = 1000 } = req.query;
       
       const allowedFields: (keyof Shape)[] = ['name', 'type', 'author', 'tags', 'category', 'version'];
 
