@@ -32,9 +32,9 @@ export default class ShapeController {
 
 
       const allowedFields: (keyof Shape)[] = ['name', 'type', 'author', 'tags', 'category', 'version'];
-
+       
       const filters = FilterUtils.buildMongoFilters<Shape>(query, allowedFields);
-      const { data, total } = await this.shapeService.findWithFilters(filters, parseInt(page as string, 10), parseInt(limit as string, 10), sort);
+      const { data, total } = await this.shapeService.findWithFiltersAndCategoryDetails(filters, parseInt(page as string, 10), parseInt(limit as string, 10), sort);
 
       res.status(200).json({ data, total });
     } catch (e) {
