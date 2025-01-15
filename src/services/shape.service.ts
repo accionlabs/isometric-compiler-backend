@@ -19,6 +19,53 @@ export class ShapeService extends BaseService<Shape> {
   @Inject(() => CategoryService)
       private readonly categoryService: CategoryService
   
+      async findWithFiltersAndCategoryDetails(
+        filters: FindOptionsWhere<Shape>,
+        page: number = 1,
+        limit: number = 1000,
+        sort: Record<string, 1 | -1> = { createdAt: -1 }
+      ): Promise<{ data: Shape[], total: number }> {
+        const repository = this.getRepository();
+        const skip = (page - 1) * limit;
+      
+        const pipeline = [
+          { $match: filters },
+          { $sort: sort },
+          { $skip: skip },
+          { $limit: limit },
+          {
+            $lookup: {
+              from: "categories",
+              let: { category: "$category" },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $eq: ["$_id", "$$category"]
+                    }
+                  }
+                },
+                { 
+                  $project: {
+                    path: 1
+                  }
+                 }
+              ],
+              as: "categoryDetails",
+            },
+          },
+          {
+            $unwind: { path: '$categoryDetails', preserveNullAndEmptyArrays: true }, // Unwind categoryDetails
+          },
+        ];
+      
+        const [data, total] = await Promise.all([
+          repository.aggregate(pipeline).toArray(),
+          repository.countDocuments(filters),
+        ]);
+      
+        return { data, total };
+      }
 
   async search(
     text: string, 
