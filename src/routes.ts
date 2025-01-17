@@ -6,12 +6,14 @@ import { validateRequest }  from './middlewares/validation'
 import { authenticate } from './middlewares/authentication'
 import ShapeController  from './controllers/shape.controller'
 import CategoriesController from './controllers/categories.controller'
+import UserController from './controllers/user.controller'
 
 var router = express.Router();
 
 export const controllers = [
   ShapeController,
-  CategoriesController
+  CategoriesController,
+  UserController
 ]
 
 controllers.forEach(controller => {
