@@ -24,6 +24,6 @@ export class User extends BaseEntity{
     enum: UserRole,
     default: UserRole.END_USER, // Reference the enum value here
   })
-    role: UserRole;
+    role: UserRole = UserRole.END_USER;
 
 }

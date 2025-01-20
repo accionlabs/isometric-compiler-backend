@@ -22,3 +22,8 @@ export class CreateUserDto {
   })
   status?: 'active' | 'inactive';
 }
+
+export class LoginUserDto{
+    @IsNotEmpty({message: 'token is required!'})
+    token: string
+}
