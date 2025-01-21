@@ -22,7 +22,7 @@ export default class CategoriesController {
 
     @Post('/', CategoryValidation, {
         authorizedRole: 'all',
-        isAuthenticated: false
+        isAuthenticated: true
     },
         Category)
     async createCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -79,7 +79,7 @@ export default class CategoriesController {
 
     @Put('/:id', CategoryUpadteValidation, {
         authorizedRole: 'all',
-        isAuthenticated: false
+        isAuthenticated: true
     },
         Category || null)
     async updateCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -103,7 +103,7 @@ export default class CategoriesController {
 
     @Get('/', {
         authorizedRole: 'all',
-        isAuthenticated: false
+        isAuthenticated: true
     },
         Array<Category>)
     async getCategories(req: Request, res: Response, next: NextFunction): Promise<void> {

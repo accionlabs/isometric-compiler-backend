@@ -100,7 +100,7 @@ export default class ShapeController {
 
   @Post('/', ValidShape, {
     authorizedRole: 'all',
-    isAuthenticated: false
+    isAuthenticated: true
   },
   Shape)
   async createShape(req: Request, res: Response, next: NextFunction): Promise<void> {
