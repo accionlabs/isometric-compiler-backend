@@ -7,13 +7,15 @@ import { authenticate } from './middlewares/authentication'
 import ShapeController  from './controllers/shape.controller'
 import CategoriesController from './controllers/categories.controller'
 import UserController from './controllers/user.controller'
+import DiagramController from './controllers/diagram.controller'
 
 var router = express.Router();
 
 export const controllers = [
   ShapeController,
   CategoriesController,
-  UserController
+  UserController,
+  DiagramController
 ]
 
 controllers.forEach(controller => {
