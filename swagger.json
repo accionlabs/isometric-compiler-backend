@@ -12,6 +12,11 @@
         "tags": [
           "Categories"
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "format",
@@ -135,6 +140,11 @@
         "tags": [
           "Categories"
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -169,6 +179,11 @@
         "summary": "Update a category by ID",
         "tags": [
           "Categories"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "parameters": [
           {
@@ -221,6 +236,11 @@
         "description": "Retrieve a specific category by its unique ID.",
         "tags": [
           "Categories"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "parameters": [
           {
@@ -345,6 +365,11 @@
         "tags": [
           "Categories"
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -440,6 +465,11 @@
         "summary": "Get all shapes",
         "tags": [
           "Shapes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "parameters": [
           {
@@ -554,6 +584,11 @@
         "summary": "Create a new shape",
         "tags": [
           "Shapes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "requestBody": {
           "required": true,
@@ -888,6 +923,11 @@
         "tags": [
           "Shapes"
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1015,6 +1055,11 @@
         "description": "Updates the details of an existing shape using its ID. The ID must be a valid ObjectId.",
         "tags": [
           "Shapes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "parameters": [
           {
@@ -1407,6 +1452,11 @@
         "tags": [
           "Shapes"
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1508,6 +1558,11 @@
         "tags": [
           "Shapes"
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "categoryId",
@@ -1585,6 +1640,11 @@
         "summary": "Search for parent shapes",
         "tags": [
           "Shapes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "description": "This endpoint allows you to search for parent shapes based on dynamic filters. Use dot notation to specify filters (e.g., `filters[field][$operator]=value`). The following fields are supported for filtering:\n\n **`name`**, **`type`**, **`author`**, **`tags`**, **`category`**, **`version`**",
         "parameters": [
@@ -1800,9 +1860,239 @@
           }
         }
       }
+    },
+    "/diagram/{id}": {
+      "put": {
+        "summary": "Update an existing diagram",
+        "tags": ["Diagrams"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the diagram to update.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Diagram"
+              },
+              "example": {
+                "name": "isometric_diagram v1 hasan ka token",
+                "version": "1.0.2",
+                "metadata": {
+                  "check": {
+                    "sso": "keycloak"
+                  }
+                },
+                "diagramComponents": {
+                  "userstory": "check v2"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Diagram successfully updated",
+            "content": {
+              "application/json": {
+                "example": {
+                  "_id": "6790d08347407353d5047171",
+                  "name": "isometric_diagram v1 hasan ka token",
+                  "version": "1.0.2",
+                  "metadata": {
+                    "check": {
+                      "sso": "keycloak"
+                    }
+                  },
+                  "diagramComponents": {
+                    "userstory": "check v2"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Valid token required."
+          },
+          "404": {
+            "description": "Diagram not found."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a diagram",
+        "tags": ["Diagrams"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the diagram to delete.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Diagram successfully deleted"
+          },
+          "401": {
+            "description": "Unauthorized - Valid token required."
+          },
+          "404": {
+            "description": "Diagram not found."
+          }
+        }
+      }
+    },
+    "/diagram": {
+      "post": {
+        "summary": "Create a new diagram",
+        "tags": [
+          "Diagrams"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Diagram"
+              },
+              "example": {
+                "name": "Sample Diagram",
+                "version": "1.0.0",
+                "metadata": {
+                  "project": "AI development",
+                  "priority": "high"
+                },
+                "diagramComponents": {
+                  "component1": {
+                    "type": "database",
+                    "position": "center"
+                  },
+                  "component2": {
+                    "type": "server",
+                    "position": "left"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Diagram successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Diagram"
+                },
+                "example": {
+                  "_id": "676e9af6c73809d1a6f04f02",
+                  "createdAt": "2025-01-23T10:00:00.000Z",
+                  "updatedAt": "2025-01-23T10:00:00.000Z",
+                  "author": "authorId123",
+                  "name": "Sample Diagram",
+                  "version": "1.0.0",
+                  "metadata": {
+                    "project": "AI development",
+                    "priority": "high"
+                  },
+                  "diagramComponents": {
+                    "component1": {
+                      "type": "database",
+                      "position": "center"
+                    },
+                    "component2": {
+                      "type": "server",
+                      "position": "left"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all diagrams",
+        "tags": ["Diagrams"],
+        "responses": {
+          "200": {
+            "description": "List of diagrams",
+            "content": {
+              "application/json": {
+                "example": [
+                  {
+                    "_id": "6790d01af226797ad5d1e5d6",
+                    "name": "Sample Diagram",
+                    "version": "1.0.0",
+                    "metadata": {
+                      "project": "Project Alpha"
+                    },
+                    "diagramComponents": {
+                      "component1": {
+                        "type": "database",
+                        "position": "center"
+                      }
+                    }
+                  },
+                  {
+                    "_id": "6790d08347407353d5047171",
+                    "name": "isometric_diagram v1 hasan ka token",
+                    "version": "1.0.2",
+                    "metadata": {
+                      "check": {
+                        "sso": "keycloak"
+                      }
+                    },
+                    "diagramComponents": {
+                      "userstory": "check v2"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Valid token required."
+          }
+        }
+      }
     }
   },
   "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
     "schemas": {
       "Category": {
         "type": "object",
@@ -1950,6 +2240,34 @@
             }
           }
         }
+      },
+      "Diagram": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the diagram."
+          },
+          "version": {
+            "type": "string",
+            "default": "1.0.0",
+            "description": "The version of the diagram."
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata associated with the diagram.",
+            "additionalProperties": true
+          },
+          "diagramComponents": {
+            "type": "object",
+            "description": "A collection of components in the diagram.",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Details about the diagram component."
+            }
+          }
+        },
+        "required": ["name"]
       }
     }
   }
