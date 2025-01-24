@@ -23,6 +23,6 @@ import { BaseEntity } from './base.entity';
     metadata: any;
   
     @Column({ type: 'json', nullable: true })
-    diagramComponents: any;
+    diagramComponents: Record<string, any>[]; 
   }
   

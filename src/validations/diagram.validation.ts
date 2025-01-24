@@ -4,6 +4,7 @@ import {
     IsOptional,
     IsMongoId,
     IsObject,
+    IsArray,
 } from 'class-validator';
 
 export class CreateDiagramValidation {
@@ -21,8 +22,9 @@ export class CreateDiagramValidation {
     metadata?: any;
 
     @IsOptional()
+    @IsArray()
     @IsObject({ each: true })
-    diagramComponents?: any;
+    diagramComponents?:  Record<string, any>[]; 
 }
 
 export class DiagramUpdateValidation {
