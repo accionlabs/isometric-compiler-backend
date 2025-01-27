@@ -137,4 +137,10 @@ export class ShapeUpdateValidation {
   @IsArray()
   @IsObject({ each: true })
   attachment_points?: Record<string, any>[];
+
+  @IsOptional()
+  @IsEnum(['active', 'inactive'], {
+    message: 'Status must be either active or inactive',
+  })
+  status?: 'active' | 'inactive';
 }

@@ -5,6 +5,7 @@ import {
     IsMongoId,
     IsObject,
     IsArray,
+    IsEnum,
 } from 'class-validator';
 
 export class CreateDiagramValidation {
@@ -43,4 +44,10 @@ export class DiagramUpdateValidation {
     @IsOptional()
     @IsObject({ each: true })
     diagramComponents?: any;
+
+    @IsOptional()
+    @IsEnum(['active', 'inactive'], {
+    message: 'Status must be either active or inactive',
+    })
+    status?: 'active' | 'inactive';
 }
