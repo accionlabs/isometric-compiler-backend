@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsArray, IsInt, IsJSON, ValidateNested, IsNotEmpty, IsMongoId, MinLength, isObject, IsObject } from 'class-validator';
+import { IsString, IsOptional, IsArray, IsInt, IsJSON, ValidateNested, IsNotEmpty, IsMongoId, MinLength, isObject, IsObject, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ObjectId } from 'typeorm';
 
@@ -66,4 +66,10 @@ export class CategoryUpadteValidation {
     @ValidateNested() // Validate nested Metadata object
     @Type(() => Metadata) // Ensure the Type for Metadata is applied for validation
     metadata: Metadata;
+
+    @IsOptional()
+    @IsEnum(['active', 'inactive'], {
+    message: 'Status must be either active or inactive',
+    })
+    status?: 'active' | 'inactive';
 }
