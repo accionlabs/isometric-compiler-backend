@@ -89,6 +89,11 @@ export class ShapeService extends BaseService<Shape> {
         $match: query
       },
       {
+        $addFields: {
+          score: { $meta: "textScore" } // Add the text score to each document
+        }
+      },
+      {
         $lookup: {
           from: "categories",
           let: { category: "$category" },
@@ -114,6 +119,9 @@ export class ShapeService extends BaseService<Shape> {
           path: "$categoryDetails",
           preserveNullAndEmptyArrays: true,
         },
+      },
+      {
+        $sort: { score:  -1, updatedAt: -1 }
       },
       {
         $skip: skip
