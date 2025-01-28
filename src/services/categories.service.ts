@@ -224,7 +224,8 @@ export class CategoryService extends BaseService<Category> {
       return repository.find({
           where: { $and: [ filters, { $text: { $search: text } } ] },
           skip,
-          take: limit
+          take: limit,
+          order: { score: { $meta: "textScore" } }
         })
     }
 }
