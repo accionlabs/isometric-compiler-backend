@@ -1,0 +1,2274 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Shapes and Categories API",
+    "version": "1.0.0",
+    "description": "API documentation for managing categories and shapes."
+  },
+  "paths": {
+    "/categories": {
+      "get": {
+        "summary": "Get all categories with optional formatting and filtering",
+        "tags": [
+          "Categories"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "description": "Optional. Specifies the response format. By default, the response is formatted. Use 'nested' for a nested category structure.filters and sorting will not work if any format is selected",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "formatted",
+                "nested"
+              ],
+              "default": "formatted"
+            },
+            "example": "formatted"
+          },
+          {
+            "name": "sortName",
+            "in": "query",
+            "description": "Optional. The field to sort by. Defaults to 'createdAt'.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "createdAt"
+            },
+            "example": "createdAt"
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "description": "Optional. The sort order, either 'asc' for ascending or 'desc' for descending. Defaults to 'asc'.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "asc"
+            },
+            "example": "asc"
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "description": "Dynamic filters for querying categories. Use dot notation to specify filters (e.g., `filters[name][$operator]=value`). The following fields are supported for filtering: **`name`**, **`parent`**, **`path`**. Allowed operators: `$eq`, `$ne`, `$in`, `$gte`, `$lte`, `$gt`, `$lt`.",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "examples": {
+              "Example 1": {
+                "value": {
+                  "filters[name][$eq]": "default parent",
+                  "filters[parent][$ne]": "null",
+                  "filters[path][$in]": "default parent"
+                }
+              },
+              "Example 2": {
+                "value": {
+                  "filters[name][$gte]": "layer shape 3",
+                  "filters[path][$lt]": "path2"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of formatted categories or nested categories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Category"
+                  },
+                  "example": [
+                    {
+                      "_id": "677280b9db9875cbb8a7d301",
+                      "createdAt": "2024-12-30T11:15:05.294Z",
+                      "updatedAt": "2024-12-30T11:15:05.294Z",
+                      "status": "active",
+                      "name": "default parent",
+                      "description": "new category for accion labs child",
+                      "parent": null,
+                      "path": "default parent",
+                      "metadata": null,
+                      "ancestors": [],
+                      "allDescendants": [
+                        {
+                          "_id": "6773a713db9875cbb8a7d302",
+                          "createdAt": "2024-12-31T08:10:59.911Z",
+                          "updatedAt": "2024-12-31T08:10:59.911Z",
+                          "status": "active",
+                          "name": "default parent",
+                          "description": "new category for accion labs child",
+                          "parent": "677280b9db9875cbb8a7d301",
+                          "path": "default parent/default parent",
+                          "metadata": null,
+                          "ancestors": [
+                            "677280b9db9875cbb8a7d301"
+                          ],
+                          "level": 0
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "note": "Filters will work when no format is selected. Filters can be applied to fields like 'name', 'parent', and 'path' using the following operators: '$eq', '$ne', '$in', '$gte', '$lte', '$gt', '$lt'. Example: categories?filters[name][$eq]=layer shape 3"
+      },
+      "post": {
+        "summary": "Create a new category",
+        "tags": [
+          "Categories"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Category"
+              },
+              "example": {
+                "name": "default parent",
+                "description": "new category for accion labs",
+                "parent": null
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Category created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/categories/{id}": {
+      "put": {
+        "summary": "Update a category by ID",
+        "tags": [
+          "Categories"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Category"
+              },
+              "example": {
+                "name": "default parent child v1",
+                "description": "new category for accion labs child",
+                "parent": "677280b9db9875cbb8a7d301",
+                "Metadata": {
+                  "displayOrder": "1",
+                  "icon": "default icon",
+                  "customProperties": {
+                    "name": "default parent",
+                    "value": "small"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Category updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get category by ID",
+        "description": "Retrieve a specific category by its unique ID.",
+        "tags": [
+          "Categories"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the category",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "12345abcde"
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "Category Name"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Detailed description of the category"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "example": "2024-12-31T12:00:00Z"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "example": "2024-12-31T12:00:00Z"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Category not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Category not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid ID format"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Something went wrong"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a category by ID",
+        "description": "Deletes a category based on the provided ID. The ID must be a valid ObjectId. Additionally, you can pass `categoryIdForExistingShapes` as a query parameter to associate the deletion with shapes under that category.",
+        "tags": [
+          "Categories"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the category to delete",
+            "schema": {
+              "type": "string",
+              "example": "677cd8973214ab562b333a52"
+            }
+          },
+          {
+            "name": "categoryIdForExistingShapes",
+            "in": "query",
+            "required": false,
+            "description": "The ID of the category for existing shapes to be affected by the deletion",
+            "schema": {
+              "type": "string",
+              "example": "677baa5b56b727fad9a71cd8"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category successfully deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Category deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid ID format"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Category not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Category not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Something went wrong"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shapes": {
+      "get": {
+        "summary": "Get all shapes",
+        "tags": [
+          "Shapes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "filters",
+            "in": "query",
+            "description": "Dynamic filters for querying shapes. Use dot notation to specify filters (e.g., `filters[field][$operator]=value`).The following fields are supported for filtering:\n\n **`name`**, **`type`**, **`author`**, **`tags`**, **`category`**, **`version`**",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "examples": {
+              "Example 1": {
+                "value": {
+                  "filters[name][$eq]": "MyShapeName4",
+                  "filters[type][$ne]": "3D",
+                  "filters[category][$in]": "676d21530b21683093603bdb"
+                }
+              },
+              "Example 2": {
+                "value": {
+                  "filters[author][$eq]": "authorId123",
+                  "filters[tags][$in]": "design"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of shapes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Shape"
+                      },
+                      "description": "List of shapes"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "description": "Total number of shapes"
+                    }
+                  }
+                },
+                "example": {
+                  "data": [
+                    {
+                      "_id": "676e9af6c73809d1a6f04f02",
+                      "createdAt": "2024-12-27T12:17:58.424Z",
+                      "updatedAt": "2024-12-27T12:17:58.424Z",
+                      "status": "active",
+                      "name": "circle 2*2",
+                      "type": "2D",
+                      "attachTo": "categoryId latest",
+                      "svgFile": "my-shape.svg",
+                      "svgContent": "<svg>...</svg>",
+                      "version": "1.0.1",
+                      "category": "676e9af6c73809d1a6f04f02",
+                      "metadata": {
+                        "description": "A detailed description of the shape",
+                        "applicationTypes": [
+                          "website",
+                          "tab"
+                        ],
+                        "customProperties": {
+                          "name": "custom data"
+                        },
+                        "dependencies": [
+                          {
+                            "shapeId": "shapeId1",
+                            "version": "1.0.0"
+                          }
+                        ]
+                      },
+                      "tags": [
+                        "2d layer",
+                        "component specific"
+                      ],
+                      "author": "authorId123",
+                      "diagram_components": {
+                        "component1": {
+                          "type": "visual",
+                          "position": "top-left"
+                        }
+                      },
+                      "attachment_points": {
+                        "point1": {
+                          "coordinates": [
+                            10,
+                            20
+                          ],
+                          "type": "connection"
+                        }
+                      }
+                    }
+                  ],
+                  "total": 1
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new shape",
+        "tags": [
+          "Shapes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Shape"
+              },
+              "example": {
+                "name": "layer shape",
+                "type": "2D",
+                "attachTo": "categoryId latest",
+                "svgFile": "my-shape.svg",
+                "svgContent": "<svg>...</svg>",
+                "version": "1.0.1",
+                "category": "676e9a0dc6b16c1303c76b7c",
+                "metadata": {
+                  "description": "A detailed description of the shape",
+                  "applicationTypes": [
+                    "website",
+                    "tab"
+                  ],
+                  "customProperties": {
+                    "name": "custom data"
+                  },
+                  "dependencies": [
+                    {
+                      "shapeId": "shapeId1",
+                      "version": "1.0.0"
+                    }
+                  ]
+                },
+                "tags": [
+                  "2d layer",
+                  "component specific"
+                ],
+                "author": "authorId123",
+                "diagram_components": [
+                  {
+                    "id": "shape-1736157286702-iynkldxxt",
+                    "shape": "server-L",
+                    "position": "top",
+                    "source": "shape",
+                    "relativeToId": null,
+                    "attached2DShapes": [],
+                    "attachmentPoints": [
+                      {
+                        "name": "attach-front-right",
+                        "x": 226.2,
+                        "y": 159.39999
+                      },
+                      {
+                        "name": "attach-front-left",
+                        "x": 63.700001,
+                        "y": 159.39999
+                      },
+                      {
+                        "name": "attach-back-left",
+                        "x": 63.799999,
+                        "y": 65.599998
+                      },
+                      {
+                        "name": "attach-top",
+                        "x": 144.89999,
+                        "y": 76.400002
+                      },
+                      {
+                        "name": "attach-back-right",
+                        "x": 226.2,
+                        "y": 65.599998
+                      },
+                      {
+                        "name": "attach-bottom",
+                        "x": 145,
+                        "y": 148.60001
+                      }
+                    ]
+                  },
+                  {
+                    "id": "shape-1736157286703-502hkdwrk",
+                    "shape": "database-L",
+                    "position": "top",
+                    "source": "shape",
+                    "relativeToId": "shape-1736157286702-iynkldxxt",
+                    "attached2DShapes": [
+                      {
+                        "name": "react logo-L",
+                        "attachedTo": "top"
+                      }
+                    ],
+                    "attachmentPoints": [
+                      {
+                        "name": "attach-top",
+                        "x": 106,
+                        "y": 54
+                      },
+                      {
+                        "name": "attach-bottom",
+                        "x": 106,
+                        "y": 126.2
+                      },
+                      {
+                        "name": "attach-front-right",
+                        "x": 187.2,
+                        "y": 137
+                      },
+                      {
+                        "name": "attach-back-right",
+                        "x": 187.2,
+                        "y": 43.200001
+                      },
+                      {
+                        "name": "attach-front-left",
+                        "x": 24.700001,
+                        "y": 137
+                      },
+                      {
+                        "name": "attach-back-left",
+                        "x": 24.700001,
+                        "y": 43.200001
+                      }
+                    ]
+                  }
+                ],
+                "attachment_points": [
+                  {
+                    "name": "attach-top",
+                    "x": 645,
+                    "y": 504
+                  },
+                  {
+                    "name": "attach-front-right",
+                    "x": 726,
+                    "y": 659
+                  },
+                  {
+                    "name": "attach-front-left",
+                    "x": 564,
+                    "y": 659
+                  },
+                  {
+                    "name": "attach-back-left",
+                    "x": 564,
+                    "y": 566
+                  },
+                  {
+                    "name": "attach-back-right",
+                    "x": 726,
+                    "y": 566
+                  },
+                  {
+                    "name": "attach-bottom",
+                    "x": 645,
+                    "y": 649
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Shape created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Shape"
+                },
+                "example": {
+                  "_id": "676e9af6c73809d1a6f04f02",
+                  "createdAt": "2024-12-27T12:17:58.424Z",
+                  "updatedAt": "2024-12-27T12:17:58.424Z",
+                  "status": "active",
+                  "name": "2d layer latest",
+                  "type": "2D",
+                  "attachTo": "categoryId latest",
+                  "svgFile": "my-shape.svg",
+                  "svgContent": "<svg>...</svg>",
+                  "version": "1.0.1",
+                  "category": "676e9a0dc6b16c1303c76b7c",
+                  "metadata": {
+                    "description": "A detailed description of the shape",
+                    "applicationTypes": [
+                      "website",
+                      "tab"
+                    ],
+                    "customProperties": {
+                      "name": "custom data"
+                    },
+                    "dependencies": [
+                      {
+                        "shapeId": "shapeId1",
+                        "version": "1.0.0"
+                      }
+                    ]
+                  },
+                  "tags": [
+                    "2d layer",
+                    "component specific"
+                  ],
+                  "author": "authorId123",
+                  "diagram_components": [
+                    {
+                      "id": "shape-1736157286702-iynkldxxt",
+                      "shape": "server-L",
+                      "position": "top",
+                      "source": "shape",
+                      "relativeToId": null,
+                      "attached2DShapes": [],
+                      "attachmentPoints": [
+                        {
+                          "name": "attach-front-right",
+                          "x": 226.2,
+                          "y": 159.39999
+                        },
+                        {
+                          "name": "attach-front-left",
+                          "x": 63.700001,
+                          "y": 159.39999
+                        },
+                        {
+                          "name": "attach-back-left",
+                          "x": 63.799999,
+                          "y": 65.599998
+                        },
+                        {
+                          "name": "attach-top",
+                          "x": 144.89999,
+                          "y": 76.400002
+                        },
+                        {
+                          "name": "attach-back-right",
+                          "x": 226.2,
+                          "y": 65.599998
+                        },
+                        {
+                          "name": "attach-bottom",
+                          "x": 145,
+                          "y": 148.60001
+                        }
+                      ]
+                    },
+                    {
+                      "id": "shape-1736157286703-502hkdwrk",
+                      "shape": "database-L",
+                      "position": "top",
+                      "source": "shape",
+                      "relativeToId": "shape-1736157286702-iynkldxxt",
+                      "attached2DShapes": [
+                        {
+                          "name": "react logo-L",
+                          "attachedTo": "top"
+                        }
+                      ],
+                      "attachmentPoints": [
+                        {
+                          "name": "attach-top",
+                          "x": 106,
+                          "y": 54
+                        },
+                        {
+                          "name": "attach-bottom",
+                          "x": 106,
+                          "y": 126.2
+                        },
+                        {
+                          "name": "attach-front-right",
+                          "x": 187.2,
+                          "y": 137
+                        },
+                        {
+                          "name": "attach-back-right",
+                          "x": 187.2,
+                          "y": 43.200001
+                        },
+                        {
+                          "name": "attach-front-left",
+                          "x": 24.700001,
+                          "y": 137
+                        },
+                        {
+                          "name": "attach-back-left",
+                          "x": 24.700001,
+                          "y": 43.200001
+                        }
+                      ]
+                    }
+                  ],
+                  "attachment_points": [
+                    {
+                      "name": "attach-top",
+                      "x": 645,
+                      "y": 504
+                    },
+                    {
+                      "name": "attach-front-right",
+                      "x": 726,
+                      "y": 659
+                    },
+                    {
+                      "name": "attach-front-left",
+                      "x": 564,
+                      "y": 659
+                    },
+                    {
+                      "name": "attach-back-left",
+                      "x": 564,
+                      "y": 566
+                    },
+                    {
+                      "name": "attach-back-right",
+                      "x": 726,
+                      "y": 566
+                    },
+                    {
+                      "name": "attach-bottom",
+                      "x": 645,
+                      "y": 649
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shapes/{id}": {
+      "get": {
+        "summary": "Get a shape by ID",
+        "description": "Retrieves a shape's details based on the provided ID. The ID must be a valid ObjectId.",
+        "tags": [
+          "Shapes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the shape to retrieve",
+            "schema": {
+              "type": "string",
+              "example": "64b2bfe47f3f1a7bfa2d1234"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Shape retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Shape"
+                },
+                "example": {
+                  "_id": "64b2bfe47f3f1a7bfa2d1234",
+                  "createdAt": "2024-12-27T12:17:58.424Z",
+                  "updatedAt": "2024-12-27T12:17:58.424Z",
+                  "status": "active",
+                  "name": "circle 2*2",
+                  "type": "2D",
+                  "attachTo": "categoryId latest",
+                  "svgFile": "my-shape.svg",
+                  "svgContent": "<svg>...</svg>",
+                  "version": "1.0.1",
+                  "category": "676e9af6c73809d1a6f04f02",
+                  "metadata": {
+                    "description": "A detailed description of the shape",
+                    "applicationTypes": [
+                      "website",
+                      "tab"
+                    ],
+                    "customProperties": {
+                      "name": "custom data"
+                    },
+                    "dependencies": [
+                      {
+                        "shapeId": "shapeId1",
+                        "version": "1.0.0"
+                      }
+                    ]
+                  },
+                  "tags": [
+                    "accionConnect",
+                    "breeze"
+                  ],
+                  "author": "authorId123",
+                  "diagram_components": {
+                    "component1": {
+                      "type": "visual",
+                      "position": "top-left"
+                    }
+                  },
+                  "attachment_points": {
+                    "point1": {
+                      "coordinates": [
+                        10,
+                        20
+                      ],
+                      "type": "connection"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid ID format"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Shape not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Shape not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Something went wrong"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a shape by ID",
+        "description": "Updates the details of an existing shape using its ID. The ID must be a valid ObjectId.",
+        "tags": [
+          "Shapes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the shape to update",
+            "schema": {
+              "type": "string",
+              "example": "64b2bfe47f3f1a7bfa2d1234"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Shape"
+              },
+              "example": {
+                "name": "Updated Shape",
+                "type": "3D",
+                "attachTo": "updatedCategoryId",
+                "svgFile": "updated-shape.svg",
+                "svgContent": "<svg>Updated content</svg>",
+                "version": "2.0.0",
+                "category": "676e9af6c73809d1a6f04f02",
+                "metadata": {
+                  "description": "An updated description of the shape",
+                  "applicationTypes": [
+                    "mobile",
+                    "tablet"
+                  ],
+                  "customProperties": {
+                    "updatedProperty": "updated value"
+                  },
+                  "dependencies": [
+                    {
+                      "shapeId": "updatedShapeId1",
+                      "version": "2.0.0"
+                    }
+                  ]
+                },
+                "tags": [
+                  "updatedTag1",
+                  "updatedTag2"
+                ],
+                "author": "updatedAuthorId",
+                "diagram_components": [
+                  {
+                    "id": "shape-1736157286702-iynkldxxt",
+                    "shape": "server-L",
+                    "position": "top",
+                    "source": "shape",
+                    "relativeToId": null,
+                    "attached2DShapes": [],
+                    "attachmentPoints": [
+                      {
+                        "name": "attach-front-right",
+                        "x": 226.2,
+                        "y": 159.39999
+                      },
+                      {
+                        "name": "attach-front-left",
+                        "x": 63.700001,
+                        "y": 159.39999
+                      },
+                      {
+                        "name": "attach-back-left",
+                        "x": 63.799999,
+                        "y": 65.599998
+                      },
+                      {
+                        "name": "attach-top",
+                        "x": 144.89999,
+                        "y": 76.400002
+                      },
+                      {
+                        "name": "attach-back-right",
+                        "x": 226.2,
+                        "y": 65.599998
+                      },
+                      {
+                        "name": "attach-bottom",
+                        "x": 145,
+                        "y": 148.60001
+                      }
+                    ]
+                  },
+                  {
+                    "id": "shape-1736157286703-502hkdwrk",
+                    "shape": "database-L",
+                    "position": "top",
+                    "source": "shape",
+                    "relativeToId": "shape-1736157286702-iynkldxxt",
+                    "attached2DShapes": [
+                      {
+                        "name": "react logo-L",
+                        "attachedTo": "top"
+                      }
+                    ],
+                    "attachmentPoints": [
+                      {
+                        "name": "attach-top",
+                        "x": 106,
+                        "y": 54
+                      },
+                      {
+                        "name": "attach-bottom",
+                        "x": 106,
+                        "y": 126.2
+                      },
+                      {
+                        "name": "attach-front-right",
+                        "x": 187.2,
+                        "y": 137
+                      },
+                      {
+                        "name": "attach-back-right",
+                        "x": 187.2,
+                        "y": 43.200001
+                      },
+                      {
+                        "name": "attach-front-left",
+                        "x": 24.700001,
+                        "y": 137
+                      },
+                      {
+                        "name": "attach-back-left",
+                        "x": 24.700001,
+                        "y": 43.200001
+                      }
+                    ]
+                  }
+                ],
+                "attachment_points": [
+                  {
+                    "name": "attach-top",
+                    "x": 645,
+                    "y": 504
+                  },
+                  {
+                    "name": "attach-front-right",
+                    "x": 726,
+                    "y": 659
+                  },
+                  {
+                    "name": "attach-front-left",
+                    "x": 564,
+                    "y": 659
+                  },
+                  {
+                    "name": "attach-back-left",
+                    "x": 564,
+                    "y": 566
+                  },
+                  {
+                    "name": "attach-back-right",
+                    "x": 726,
+                    "y": 566
+                  },
+                  {
+                    "name": "attach-bottom",
+                    "x": 645,
+                    "y": 649
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Shape updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Shape"
+                },
+                "example": {
+                  "_id": "64b2bfe47f3f1a7bfa2d1234",
+                  "createdAt": "2024-12-27T12:17:58.424Z",
+                  "updatedAt": "2024-12-31T13:00:00.000Z",
+                  "status": "active",
+                  "name": "Updated Shape",
+                  "type": "3D",
+                  "attachTo": "updatedCategoryId",
+                  "svgFile": "updated-shape.svg",
+                  "svgContent": "<svg>Updated content</svg>",
+                  "version": "2.0.0",
+                  "category": "676e9af6c73809d1a6f04f02",
+                  "metadata": {
+                    "description": "An updated description of the shape",
+                    "applicationTypes": [
+                      "mobile",
+                      "tablet"
+                    ],
+                    "customProperties": {
+                      "updatedProperty": "updated value"
+                    },
+                    "dependencies": [
+                      {
+                        "shapeId": "updatedShapeId1",
+                        "version": "2.0.0"
+                      }
+                    ]
+                  },
+                  "tags": [
+                    "updatedTag1",
+                    "updatedTag2"
+                  ],
+                  "author": "updatedAuthorId",
+                  "diagram_components": [
+                    {
+                      "id": "shape-1736157286702-iynkldxxt",
+                      "shape": "server-L",
+                      "position": "top",
+                      "source": "shape",
+                      "relativeToId": null,
+                      "attached2DShapes": [],
+                      "attachmentPoints": [
+                        {
+                          "name": "attach-front-right",
+                          "x": 226.2,
+                          "y": 159.39999
+                        },
+                        {
+                          "name": "attach-front-left",
+                          "x": 63.700001,
+                          "y": 159.39999
+                        },
+                        {
+                          "name": "attach-back-left",
+                          "x": 63.799999,
+                          "y": 65.599998
+                        },
+                        {
+                          "name": "attach-top",
+                          "x": 144.89999,
+                          "y": 76.400002
+                        },
+                        {
+                          "name": "attach-back-right",
+                          "x": 226.2,
+                          "y": 65.599998
+                        },
+                        {
+                          "name": "attach-bottom",
+                          "x": 145,
+                          "y": 148.60001
+                        }
+                      ]
+                    },
+                    {
+                      "id": "shape-1736157286703-502hkdwrk",
+                      "shape": "database-L",
+                      "position": "top",
+                      "source": "shape",
+                      "relativeToId": "shape-1736157286702-iynkldxxt",
+                      "attached2DShapes": [
+                        {
+                          "name": "react logo-L",
+                          "attachedTo": "top"
+                        }
+                      ],
+                      "attachmentPoints": [
+                        {
+                          "name": "attach-top",
+                          "x": 106,
+                          "y": 54
+                        },
+                        {
+                          "name": "attach-bottom",
+                          "x": 106,
+                          "y": 126.2
+                        },
+                        {
+                          "name": "attach-front-right",
+                          "x": 187.2,
+                          "y": 137
+                        },
+                        {
+                          "name": "attach-back-right",
+                          "x": 187.2,
+                          "y": 43.200001
+                        },
+                        {
+                          "name": "attach-front-left",
+                          "x": 24.700001,
+                          "y": 137
+                        },
+                        {
+                          "name": "attach-back-left",
+                          "x": 24.700001,
+                          "y": 43.200001
+                        }
+                      ]
+                    }
+                  ],
+                  "attachment_points": [
+                    {
+                      "name": "attach-top",
+                      "x": 645,
+                      "y": 504
+                    },
+                    {
+                      "name": "attach-front-right",
+                      "x": 726,
+                      "y": 659
+                    },
+                    {
+                      "name": "attach-front-left",
+                      "x": 564,
+                      "y": 659
+                    },
+                    {
+                      "name": "attach-back-left",
+                      "x": 564,
+                      "y": 566
+                    },
+                    {
+                      "name": "attach-back-right",
+                      "x": 726,
+                      "y": 566
+                    },
+                    {
+                      "name": "attach-bottom",
+                      "x": 645,
+                      "y": 649
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or ID format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid ID format or request body"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Shape not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Shape not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Something went wrong"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a shape",
+        "description": "Delete a specific shape by its ID.",
+        "tags": [
+          "Shapes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the shape to delete",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Shape deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Shape deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Shape not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Shape not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid ID format"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Something went wrong"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shapes/category/{categoryId}": {
+      "get": {
+        "summary": "Get shapes by category ID",
+        "tags": [
+          "Shapes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "description": "The ID of the category to retrieve shapes for.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "677271fbc191b99b3f4b4d6d"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of shapes in the specified category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Shape"
+                      },
+                      "example": [
+                        {
+                          "_id": "exampleShapeId1",
+                          "name": "Shape 1",
+                          "category": "677271fbc191b99b3f4b4d6d",
+                          "description": "A description of shape 1",
+                          "createdAt": "2024-12-30T11:15:05.294Z",
+                          "updatedAt": "2024-12-30T11:15:05.294Z"
+                        },
+                        {
+                          "_id": "exampleShapeId2",
+                          "name": "Shape 2",
+                          "category": "677271fbc191b99b3f4b4d6d",
+                          "description": "A description of shape 2",
+                          "createdAt": "2024-12-30T11:15:05.294Z",
+                          "updatedAt": "2024-12-30T11:15:05.294Z"
+                        }
+                      ]
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 2
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Category not found or incorrect category ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "incorrect category ID"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shapes/search/{searchText}": {
+      "get": {
+        "summary": "Search for parent shapes",
+        "tags": [
+          "Shapes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "This endpoint allows you to search for parent shapes based on dynamic filters. Use dot notation to specify filters (e.g., `filters[field][$operator]=value`). The following fields are supported for filtering:\n\n **`name`**, **`type`**, **`author`**, **`tags`**, **`category`**, **`version`**",
+        "parameters": [
+          {
+            "name": "searchText",
+            "in": "path",
+            "required": true,
+            "description": "text to be search ",
+            "schema": {
+              "type": "string",
+              "example": "3 level child"
+            }
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "description": "Dynamic filters for querying shapes. You can use dot notation to specify filters. The following fields are supported for filtering:\n\n **`name`**, **`type`**, **`author`**, **`tags`**, **`category`**, **`version`**",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "examples": {
+              "Example 1": {
+                "value": {
+                  "filters[type][$eq]": "2D"
+                }
+              },
+              "Example 2": {
+                "value": {
+                  "filters[name][$eq]": "MyShapeName",
+                  "filters[category][$in]": "676d21530b21683093603bdb"
+                }
+              },
+              "Example 3": {
+                "value": {
+                  "filters[author][$eq]": "authorId123",
+                  "filters[tags][$in]": "design"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of parent shapes matching the filters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Shape"
+                      },
+                      "description": "List of parent shapes"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "description": "Total number of shapes matching the filter"
+                    }
+                  }
+                },
+                "example": {
+                  "data": [
+                    {
+                      "_id": "676e9af6c73809d1a6f04f02",
+                      "name": "circle 2*2",
+                      "type": "2D",
+                      "category": "676e9af6c73809d1a6f04f02",
+                      "author": "authorId123",
+                      "tags": [
+                        "2d layer",
+                        "component specific"
+                      ],
+                      "version": "1.0.1",
+                      "svgFile": "circle.svg",
+                      "svgContent": "<svg>...</svg>",
+                      "diagram_components": [
+                        {
+                          "id": "shape-1736157286702-iynkldxxt",
+                          "shape": "server-L",
+                          "position": "top",
+                          "source": "shape",
+                          "relativeToId": null,
+                          "attached2DShapes": [],
+                          "attachmentPoints": [
+                            {
+                              "name": "attach-front-right",
+                              "x": 226.2,
+                              "y": 159.39999
+                            },
+                            {
+                              "name": "attach-front-left",
+                              "x": 63.700001,
+                              "y": 159.39999
+                            },
+                            {
+                              "name": "attach-back-left",
+                              "x": 63.799999,
+                              "y": 65.599998
+                            },
+                            {
+                              "name": "attach-top",
+                              "x": 144.89999,
+                              "y": 76.400002
+                            },
+                            {
+                              "name": "attach-back-right",
+                              "x": 226.2,
+                              "y": 65.599998
+                            },
+                            {
+                              "name": "attach-bottom",
+                              "x": 145,
+                              "y": 148.60001
+                            }
+                          ]
+                        },
+                        {
+                          "id": "shape-1736157286703-502hkdwrk",
+                          "shape": "database-L",
+                          "position": "top",
+                          "source": "shape",
+                          "relativeToId": "shape-1736157286702-iynkldxxt",
+                          "attached2DShapes": [
+                            {
+                              "name": "react logo-L",
+                              "attachedTo": "top"
+                            }
+                          ],
+                          "attachmentPoints": [
+                            {
+                              "name": "attach-top",
+                              "x": 106,
+                              "y": 54
+                            },
+                            {
+                              "name": "attach-bottom",
+                              "x": 106,
+                              "y": 126.2
+                            },
+                            {
+                              "name": "attach-front-right",
+                              "x": 187.2,
+                              "y": 137
+                            },
+                            {
+                              "name": "attach-back-right",
+                              "x": 187.2,
+                              "y": 43.200001
+                            },
+                            {
+                              "name": "attach-front-left",
+                              "x": 24.700001,
+                              "y": 137
+                            },
+                            {
+                              "name": "attach-back-left",
+                              "x": 24.700001,
+                              "y": 43.200001
+                            }
+                          ]
+                        }
+                      ],
+                      "attachment_points": [
+                        {
+                          "name": "attach-top",
+                          "x": 645,
+                          "y": 504
+                        },
+                        {
+                          "name": "attach-front-right",
+                          "x": 726,
+                          "y": 659
+                        },
+                        {
+                          "name": "attach-front-left",
+                          "x": 564,
+                          "y": 659
+                        },
+                        {
+                          "name": "attach-back-left",
+                          "x": 564,
+                          "y": 566
+                        },
+                        {
+                          "name": "attach-back-right",
+                          "x": 726,
+                          "y": 566
+                        },
+                        {
+                          "name": "attach-bottom",
+                          "x": 645,
+                          "y": 649
+                        }
+                      ]
+                    }
+                  ],
+                  "total": 1
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters or filter format"
+          },
+          "404": {
+            "description": "No shapes found matching the filter"
+          }
+        }
+      }
+    },
+    "/diagram/{id}": {
+      "put": {
+        "summary": "Update an existing diagram",
+        "tags": ["Diagrams"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the diagram to update.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Diagram"
+              },
+              "example": {
+                "name": "isometric_diagram v1 hasan ka token",
+                "version": "1.0.2",
+                "metadata": {
+                  "check": {
+                    "sso": "keycloak"
+                  }
+                },
+                "diagramComponents": {
+                  "userstory": "check v2"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Diagram successfully updated",
+            "content": {
+              "application/json": {
+                "example": {
+                  "_id": "6790d08347407353d5047171",
+                  "name": "isometric_diagram v1 hasan ka token",
+                  "version": "1.0.2",
+                  "metadata": {
+                    "check": {
+                      "sso": "keycloak"
+                    }
+                  },
+                  "diagramComponents": {
+                    "userstory": "check v2"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Valid token required."
+          },
+          "404": {
+            "description": "Diagram not found."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a diagram",
+        "tags": ["Diagrams"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the diagram to delete.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Diagram successfully deleted"
+          },
+          "401": {
+            "description": "Unauthorized - Valid token required."
+          },
+          "404": {
+            "description": "Diagram not found."
+          }
+        }
+      }
+    },
+    "/diagram": {
+      "post": {
+        "summary": "Create a new diagram",
+        "tags": [
+          "Diagrams"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Diagram"
+              },
+              "example": {
+                "name": "Sample Diagram",
+                "version": "1.0.0",
+                "metadata": {
+                  "project": "AI development",
+                  "priority": "high"
+                },
+                "diagramComponents": {
+                  "component1": {
+                    "type": "database",
+                    "position": "center"
+                  },
+                  "component2": {
+                    "type": "server",
+                    "position": "left"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Diagram successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Diagram"
+                },
+                "example": {
+                  "_id": "676e9af6c73809d1a6f04f02",
+                  "createdAt": "2025-01-23T10:00:00.000Z",
+                  "updatedAt": "2025-01-23T10:00:00.000Z",
+                  "author": "authorId123",
+                  "name": "Sample Diagram",
+                  "version": "1.0.0",
+                  "metadata": {
+                    "project": "AI development",
+                    "priority": "high"
+                  },
+                  "diagramComponents": {
+                    "component1": {
+                      "type": "database",
+                      "position": "center"
+                    },
+                    "component2": {
+                      "type": "server",
+                      "position": "left"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all diagrams",
+        "tags": ["Diagrams"],
+        "responses": {
+          "200": {
+            "description": "List of diagrams",
+            "content": {
+              "application/json": {
+                "example": [
+                  {
+                    "_id": "6790d01af226797ad5d1e5d6",
+                    "name": "Sample Diagram",
+                    "version": "1.0.0",
+                    "metadata": {
+                      "project": "Project Alpha"
+                    },
+                    "diagramComponents": {
+                      "component1": {
+                        "type": "database",
+                        "position": "center"
+                      }
+                    }
+                  },
+                  {
+                    "_id": "6790d08347407353d5047171",
+                    "name": "isometric_diagram v1 hasan ka token",
+                    "version": "1.0.2",
+                    "metadata": {
+                      "check": {
+                        "sso": "keycloak"
+                      }
+                    },
+                    "diagramComponents": {
+                      "userstory": "check v2"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Valid token required."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Category": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "parent": {
+            "type": "string",
+            "description": "if parent id given then its a child, otherwise optional"
+          },
+          "path": {
+            "type": "string",
+            "description": "The computed path of the category. (Read-only)",
+            "readOnly": true
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "displayOrder": {
+                "type": "integer"
+              },
+              "icon": {
+                "type": "string"
+              },
+              "customProperties": {
+                "type": "object"
+              }
+            },
+            "description": "Additional metadata for the category. (Optional)"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": " (Read-only)",
+            "readOnly": true
+          }
+        }
+      },
+      "Shape": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the shape (required)"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "2D",
+              "3D",
+              "LAYERS ",
+              "COMPONENT"
+            ],
+            "description": "The type of the shape (required). Can be 2D, 3D, LAYERS, or COMPONENT."
+          },
+          "attachTo": {
+            "type": "string",
+            "description": "An optional field to attach the shape to another entity or category (optional)."
+          },
+          "svgFile": {
+            "type": "string",
+            "description": "An optional SVG file name or path (optional)"
+          },
+          "svgContent": {
+            "type": "string",
+            "description": "The content of the SVG (required for 2D and 3D shapes). It is a string representation of the SVG content."
+          },
+          "version": {
+            "type": "string",
+            "default": "1.0.0",
+            "description": "The version of the shape (optional). This is useful to track different versions of the same shape."
+          },
+          "category": {
+            "type": "string",
+            "description": "A reference to the category to which the shape belongs (optional)."
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "description": {
+                "type": "string",
+                "description": "A detailed description of the shape (optional)."
+              },
+              "applicationTypes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Optional application types."
+              },
+              "customProperties": {
+                "type": "object",
+                "description": "Custom properties that allow for flexible, user-defined data (optional)."
+              },
+              "dependencies": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "shapeId": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Metadata for the shape, including description, application types, custom properties, and dependencies (optional)."
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "A list of tags associated with the shape, useful for categorization or filtering (optional)."
+          },
+          "author": {
+            "type": "string",
+            "description": "The author of the shape (required). This identifies who created the shape."
+          },
+          "diagram_components": {
+            "type": "array",
+            "description": "A list of components in the diagram associated with the shape. Each component can have various properties.",
+            "items": {
+              "type": "object",
+              "description": "An arbitrary object representing a diagram component. The structure can vary for each component.",
+              "additionalProperties": true
+            }
+          },
+          "attachment_points": {
+            "type": "array",
+            "description": "A list of attachment points for the shape. Each attachment point can have various properties.",
+            "items": {
+              "type": "object",
+              "description": "An arbitrary object representing an attachment point. The structure can vary for each attachment point.",
+              "additionalProperties": true
+            }
+          }
+        }
+      },
+      "Diagram": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the diagram."
+          },
+          "version": {
+            "type": "string",
+            "default": "1.0.0",
+            "description": "The version of the diagram."
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata associated with the diagram.",
+            "additionalProperties": true
+          },
+          "diagramComponents": {
+            "type": "object",
+            "description": "A collection of components in the diagram.",
+            "additionalProperties": {
+              "type": "object",
+              "description": "Details about the diagram component."
+            }
+          }
+        },
+        "required": ["name"]
+      }
+    }
+  }
+}

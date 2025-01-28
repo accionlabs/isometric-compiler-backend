@@ -1,21 +1,22 @@
 import { BaseEntity } from './base.entity';
 import { Entity, ObjectIdColumn, ObjectId, Column, Index, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { IsString, IsEnum, IsOptional, IsArray, IsJSON, IsNotEmpty, ValidateNested } from 'class-validator';
+import { IsString, IsEnum, IsOptional, IsArray, IsJSON, IsNotEmpty, ValidateNested, isJSON, IsMongoId } from 'class-validator';
 import { Category } from './categories.entity';
 import { Type } from 'class-transformer';
 
 // Enum for the shape types
 export enum ShapeType {
-    '2D' = '2D',
-    '3D' = '3D',
-    'COMPONENT' = 'COMPONENT',
+  '2D' = '2D',
+  '3D' = '3D',
+  'COMPONENT' = 'COMPONENT',
+  "LAYERS" = 'LAYERS'
 }
 
 // Define DependencyRef class for dependencies
 class DependencyRef {
   @IsString()
   shapeId: string;  // Reference to the dependent shape's ID
-  
+
   @IsString()
   version: string;  // Version of the dependent shape or component
 }
@@ -30,46 +31,54 @@ class Metadata {
   applicationTypes?: string[];  // Optional application types
 
   @IsOptional()
-  @IsJSON()
   customProperties?: Record<string, any>;  // Custom properties (flexible)
 
   @IsOptional()
-  @IsJSON()  // No type checking for dependencies, any structure can be provided
-  dependencies?: any; 
+  @ValidateNested({ each: true })
+  @Type(() => DependencyRef)
+  dependencies?: DependencyRef[];
 }
 
 @Entity('shapes')
 @Index('shapes_name_version_unique', ['name', 'version'], { unique: true }) // Unique constraint on name and version
 export class Shape extends BaseEntity {
 
-    @Column({ type: 'string' })
-    name: string;  // Shape name
+  @Column({ type: 'string' })
+  name: string;  
 
-    @Column({ type: 'enum', enum: ShapeType })
-   type: ShapeType;  // Shape type (2D, 3D, COMPONENT)
+  @Column({ type: 'enum', enum: ShapeType })
+  type: ShapeType;  
 
-    @Column({ type: 'string', nullable: true })
-    attachTo?: string;  // Field to attach the shape to another entity or category
+  @Column({ type: 'string', nullable: true })
+  attachTo?: string;  
 
-    @Column({ type: 'text', nullable: true })
-    svgFile?: string;  // SVG file name or path (optional)
+  @Column({ nullable: true })
+  svgFile?: string;  
 
-    @Column({ type: 'text' })
-    svgContent: string;  // SVG content as a string (mandatory)
+  @Column({})
+  svgContent: string;  
 
-    @Column({ type: 'text',default:'1.0.0', nullable: false })
-    version: string;  // Version field (optional)
+  @Column({ default: '1.0.0', nullable: false })
+  version: string = '1.0.0';  
 
-    @ManyToOne(() => Category, { nullable: true })
-    category?: Category;  // Reference to Category (parent-child relation)
+  @Index()
+  @IsMongoId()
+  @Column({ type: 'string' })
+  category: ObjectId;  
 
-    @Column('jsonb', { default: '{}' })
-   metadata: Metadata;  // Metadata field with default empty object
+  @Column({type: 'json'})
+  metadata: Metadata;  
 
-    @Column({ type: 'array' })
-    tags: string[];  // Tags for the shape
+  @Column({ type: 'array' })
+  tags: string[];  
 
-    @Column({ type: 'string' })
-    author: string;  // Author of the shape
+  @Column({ type: 'string' })
+  author: string;  
+
+  @Column({ type: 'json', nullable: true })
+  diagram_components?: Record<string, any>[]; 
+
+  @Column({ type: 'json', nullable: true })
+  attachment_points?: Record<string, any>[]; 
 
 }

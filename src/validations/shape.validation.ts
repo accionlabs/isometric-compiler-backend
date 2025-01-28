@@ -1,74 +1,146 @@
-import { IsString, IsEnum, IsOptional, IsArray, IsJSON, IsNotEmpty, ValidateNested } from 'class-validator';
+import { IsString, IsEnum, IsOptional, IsArray, IsJSON, IsNotEmpty, ValidateNested, IsObject, isArray, IsMongoId } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ShapeType } from '../entities/shape.entity';
 
-// Define DependencyRef class for validating dependencies
-export class DependencyRefValidation {
-  @IsString()
-  shapeId: string;  // Reference to the dependent shape's ID
-
-  @IsString()
-  version: string;  // Version of the dependent shape or component
-}
 
 // Define Metadata validation class
 export class MetadataValidation {
   @IsString()
-  description: string;  // Description of the shape
+  @IsOptional()
+  description: string;  
 
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  applicationTypes?: string[];  // Optional application types
+  applicationTypes?: string[];  
 
   @IsOptional()
-  @IsJSON()
-  customProperties?: Record<string, any>;  // Custom properties (flexible)
+  @IsObject()
+  customProperties?: Record<string, any>;  
 
   @IsOptional()
   @ValidateNested({ each: true })
-  @Type(() => DependencyRefValidation)  // Validate nested dependencies (shapes and components)
   dependencies?: {
-    shapes: DependencyRefValidation[];
-    components: DependencyRefValidation[];
+    shapes: any;
+    components: any;
   };
 }
 
 // Validation class for Shape entity
 export class ValidShape {
-  description: string;
+  @IsString()
+  @IsOptional()
+  description?: string;
 
   @IsString()
   @IsNotEmpty()
-  name: string;  // Shape name
+  name: string;  
 
-  @IsEnum(ShapeType)
-  type: ShapeType;  // Shape type (2D, 3D, COMPONENT)
-
-  @IsOptional()
-  @IsString()
-  attachTo?: string;  // Field to attach the shape to another entity or category
+  @IsEnum(ShapeType, { message: 'type must be one of the following values: 2D, 3D, COMPONENT, LAYERS' })
+  type: ShapeType;  
 
   @IsOptional()
   @IsString()
-  svgFile?: string;  // SVG file name or path (optional)
+  attachTo?: string;  
+
+  @IsOptional()
+  @IsString()
+  svgFile?: string;  
 
   @IsString()
-  svgContent: string;  // SVG content as a string (mandatory)
+  @IsOptional()
+  svgContent: string;  
 
   @IsString()
-  @IsNotEmpty()
-  version: string;  // Version field (optional)
+  @IsOptional()
+  version?: string;  
 
   @IsOptional()
   @ValidateNested()
   @Type(() => MetadataValidation)
-  metadata?: MetadataValidation;  // Metadata field with nested validation
+  metadata?: MetadataValidation;  
 
   @IsArray()
   @IsString({ each: true })
-  tags: string[];  // Tags for the shape
+  @IsOptional()
+  tags: string[];  
 
   @IsString()
-  author: string;  // Author of the shape
+  @IsOptional()
+  author: string;  
+
+  @IsOptional()
+  @IsArray()
+  @IsObject({ each: true })
+  diagram_components?:  Record<string, any>[]; 
+
+  @IsOptional()
+  @IsArray()
+  @IsObject({ each: true })
+  attachment_points?: Record<string, any>[];
+  
+  @IsMongoId()
+  @IsNotEmpty({ message: 'Category is required and must be a valid MongoDB ObjectId.' })
+  category: string;
+}
+
+
+export class ShapeUpdateValidation {
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsString()
+  @IsOptional()
+  name: string;  
+
+  @IsEnum(ShapeType)
+  @IsOptional()
+  type: ShapeType;  
+
+  @IsOptional()
+  @IsString()
+  attachTo?: string;  
+
+  @IsOptional()
+  @IsString()
+  svgFile?: string;  
+
+  @IsString()
+  @IsOptional()
+  svgContent: string;  
+
+  @IsString()
+  @IsOptional()
+  version?: string;  
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => MetadataValidation)
+  metadata?: MetadataValidation;  
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  tags: string[];  
+
+  @IsString()
+  @IsOptional()
+  author: string;  
+
+  @IsOptional()
+  @IsArray()
+  @IsObject({ each: true })
+  diagram_components?:  Record<string, any>[]; 
+
+  @IsOptional()
+  @IsArray()
+  @IsObject({ each: true })
+  attachment_points?: Record<string, any>[];
+
+  @IsOptional()
+  @IsEnum(['active', 'inactive'], {
+    message: 'Status must be either active or inactive',
+  })
+  status?: 'active' | 'inactive';
 }

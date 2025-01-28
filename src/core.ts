@@ -12,7 +12,7 @@ export function Controller (prefix: string) {
     authorizedRole: string
   }
   
-  export function Get(path: string, auth: IAuth) {
+  export function Get(path: string, auth: IAuth, responseSchema: any | any[]) {
     return function (target: any, propertyKey: string) {
       if (!Reflect.hasMetadata('routes', target.constructor)) {
         Reflect.defineMetadata('routes', [], target.constructor)
@@ -24,12 +24,13 @@ export function Controller (prefix: string) {
         path: path,
         methodName: propertyKey,
         authorizedRole: auth.authorizedRole,
-        isAuthenticated: auth.isAuthenticated
+        isAuthenticated: auth.isAuthenticated,
+        responseSchema: responseSchema
       })
     }
   }
   
-  export function Post(path: string, validSchema: any, auth: IAuth) {
+  export function Post(path: string, validSchema: any, auth: IAuth, responseSchema: any) {
     return function (target: any, propertyKey: string) {
       if (!Reflect.hasMetadata('routes', target.constructor)) {
         Reflect.defineMetadata('routes', [], target.constructor)
@@ -41,13 +42,14 @@ export function Controller (prefix: string) {
         path: path,
         methodName: propertyKey,
         validSchema: validSchema,
+        responseSchema: responseSchema,
         isAuthenticated: auth.isAuthenticated,
         authorizedRole: auth.authorizedRole
       })
     }
   }
 
-  export function Put(path: string, validSchema: any, auth: IAuth) {
+  export function Put(path: string, validSchema: any, auth: IAuth, responseSchema: any) {
     return function (target: any, propertyKey: string) {
       if (!Reflect.hasMetadata('routes', target.constructor)) {
         Reflect.defineMetadata('routes', [], target.constructor)
@@ -59,13 +61,14 @@ export function Controller (prefix: string) {
         path: path,
         methodName: propertyKey,
         validSchema: validSchema,
+        responseSchema: responseSchema,
         isAuthenticated: auth.isAuthenticated,
         authorizedRole: auth.authorizedRole
       })
     }
   }
 
-  export function Delete(path: string, auth: IAuth) {
+  export function Delete(path: string, auth: IAuth, responseSchema: any) {
     return function (target: any, propertyKey: string) {
       if (!Reflect.hasMetadata('routes', target.constructor)) {
         Reflect.defineMetadata('routes', [], target.constructor)
@@ -76,6 +79,7 @@ export function Controller (prefix: string) {
         requestMethod: 'delete',
         path: path,
         methodName: propertyKey,
+        responseSchema: responseSchema,
         authorizedRole: auth.authorizedRole,
         isAuthenticated: auth.isAuthenticated
       })
@@ -86,5 +90,6 @@ export function Controller (prefix: string) {
     requestMethod: string;
     path: string;
     methodName: string;
-    validSchema?: any
+    validSchema?: any;
+    responseSchema?: any;
   }
