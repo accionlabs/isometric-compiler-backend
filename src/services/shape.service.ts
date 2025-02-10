@@ -121,7 +121,25 @@ export class ShapeService extends BaseService<Shape> {
         },
       },
       {
-        $sort: { score:  -1, updatedAt: -1 }
+            // ✅ Explicitly project `score` before sorting
+            $project: {
+              "_id": 1,
+        "name": 1,
+        "type": 1,
+        "category": 1,
+        "metadata": 1,
+        "status": 1,
+        "createdAt": 1,
+        "updatedAt": 1,
+        "svgContent": 1,
+        "diagram_components": 1,
+        "attachment_points": 1,
+        "score": 1, 
+        "categoryDetails": 1
+            }
+      },
+      {
+        $sort: { score: -1, updatedAt: -1 }
       },
       {
         $skip: skip
