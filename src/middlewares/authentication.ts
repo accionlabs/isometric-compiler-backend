@@ -7,6 +7,7 @@ import jwkToPem from 'jwk-to-pem'
 import Container from "typedi";
 import { UserService } from "../services/user.service";
 import { User } from "../entities/user.entity";
+import config from "../configs";
 
 declare global {
   namespace Express {
@@ -23,6 +24,12 @@ export function authenticate (isAuthenticated: boolean) {
       if (!isAuthenticated) {
         return next()
       }
+      if (req.headers['api-key']) {
+        if (config.API_KEY === req.headers['api-key']) {
+          return next()
+        }
+      }
+      
       if (isAuthorizationHeader(req)) {
   
         const payload: any = await getPayload(req, next);
