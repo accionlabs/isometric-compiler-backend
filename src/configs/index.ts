@@ -11,7 +11,8 @@ const config = {
         password: process.env.DB_PASSWORD
     },
     logLocation: process.env.LOG_LOCATION,
-    microserviceName: process.env.MICROSERVICE_NAME
+    microserviceName: process.env.MICROSERVICE_NAME,
+    API_KEY:process.env.API_KEY
 }
 
 console.log("config", config)
