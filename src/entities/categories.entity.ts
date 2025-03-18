@@ -1,5 +1,5 @@
-import { Entity, Column, Index, ManyToOne, ObjectId, ObjectIdColumn } from 'typeorm';
-import { IsOptional, IsString, IsInt, IsJSON, IsMongoId } from 'class-validator';
+import { Entity, Column, Index, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { IsOptional, IsString, IsInt, IsJSON } from 'class-validator';
 import { BaseEntity } from './base.entity';
 
 // Define a Metadata subdocument class
@@ -13,7 +13,7 @@ class Metadata {
     icon?: string;  // Store SVG content as a string
 
     @IsOptional()
-    @Column({type: 'json'})
+    @Column({ type: 'jsonb' })  // Use `jsonb` for efficient storage
     customProperties?: Record<string, any>;  // Flexible custom properties
 }
 
@@ -21,25 +21,23 @@ class Metadata {
 @Index('categories_path_unique', ['path'], { unique: true }) // Unique index on the 'path' field
 export class Category extends BaseEntity {
 
-
-    @Column({ type: 'string' })
+    @Column({ type: 'varchar', length: 255 })
     name: string;
 
     @Column({ type: 'text', nullable: true })
     description?: string;
 
     @Index()
-    @IsMongoId()
-    @Column({ type: 'string', nullable: true })
-    parent?: ObjectId;
+    @Column({ type: 'int', nullable: true })
+    parent?: number;  // Replace `ObjectId` with `number`
 
-    @Column()
+    @Column({ type: 'varchar', unique: true })
     path: string;
 
     // Define metadata as a subdocument with class validation and nesting
-    @Column({type: 'json'})
+    @Column({ type: 'jsonb' })
     metadata: Metadata;
 
-    @Column({ type: 'array' })
-    ancestors: ObjectId[]
+    @Column({ type: 'integer', array: true, default: [] }) // Use integer array
+    ancestors: number[];
 }

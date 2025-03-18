@@ -1,6 +1,8 @@
 import { BaseEntity } from './base.entity';
-import { Entity, ObjectIdColumn, ObjectId, Column, Index, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { IsString, IsEnum, IsOptional, IsArray, IsJSON, IsNotEmpty, ValidateNested, isJSON, IsMongoId } from 'class-validator';
+import {
+  Entity, Column, Index, ManyToOne, PrimaryGeneratedColumn
+} from 'typeorm';
+import { IsString, IsEnum, IsOptional, IsArray, ValidateNested } from 'class-validator';
 import { Category } from './categories.entity';
 import { Type } from 'class-transformer';
 
@@ -9,7 +11,7 @@ export enum ShapeType {
   '2D' = '2D',
   '3D' = '3D',
   'COMPONENT' = 'COMPONENT',
-  "LAYERS" = 'LAYERS'
+  'LAYERS' = 'LAYERS'
 }
 
 // Define DependencyRef class for dependencies
@@ -43,42 +45,40 @@ class Metadata {
 @Index('shapes_name_version_unique', ['name', 'version'], { unique: true }) // Unique constraint on name and version
 export class Shape extends BaseEntity {
 
-  @Column({ type: 'string' })
-  name: string;  
+  @Column({ type: 'varchar', length: 255 })
+  name: string;
 
   @Column({ type: 'enum', enum: ShapeType })
-  type: ShapeType;  
+  type: ShapeType;
 
-  @Column({ type: 'string', nullable: true })
-  attachTo?: string;  
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  attachTo?: string;
 
-  @Column({ nullable: true })
-  svgFile?: string;  
+  @Column({ type: 'text', nullable: true })
+  svgFile?: string;
 
-  @Column({})
-  svgContent: string;  
+  @Column({ type: 'text' })
+  svgContent: string;
 
-  @Column({ default: '1.0.0', nullable: false })
-  version: string = '1.0.0';  
+  @Column({ type: 'varchar', length: 20, default: '1.0.0', nullable: false })
+  version: string = '1.0.0';
 
   @Index()
-  @IsMongoId()
-  @Column({ type: 'string' })
-  category: ObjectId;  
+  @Column({ type: 'int' })
+  category: number;  // Replaced `ObjectId` with `number`
 
-  @Column({type: 'json'})
-  metadata: Metadata;  
+  @Column({ type: 'jsonb' })
+  metadata: Metadata;
 
-  @Column({ type: 'array' })
-  tags: string[];  
+  @Column({ type: 'text', array: true, default: [] })
+  tags: string[];
 
-  @Column({ type: 'string' })
-  author: string;  
+  @Column({ type: 'varchar', length: 255 })
+  author: string;
 
-  @Column({ type: 'json', nullable: true })
-  diagram_components?: Record<string, any>[]; 
+  @Column({ type: 'jsonb', nullable: true })
+  diagram_components?: Record<string, any>[];
 
-  @Column({ type: 'json', nullable: true })
-  attachment_points?: Record<string, any>[]; 
-
+  @Column({ type: 'jsonb', nullable: true })
+  attachment_points?: Record<string, any>[];
 }

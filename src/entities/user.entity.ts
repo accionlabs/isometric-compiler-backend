@@ -1,29 +1,29 @@
-import { Entity, ObjectIdColumn, Column } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
 
 export enum UserRole {
-'DESIGNER' = 'DESIGNER',
-'END_USER' = 'END_USER',
-'ADMIN'=  'ADMIN',
-'COMPONENT_AUTHOR'= 'COMPONENT_AUTHOR'
+  'DESIGNER' = 'DESIGNER',
+  'END_USER' = 'END_USER',
+  'ADMIN' = 'ADMIN',
+  'COMPONENT_AUTHOR' = 'COMPONENT_AUTHOR'
 }
 
 @Entity('users')
-export class User extends BaseEntity{
-  @Column()
+export class User extends BaseEntity {
+
+  @Column({ type: 'varchar', length: 255 })
   firstName: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 255 })
   lastName: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', length: 255, unique: true })
   email: string;
 
   @Column({
     type: 'enum',
     enum: UserRole,
-    default: UserRole.END_USER, // Reference the enum value here
+    default: UserRole.END_USER
   })
-    role: UserRole = UserRole.END_USER;
-
+  role: UserRole = UserRole.END_USER;
 }

@@ -1,9 +1,9 @@
-import { ObjectIdColumn, Column, CreateDateColumn, UpdateDateColumn, ObjectId } from 'typeorm';
-import { Status } from '../enums'
+import { PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Status } from '../enums';
 
 export abstract class BaseEntity {
-  @ObjectIdColumn()
-  _id: ObjectId;
+  @PrimaryGeneratedColumn()
+  id: number;  // Change _id to id and make it auto-incrementing
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
