@@ -12,7 +12,9 @@ const config = {
     },
     logLocation: process.env.LOG_LOCATION,
     microserviceName: process.env.MICROSERVICE_NAME,
-    API_KEY:process.env.API_KEY
+    API_KEY:process.env.API_KEY,
+    ISOMETRIC_DOC_FOLDER: process.env.ISOMETRIC_DOC_FOLDER || 'isometric/document/',
+    ISOMETRIC_IMAGE_FOLDER: process.env.ISOMETRIC_IMAGE_FOLDER || 'isometric/image/',
 }
 
 console.log("config", config)

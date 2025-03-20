@@ -1,0 +1,1064 @@
+{
+    "complex_example.pdf":{
+        "qum": [
+            {
+                "persona": "Corporate Admin",
+                "outcomes": [
+                    {
+                        "outcome": "Manage corporate settings",
+                        "citations": [
+                            {
+                                "documentId": "180",
+                                "documentName": "comple_example.pdf"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Select a new corporate logo",
+                                        "actions": [
+                                            {
+                                                "action": "Click on 'Select Logo' button"
+                                            },
+                                            {
+                                                "action": "Choose a logo file from file explorer"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "step": "Upload the selected logo",
+                                        "actions": [
+                                            {
+                                                "action": "Confirm the selection to upload the logo"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Corporate Admin updates corporate logo",
+                                "description": "Corporate Admin selects a new corporate logo file using the file explorer.",
+                                "metadataShapeName": "ServerA"
+                            },
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Access the corporate industry type settings",
+                                        "actions": [
+                                            {
+                                                "action": "Select the industry type from the multi-select list"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Corporate Admin edits corporate industry type",
+                                "description": "Corporate Admin selects multiple industries from a list to update the corporate industry type.",
+                                "metadataShapeName": "ServerB"
+                            }
+                        ]
+                    },
+                    {
+                        "outcome": "Upload claims data",
+                        "citations": [
+                            {
+                                "documentId": "180",
+                                "documentName": "comple_example.pdf"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Navigate to claims data upload section",
+                                        "actions": [
+                                            {
+                                                "action": "Click on 'Browse File' button"
+                                            },
+                                            {
+                                                "action": "Select claims data file from file explorer"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "step": "Validate and upload the claims data file",
+                                        "actions": [
+                                            {
+                                                "action": "Confirm the file selection for upload"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Corporate Admin uploads claims data file",
+                                "description": "Corporate Admin uses the 'Browse File' button to select and upload a claims data file.",
+                                "metadataShapeName": "ServerA"
+                            }
+                        ]
+                    },
+                    {
+                        "outcome": "Manage corporate FAQ",
+                        "citations": [
+                            {
+                                "documentId": "180",
+                                "documentName": "comple_example.pdf"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Access the FAQ management section",
+                                        "actions": [
+                                            {
+                                                "action": "Edit existing FAQ entries or add new ones"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Corporate Admin updates FAQ list",
+                                "description": "Corporate Admin adds new questions and answers to the corporate FAQ list.",
+                                "metadataShapeName": "ServerA"
+                            }
+                        ]
+                    },
+                    {
+                        "outcome": "Edit corporate information",
+                        "citations": [
+                            {
+                                "documentId": "180",
+                                "documentName": "comple_example.pdf"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Navigate to corporate sub-domain settings",
+                                        "actions": [
+                                            {
+                                                "action": "Edit the sub-domain field"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Corporate Admin edits corporate sub-domain",
+                                "description": "Corporate Admin attempts to edit the corporate sub-domain but is informed it cannot be changed.",
+                                "metadataShapeName": "ServerB"
+                            }
+                        ]
+                    },
+                    {
+                        "outcome": "Import data for corporate branch",
+                        "citations": [
+                            {
+                                "documentId": "180",
+                                "documentName": "comple_example.pdf"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Access employee data import section",
+                                        "actions": [
+                                            {
+                                                "action": "Click on 'Browse File' button"
+                                            },
+                                            {
+                                                "action": "Select employee data file from file explorer"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "step": "Validate and upload the employee data file",
+                                        "actions": [
+                                            {
+                                                "action": "Confirm the file selection for upload"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Corporate Admin imports employee data",
+                                "description": "Corporate Admin uses the import feature to upload employee data for a corporate branch.",
+                                "metadataShapeName": "ServerA"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "persona": "Corporate Employee",
+                "outcomes": [
+                    {
+                        "outcome": "Log in to the system",
+                        "citations": [
+                            {
+                                "documentId": "180",
+                                "documentName": "comple_example.pdf"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Navigate to the login page",
+                                        "actions": [
+                                            {
+                                                "action": "Enter corporate sub-domain in the login field"
+                                            },
+                                            {
+                                                "action": "Click on 'Login' button"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Corporate Employee logs in using sub-domain",
+                                "description": "Corporate Employee logs in to the IA system using the corporate sub-domain.",
+                                "metadataShapeName": "ServerA"
+                            }
+                        ]
+                    },
+                    {
+                        "outcome": "View employee FAQ",
+                        "citations": [
+                            {
+                                "documentId": "180",
+                                "documentName": "comple_example.pdf"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Access the FAQ section",
+                                        "actions": [
+                                            {
+                                                "action": "Click on 'FAQ' link"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Corporate Employee views FAQ",
+                                "description": "Corporate Employee accesses the FAQ section to find answers to common questions.",
+                                "metadataShapeName": "ServerB"
+                            }
+                        ]
+                    },
+                    {
+                        "outcome": "Upload claims data",
+                        "citations": [
+                            {
+                                "documentId": "180",
+                                "documentName": "comple_example.pdf"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Navigate to claims upload section",
+                                        "actions": [
+                                            {
+                                                "action": "Click on 'Browse File' button"
+                                            },
+                                            {
+                                                "action": "Select claims data file from file explorer"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "step": "Validate and upload the claims data file",
+                                        "actions": [
+                                            {
+                                                "action": "Confirm the file selection for upload"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Corporate Employee uploads claims data",
+                                "description": "Corporate Employee uses the 'Browse File' button to upload a claims data file.",
+                                "metadataShapeName": "ServerA"
+                            }
+                        ]
+                    },
+                    {
+                        "outcome": "Add wellness events",
+                        "citations": [
+                            {
+                                "documentId": "180",
+                                "documentName": "comple_example.pdf"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Access the wellness event section",
+                                        "actions": [
+                                            {
+                                                "action": "Click on 'Add Wellness Event' button"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Corporate Employee adds a wellness event",
+                                "description": "Corporate Employee adds details of a new wellness event to the system.",
+                                "metadataShapeName": "ServerB"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "persona": "IA Admin",
+                "outcomes": [
+                    {
+                        "outcome": "Manage IA Executive",
+                        "citations": [
+                            {
+                                "documentId": "180",
+                                "documentName": "comple_example.pdf"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Navigate to IA Executive details section",
+                                        "actions": [
+                                            {
+                                                "action": "Edit the IA Executive details"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "IA Admin updates IA Executive details",
+                                "description": "IA Admin edits the details of an IA Executive in the system.",
+                                "metadataShapeName": "ServerA"
+                            }
+                        ]
+                    },
+                    {
+                        "outcome": "Manage employee FAQ",
+                        "citations": [
+                            {
+                                "documentId": "180",
+                                "documentName": "comple_example.pdf"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Access the employee FAQ management section",
+                                        "actions": [
+                                            {
+                                                "action": "Edit existing FAQ entries or add new ones"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "IA Admin updates employee FAQ",
+                                "description": "IA Admin adds new questions and answers to the employee FAQ list.",
+                                "metadataShapeName": "ServerB"
+                            }
+                        ]
+                    },
+                    {
+                        "outcome": "View claims data",
+                        "citations": [
+                            {
+                                "documentId": "180",
+                                "documentName": "comple_example.pdf"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Navigate to claims data section",
+                                        "actions": [
+                                            {
+                                                "action": "Click on 'View Claims Data' link"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "IA Admin views claims data",
+                                "description": "IA Admin accesses the claims data section to review submitted claims.",
+                                "metadataShapeName": "ServerA"
+                            }
+                        ]
+                    },
+                    {
+                        "outcome": "List corporate branches",
+                        "citations": [
+                            {
+                                "documentId": "180",
+                                "documentName": "comple_example.pdf"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Access the corporate branches section",
+                                        "actions": [
+                                            {
+                                                "action": "Click on 'List Corporate Branches' link"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "IA Admin lists all corporate branches",
+                                "description": "IA Admin views a list of all corporate branches in the system.",
+                                "metadataShapeName": "ServerB"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "persona": "IA Executive",
+                "outcomes": [
+                    {
+                        "outcome": "View claims data",
+                        "citations": [
+                            {
+                                "documentId": "180",
+                                "documentName": "comple_example.pdf"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Navigate to claims review section",
+                                        "actions": [
+                                            {
+                                                "action": "Click on 'Review Claims Data' link"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "IA Executive reviews claims data",
+                                "description": "IA Executive accesses the claims data section to review submitted claims.",
+                                "metadataShapeName": "ServerA"
+                            }
+                        ]
+                    },
+                    {
+                        "outcome": "List corporate branches",
+                        "citations": [
+                            {
+                                "documentId": "180",
+                                "documentName": "comple_example.pdf"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Access the corporate branches section",
+                                        "actions": [
+                                            {
+                                                "action": "Click on 'List Corporate Branches' link"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "IA Executive lists corporate branches",
+                                "description": "IA Executive views a list of all corporate branches in the system.",
+                                "metadataShapeName": "ServerB"
+                            }
+                        ]
+                    },
+                    {
+                        "outcome": "Manage corporate settings",
+                        "citations": [
+                            {
+                                "documentId": "180",
+                                "documentName": "comple_example.pdf"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Navigate to corporate settings section",
+                                        "actions": [
+                                            {
+                                                "action": "Edit corporate settings"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "180",
+                                                "documentName": "comple_example.pdf"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "IA Executive updates corporate settings",
+                                "description": "IA Executive makes changes to the corporate settings as needed.",
+                                "metadataShapeName": "ServerA"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "status": "active"
+    },
+    "simple_example.png":{
+        "qum": [
+            {
+                "persona": "Customer",
+                "outcomes": [
+                    {
+                        "outcome": "Purchase a product or service",
+                        "citations": [
+                            {
+                                "documentId": "181",
+                                "documentName": "simple_example.png"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Customer selects items",
+                                        "actions": [
+                                            {
+                                                "action": "Click on items to add to cart"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "181",
+                                                "documentName": "simple_example.png"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "step": "Customer proceeds to checkout",
+                                        "actions": [
+                                            {
+                                                "action": "Click on checkout button"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "181",
+                                                "documentName": "simple_example.png"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Customer selects items and proceeds to checkout on the seller's website",
+                                "description": "The customer initiates the transaction by choosing products and moving to the checkout process.",
+                                "metadataShapeName": "ServerA"
+                            }
+                        ]
+                    },
+                    {
+                        "outcome": "Receive confirmation of the purchase",
+                        "citations": [
+                            {
+                                "documentId": "181",
+                                "documentName": "simple_example.png"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "System sends confirmation email",
+                                        "actions": [
+                                            {
+                                                "action": "Receive email notification"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "181",
+                                                "documentName": "simple_example.png"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Customer receives an email or notification confirming the purchase",
+                                "description": "After completing the transaction, the customer gets a confirmation message.",
+                                "metadataShapeName": "ServerB"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "persona": "Online Seller",
+                "outcomes": [
+                    {
+                        "outcome": "Receive payment for goods or services",
+                        "citations": [
+                            {
+                                "documentId": "181",
+                                "documentName": "simple_example.png"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Bank transfers funds to merchant's account",
+                                        "actions": [
+                                            {
+                                                "action": "Funds are credited to seller's account"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "181",
+                                                "documentName": "simple_example.png"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Seller's account is credited after bank approval",
+                                "description": "The seller receives the payment once the bank approves the transaction.",
+                                "metadataShapeName": "ServerA"
+                            }
+                        ]
+                    },
+                    {
+                        "outcome": "Notify customer of successful payment",
+                        "citations": [
+                            {
+                                "documentId": "181",
+                                "documentName": "simple_example.png"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Seller sends payment confirmation",
+                                        "actions": [
+                                            {
+                                                "action": "Send notification to customer"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "181",
+                                                "documentName": "simple_example.png"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Seller sends a notification to the customer about the successful payment",
+                                "description": "The seller informs the customer that the payment has been successfully processed.",
+                                "metadataShapeName": "ServerB"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "persona": "Payment Processor",
+                "outcomes": [
+                    {
+                        "outcome": "Verify transaction details",
+                        "citations": [
+                            {
+                                "documentId": "181",
+                                "documentName": "simple_example.png"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Payment processor verifies transaction",
+                                        "actions": [
+                                            {
+                                                "action": "Check transaction details"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "181",
+                                                "documentName": "simple_example.png"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Payment processor checks the transaction details for accuracy",
+                                "description": "The processor ensures that all transaction information is correct before proceeding.",
+                                "metadataShapeName": "ServerA"
+                            }
+                        ]
+                    },
+                    {
+                        "outcome": "Ensure payment information is valid",
+                        "citations": [
+                            {
+                                "documentId": "181",
+                                "documentName": "simple_example.png"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Payment processor validates payment",
+                                        "actions": [
+                                            {
+                                                "action": "Validate payment information"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "181",
+                                                "documentName": "simple_example.png"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Payment processor validates the payment information",
+                                "description": "The processor confirms that the payment details are legitimate and funds are available.",
+                                "metadataShapeName": "ServerB"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "persona": "Bank",
+                "outcomes": [
+                    {
+                        "outcome": "Verify customer funds",
+                        "citations": [
+                            {
+                                "documentId": "181",
+                                "documentName": "simple_example.png"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Bank verifies customer funds",
+                                        "actions": [
+                                            {
+                                                "action": "Check account balance"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "181",
+                                                "documentName": "simple_example.png"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Bank checks if the customer has sufficient funds",
+                                "description": "The bank verifies the customer's account balance to ensure funds are available for the transaction.",
+                                "metadataShapeName": "ServerA"
+                            }
+                        ]
+                    },
+                    {
+                        "outcome": "Approve or decline transaction",
+                        "citations": [
+                            {
+                                "documentId": "181",
+                                "documentName": "simple_example.png"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Bank processes transaction decision",
+                                        "actions": [
+                                            {
+                                                "action": "Approve or decline transaction"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "181",
+                                                "documentName": "simple_example.png"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Bank decides to approve or decline the transaction based on funds availability",
+                                "description": "The bank makes a decision on the transaction after checking the customer's funds.",
+                                "metadataShapeName": "ServerB"
+                            }
+                        ]
+                    },
+                    {
+                        "outcome": "Transfer funds to merchant's account",
+                        "citations": [
+                            {
+                                "documentId": "181",
+                                "documentName": "simple_example.png"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Bank transfers funds",
+                                        "actions": [
+                                            {
+                                                "action": "Execute fund transfer to merchant"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "181",
+                                                "documentName": "simple_example.png"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Bank transfers the approved funds to the merchant's account",
+                                "description": "Once approved, the bank moves the funds to the merchant's account.",
+                                "metadataShapeName": "ServerA"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "persona": "Payment Gateway",
+                "outcomes": [
+                    {
+                        "outcome": "Transmit payment information securely",
+                        "citations": [
+                            {
+                                "documentId": "181",
+                                "documentName": "simple_example.png"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Payment gateway transmits details",
+                                        "actions": [
+                                            {
+                                                "action": "Send payment details to processor"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "181",
+                                                "documentName": "simple_example.png"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Payment gateway securely transmits payment details to the processor",
+                                "description": "The gateway ensures that payment information is sent securely to the payment processor.",
+                                "metadataShapeName": "ServerA"
+                            }
+                        ]
+                    },
+                    {
+                        "outcome": "Forward transaction details to payment processor",
+                        "citations": [
+                            {
+                                "documentId": "181",
+                                "documentName": "simple_example.png"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Payment gateway forwards transaction",
+                                        "actions": [
+                                            {
+                                                "action": "Forward transaction details"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "181",
+                                                "documentName": "simple_example.png"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Payment gateway forwards transaction details to the processor",
+                                "description": "The gateway acts as a bridge, sending transaction details to the payment processor.",
+                                "metadataShapeName": "ServerB"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "persona": "Merchant",
+                "outcomes": [
+                    {
+                        "outcome": "Receive funds for sold goods or services",
+                        "citations": [
+                            {
+                                "documentId": "181",
+                                "documentName": "simple_example.png"
+                            }
+                        ],
+                        "scenarios": [
+                            {
+                                "steps": [
+                                    {
+                                        "step": "Merchant receives funds",
+                                        "actions": [
+                                            {
+                                                "action": "Credit funds to merchant's account"
+                                            }
+                                        ],
+                                        "citations": [
+                                            {
+                                                "documentId": "181",
+                                                "documentName": "simple_example.png"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scenario": "Merchant's account is credited with funds from the bank",
+                                "description": "The merchant receives the payment in their account after the bank transfers the funds.",
+                                "metadataShapeName": "ServerA"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "status": "active"
+    }
+}
