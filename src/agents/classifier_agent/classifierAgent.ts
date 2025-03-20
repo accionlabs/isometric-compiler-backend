@@ -1,10 +1,8 @@
-// import { z } from 'zod'
-// import {
-//   __LLM_PLATFORM,
-//   generateJsonWithConversation,
-// } from '../../services/llm'
+// import { LlmService } from "../../services/llm.service";
+
 // import { fetchChatHistory, saveChatContext } from '../../services/chat_service'
 // import fs from 'fs'
+// import Container from 'typedi';
 
 // const __CLASSIFIER_PROMPT__ = fs.readFileSync(
 //   './agents/classifier_agent/CLASSIFIER_AGENT_PROMPT.md',
@@ -40,11 +38,11 @@
 //     uploadedFile: newDocument,
 //     question,
 //   }
-
-//   const result = await generateJsonWithConversation(
+//   const llmServiceInstance = Container.get(LlmService)
+//   const result = await llmServiceInstance.generateJsonWithConversation(
 //     __CLASSIFIER_PROMPT__,
 //     placeholders,
-//     __LLM_PLATFORM.OPENAI,
+//     LlmService.getPlatform().OPENAI,
 //   )
 
 //   if (uuid) {

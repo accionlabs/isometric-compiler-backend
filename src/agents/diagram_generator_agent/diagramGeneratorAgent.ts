@@ -1,5 +1,5 @@
 // import { generateMultiModel, generateJsonWithConversation, __LLM_PLATFORM } from '../../services/llm';
-// import shapes from '../../config/shapesv3.json';
+// import shapes from '../../configs/shapesv3.json';
 // import ShapeManager from '../shapesManager';
 // import { vectorSearch } from '../../services/isomtericPgVector';
 // import { getLayerByLength, nextPositionOnLayer, filterQumByScenarios, extractScenarios } from '../helpers';
@@ -84,7 +84,7 @@
 //     }
 
 //     const scenarios = extractScenarios(semanticModel?.metadata?.qum);
-//     documents.forEach(x => context += "\n\n---\n" + x.pageContent);
+//     documents.forEach((x: { pageContent: string; }) => context += "\n\n---\n" + x.pageContent);
 //     const breeze_blueprint = await generateBreezeSpec(scenarios, context || '');
 
 //     const unifiedModel = { qum: semanticModel?.metadata?.qum, blueprint: breeze_blueprint };
