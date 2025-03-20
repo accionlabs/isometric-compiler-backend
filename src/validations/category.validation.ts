@@ -1,7 +1,5 @@
-import { IsString, IsOptional, IsArray, IsInt, IsJSON, ValidateNested, IsNotEmpty, IsMongoId, MinLength, isObject, IsObject, IsEnum } from 'class-validator';
+import { IsString, IsOptional, IsArray, IsInt, IsJSON, ValidateNested, IsNotEmpty, MinLength, isObject, IsObject, IsEnum, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ObjectId } from 'typeorm';
-
 // Metadata class to define the structure and validation of metadata
 class Metadata {
     @IsOptional()
@@ -19,7 +17,7 @@ class Metadata {
 
 // Category validation class
 export class CategoryValidation {
-  
+
     @IsString()
     @MinLength(1)  // Ensure name is not empty
     name: string;
@@ -30,8 +28,8 @@ export class CategoryValidation {
     description?: string;
 
     @IsOptional()
-    @IsMongoId()  // Validate that parent (if present) is a valid MongoDB ObjectId
-    parent?: ObjectId;
+    @IsNumber()  // Validate that parent (if present) is a valid MongoDB ObjectId
+    parent?: number;
 
     @IsString()
     @IsOptional()
@@ -43,7 +41,7 @@ export class CategoryValidation {
 }
 
 export class CategoryUpadteValidation {
-  
+
     @IsOptional()
     @IsString()
     @MinLength(1)  // Ensure name is not empty
@@ -55,8 +53,8 @@ export class CategoryUpadteValidation {
     description?: string;
 
     @IsOptional()
-    @IsMongoId()  // Validate that parent (if present) is a valid MongoDB ObjectId
-    parent?: ObjectId;
+    @IsNumber()  // Validate that parent (if present) is a valid MongoDB ObjectId
+    parent?: number;
 
     @IsString()
     @IsOptional()
@@ -69,7 +67,7 @@ export class CategoryUpadteValidation {
 
     @IsOptional()
     @IsEnum(['active', 'inactive'], {
-    message: 'Status must be either active or inactive',
+        message: 'Status must be either active or inactive',
     })
     status?: 'active' | 'inactive';
 }

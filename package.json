@@ -22,6 +22,7 @@
     "jwk-to-pem": "^2.0.7",
     "mongodb": "^5.9.2",
     "morgan": "^1.10.0",
+    "pg": "^8.14.1",
     "reflect-metadata": "^0.2.2",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",

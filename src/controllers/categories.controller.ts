@@ -29,13 +29,13 @@ export default class CategoriesController {
         try {
             const { parent, name } = req.body;
             let path: string = name;
-            let ancestors: ObjectId[] = []
+            let ancestors: number[] = []
             if (parent) {
                 const catPath = await this.categoryService.getCategoryPath(parent, name)
                 path = catPath.path;
                 ancestors = catPath.ancestors
             }
-            const newShape = await this.categoryService.create({ ...req.body, path, ancestors, ...(parent && { parent: new ObjectId(parent) }) });
+            const newShape = await this.categoryService.create({ ...req.body, path, ancestors, ...(parent && { parent: Number(parent) }) });
             res.status(201).json(newShape);
         } catch (e) {
             next(e)
@@ -43,38 +43,38 @@ export default class CategoriesController {
     }
 
 
-    @Delete('/:id', {
-        isAuthenticated: true,
-        authorizedRole: 'all'
-    },
-        {})
-    async deleteCategoryById(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-            const { categoryIdForExistingShapes } = req.query
+    // @Delete('/:id', {
+    //     isAuthenticated: true,
+    //     authorizedRole: 'all'
+    // },
+    //     {})
+    // async deleteCategoryById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    //     try {
+    //         const { categoryIdForExistingShapes } = req.query
 
-            const category = await this.categoryService.findOneById(req.params.id);
-            if (!category) {
-                throw new ApiError('Category not found', 404)
-            }
+    //         const category = await this.categoryService.findOneById(Number(req.params.id));
+    //         if (!category) {
+    //             throw new ApiError('Category not found', 404)
+    //         }
 
-            const shapesCountInCategory = await this.shapeService.getCount({ category: new ObjectId(req.params.id) })
-            if (shapesCountInCategory > 0) {
-                if (!categoryIdForExistingShapes) {
-                    throw new ApiError('categoryIdForExistingShapes for moving existing shape is required!', 400)
-                }
-                const categoryForShapes = await this.categoryService.findOneById(categoryIdForExistingShapes as string)
-                if (!categoryForShapes) {
-                    throw new ApiError('Shape Category not found', 404)
-                }
-                await this.shapeService.updateMany({ category: new ObjectId(req.params.id) }, { category: new ObjectId(categoryIdForExistingShapes as string) })
-            }
-            await this.categoryService.delete(req.params.id);
-            res.status(200).json({ message: 'Category deleted successfully' });
-        } catch (e) {
-            next(e)
-        }
+    //         const shapesCountInCategory = await this.shapeService.getCount({ category: Number(req.params.id) })
+    //         if (shapesCountInCategory > 0) {
+    //             if (!categoryIdForExistingShapes) {
+    //                 throw new ApiError('categoryIdForExistingShapes for moving existing shape is required!', 400)
+    //             }
+    //             const categoryForShapes = await this.categoryService.findOneById(categoryIdForExistingShapes as string)
+    //             if (!categoryForShapes) {
+    //                 throw new ApiError('Shape Category not found', 404)
+    //             }
+    //             await this.shapeService.updateMany({ category: Number(req.params.id) }, { category: Number(categoryIdForExistingShapes as string) })
+    //         }
+    //         await this.categoryService.delete(req.params.id);
+    //         res.status(200).json({ message: 'Category deleted successfully' });
+    //     } catch (e) {
+    //         next(e)
+    //     }
 
-    }
+    // }
 
 
     @Put('/:id', CategoryUpadteValidation, {
@@ -86,15 +86,15 @@ export default class CategoriesController {
         try {
             const categoryId = req.params.id
             const { parent, name } = req.body;
-            if(categoryId == parent) {
+            if (categoryId == parent) {
                 throw new ApiError('Category can not be parent of itself', 400)
             }
-            let reqBody = { ...req.body, ...(parent && { parent: new ObjectId(parent) }) }
+            let reqBody = { ...req.body, ...(parent && { parent: Number(parent) }) }
             if (parent) {
-                const catPath = await this.categoryService.getPathOnParentChange(categoryId, parent, name)
+                const catPath = await this.categoryService.getPathOnParentChange(Number(categoryId), parent, name)
                 reqBody = { ...reqBody, path: catPath.path, ancestors: catPath.ancestors }
             }
-            const newShape = await this.categoryService.update(categoryId, { ...reqBody, ...(parent && { parent: new ObjectId(parent) }) })
+            const newShape = await this.categoryService.update(Number(categoryId), { ...reqBody, ...(parent && { parent: Number(parent) }) })
             res.status(201).json(newShape);
         } catch (e) {
             next(e)
@@ -118,7 +118,7 @@ export default class CategoriesController {
             } else {
                 const allowedFields: (keyof Category)[] = ['name', 'parent', 'path'];
 
-                const filters = FilterUtils.buildMongoFilters<Category>(restQuery, allowedFields);
+                const filters = FilterUtils.buildPostgresFilters<Category>(restQuery, allowedFields);
                 const sort: Record<string, 1 | -1> = { [sortName as string]: sortOrder === 'asc' ? 1 : -1 };
                 shapes = await this.categoryService.findWithFilters(filters, parseInt(page as string, 10), parseInt(limit as string, 10), sort);
             }
@@ -135,7 +135,7 @@ export default class CategoriesController {
         Category)
     async getCategoryById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const category = await this.categoryService.findOneById(req.params.id);
+            const category = await this.categoryService.findOneById(Number(req.params.id), { parent: true });
             if (!category) {
                 throw new ApiError('Category not found', 404)
             }
