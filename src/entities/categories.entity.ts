@@ -1,6 +1,7 @@
-import { Entity, Column, Index, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, Index, ManyToOne, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { IsOptional, IsString, IsInt, IsJSON } from 'class-validator';
 import { BaseEntity } from './base.entity';
+import { Shape } from './shape.entity';
 
 // Define a Metadata subdocument class
 class Metadata {
@@ -28,15 +29,21 @@ export class Category extends BaseEntity {
     description?: string;
 
     @Index()
-    @Column({ type: 'int', nullable: true })
-    parent?: number;  // Replace `ObjectId` with `number`
+    @ManyToOne(() => Category, (cat) => cat.children, { nullable: true, onDelete: "SET NULL" })
+    parent?: Category | null;
+
+    @OneToMany(() => Category, (cat) => cat.parent)
+    children: Category[];
+
+    @OneToMany(() => Shape, (shape) => shape.category)
+    shapes: Shape[]
 
     @Column({ type: 'varchar', unique: true })
     path: string;
 
     // Define metadata as a subdocument with class validation and nesting
-    @Column({ type: 'jsonb' })
-    metadata: Metadata;
+    @Column({ type: 'jsonb', nullable: true })
+    metadata?: Metadata;
 
     @Column({ type: 'integer', array: true, default: [] }) // Use integer array
     ancestors: number[];

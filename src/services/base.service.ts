@@ -1,16 +1,15 @@
-import { MongoError, ObjectId } from 'mongodb';
-import { DeepPartial, ObjectLiteral, MongoRepository,FindOptionsWhere } from 'typeorm';
+import { Repository, DeepPartial, ObjectLiteral, FindManyOptions, FindOneOptions, FindOptionsOrder, FindOptionsWhere, FindOptionsRelations } from 'typeorm';
 import ApiError from '../utils/apiError';
 
-
 export abstract class BaseService<T extends ObjectLiteral> {
-  constructor(private readonly repository: MongoRepository<T>) { }
+  constructor(private readonly repository: Repository<T>) { }
 
   async findWithFilters(
-    filters: FindOptionsWhere<T>, 
+    filters: FindOptionsWhere<T>,
     page: number = 1,
     limit: number = 1000,
-    sort: Record<string, 1 | -1> = { createdAt: -1 }
+    sort: FindOptionsOrder<T>,
+    relations?: FindOptionsRelations<T>
   ): Promise<{ data: T[]; total: number }> {
     const skip = (page - 1) * limit;
     const [data, total] = await Promise.all([
@@ -19,82 +18,89 @@ export abstract class BaseService<T extends ObjectLiteral> {
         skip,
         take: limit,
         order: sort,
+        relations
       }),
-      this.repository.countDocuments(filters),
+      this.repository.count({ where: filters }),
     ]);
     return { data, total };
   }
 
-
-  async getCount(filters: FindOptionsWhere<T>): Promise<number> { 
-    return this.repository.countDocuments(filters);
-   }
+  async getCount(filters: FindOptionsWhere<T>): Promise<number> {
+    return this.repository.count({ where: filters });
+  }
 
   async findAll(): Promise<T[]> {
-    return this.repository.find({});
+    return this.repository.find();
   }
 
-  getRepository(): MongoRepository<T> {
-    return this.repository
+  getRepository(): Repository<T> {
+    return this.repository;
   }
 
-  async findOneById(id: string): Promise<T | null> {
-    return this.repository.findOneBy({ _id: new ObjectId(id) });
+  async findOneById(id: number, relations?: FindOptionsRelations<T>): Promise<T | null> {
+    const options: FindOneOptions<T> = {
+      where: { _id: id } as any, // Workaround for TypeScript's strict typing
+      relations,
+    };
+    return this.repository.findOne(options);
   }
 
   async create(data: DeepPartial<T>): Promise<T> {
     try {
-      const entity = this.repository.create(data); // Now correctly typed
+      const entity = this.repository.create(data);
       return await this.repository.save(entity);
-    }
-    catch (e) {
+    } catch (e) {
       if (this.isDuplicateError(e)) {
         const duplicateInfo = this.getDuplicateKeyInfo(e);
-        throw new ApiError(`Duplicate entry found for key: ${duplicateInfo.key}, value: ${duplicateInfo.value}`, 409); // Customize the error message
+        throw new ApiError(`Duplicate entry found for key: ${duplicateInfo.key}, value: ${duplicateInfo.value}`, 409);
       }
-      throw e
+      throw e;
     }
   }
 
   private isDuplicateError(error: any): boolean {
-    // Check if the error is a MongoDB duplicate key error
-    return error instanceof MongoError && error.code === 11000;
+    return error.code === '23505'; // PostgreSQL unique constraint violation
   }
 
   private getDuplicateKeyInfo(error: any): { key: string; value: string } {
-    if (error.writeErrors && error.writeErrors.length > 0) {
-      const writeError = error.writeErrors[0];
-      const match = writeError.errmsg.match(/dup key: \{ (\w+): "(.*?)" \}/); // Extract key-value from errmsg
+    if (error.detail) {
+      const match = error.detail.match(/Key \((\w+)\)=\((.*?)\)/);
       if (match) {
         return { key: match[1], value: match[2] };
       }
     }
-  
     return { key: 'unknown', value: 'unknown' };
   }
 
-
-  async update(id: string, data: DeepPartial<T>): Promise<T | null> {
+  async update(id: number, data: DeepPartial<T>): Promise<T | null> {
     const entity = await this.findOneById(id);
     if (!entity) {
-      throw new ApiError("entity not found", 404);
+      throw new ApiError("Entity not found", 404);
     }
     Object.assign(entity, data);
     return this.repository.save(entity);
   }
 
-  async delete(id: string): Promise<boolean> {
+  async delete(id: number): Promise<boolean> {
     const result = await this.repository.delete(id);
-    return result?.affected ? result.affected > 0 : false;
+    return result.affected ? result.affected > 0 : false;
   }
 
-  async deleteMany(query: ObjectLiteral): Promise<number> {
-    const result = await this.repository.deleteMany(query);
-    return result?.deletedCount || 0;
+  async deleteMany(query: Partial<T>): Promise<number> {
+    const result = await this.repository.createQueryBuilder()
+      .delete()
+      .from(this.repository.metadata.name)
+      .where(query)
+      .execute();
+    return result.affected || 0;
   }
 
-  async updateMany(query: ObjectLiteral, data: DeepPartial<T>): Promise<number> {
-    const result = await this.repository.updateMany(query, { $set: data }); 
-    return result?.modifiedCount || 0;
+  async updateMany(query: Partial<T>, data: DeepPartial<T>): Promise<number> {
+    const result = await this.repository.createQueryBuilder()
+      .update(this.repository.metadata.name)
+      .set(data)
+      .where(query)
+      .execute();
+    return result.affected || 0;
   }
 }

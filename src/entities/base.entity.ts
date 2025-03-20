@@ -3,7 +3,7 @@ import { Status } from '../enums';
 
 export abstract class BaseEntity {
   @PrimaryGeneratedColumn()
-  id: number;  // Change _id to id and make it auto-incrementing
+  _id: number;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

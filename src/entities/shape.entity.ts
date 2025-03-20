@@ -57,24 +57,28 @@ export class Shape extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   svgFile?: string;
 
-  @Column({ type: 'text' })
-  svgContent: string;
+  @Column({ type: 'text', nullable: true })
+  svgContent?: string;
 
   @Column({ type: 'varchar', length: 20, default: '1.0.0', nullable: false })
   version: string = '1.0.0';
 
-  @Index()
-  @Column({ type: 'int' })
-  category: number;  // Replaced `ObjectId` with `number`
+  // @Index()
+  // @Column({ type: 'int' })
+  // category: number;  // Replaced `ObjectId` with `number`
 
-  @Column({ type: 'jsonb' })
-  metadata: Metadata;
+  @Index()
+  @ManyToOne(() => Category, (cat) => cat.shapes, { onDelete: "CASCADE" })
+  category: Category;
+
+  @Column({ type: 'jsonb', nullable: true })
+  metadata?: Metadata;
 
   @Column({ type: 'text', array: true, default: [] })
   tags: string[];
 
-  @Column({ type: 'varchar', length: 255 })
-  author: string;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  author?: string;
 
   @Column({ type: 'jsonb', nullable: true })
   diagram_components?: Record<string, any>[];

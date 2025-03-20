@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { BaseEntity } from './base.entity';
+import { Diagram } from './diagram.entity';
 
 export enum UserRole {
   'DESIGNER' = 'DESIGNER',
@@ -26,4 +27,7 @@ export class User extends BaseEntity {
     default: UserRole.END_USER
   })
   role: UserRole = UserRole.END_USER;
+
+  @OneToMany(() => Diagram, (diag) => diag.author)
+  diagrams: Diagram[];
 }

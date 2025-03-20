@@ -1,17 +1,18 @@
 import {
   Entity,
   Column,
-  Index,
-  PrimaryGeneratedColumn
+  ManyToOne,
+  Index
 } from 'typeorm';
 import { BaseEntity } from './base.entity';
+import { User } from './user.entity';
 
 @Entity('diagrams')
 @Index('diagram_name_version_unique', ['name', 'version'], { unique: true })
 export class Diagram extends BaseEntity {
 
-  @Column({ type: 'int' })
-  author: number;  // Replaced ObjectId with number
+  @ManyToOne(() => User, (user) => user.diagrams, { onDelete: "CASCADE" })
+  author: User;
 
   @Column({ type: 'varchar', length: 255 })
   name: string;
