@@ -34,14 +34,64 @@ export default class CategoriesController {
         fileUpload: true
     }, ChatResp
     )
-    async processChat(req: Request, res: Response, next: NextFunction): Promise<void> {
+    async processChat(req: Request, res: Response, next: NextFunction) {
         try {
-            console.log("req.body", req.body)
-            if (req.file) {
-                const resp = await this.awsService.uploadFile(config.ISOMETRIC_IMAGE_FOLDER, req.file)
-                res.json(resp)
+
+            const { uuid, query, currentState } = req.body
+            const { file } = req
+            let messageType = 'text';
+            let handledDoc = null;
+            let fileType;
+            if (file) {
+                messageType = 'file';
+                switch (file?.mimetype) {
+                    case 'image/jpeg':
+                    case 'image/png':
+                        const uploadedImage = await this.awsService.uploadFile(config.ISOMETRIC_IMAGE_FOLDER, file);
+                        fileType = 'image'
+                        // handledDoc = await isometricService.handleImage(file, uuid, uploadedImage.s3Url);
+                        break;
+                    case 'application/pdf':
+                        const uploadedDoc = await this.awsService.uploadFile(config.ISOMETRIC_DOC_FOLDER, file);
+                        fileType = 'pdf'
+                        // handledDoc = await isometricService.handlePdf(file, uuid, uploadedDoc.s3Url);
+                        break;
+                    default:
+                        return res.status(400).json({ error: 'File format not allowed!' });
+                }
             }
-            else res.json({ mesaage: 'file not uploaded' })
+
+            // const payload = await isometricService.classifyAndRouteQuery(uuid, query, currentState, handledDoc?.savedDocument.id);
+            // const agrentResponse = await isometricService.processWithAgents(payload);
+            // const result = await processRequest(query, uuid, currentState, file)
+            // const chats = [
+            //     {
+            //         uuid,
+            //         message: query,
+            //         messageType: messageType,
+            //         metadata: {
+            //             ...(!!handledDoc?.savedDocument.id && { documentId: handledDoc.savedDocument.id }), ...(!!handledDoc?.savedDocument.metadata.fileUrl && { fileUrl: handledDoc?.savedDocument.metadata.fileUrl }),
+            //             ...(fileType && { fileType: fileType })
+            //         },
+            //         role: 'user'
+            //     },
+            //     {
+            //         uuid,
+            //         message: result.feedback,
+            //         messageType: !!result.result?.length ? 'json' : 'text', // json or text check
+            //         metadata: { content: result.result, action: result.action, needFeedback: result.needFeedback, isGherkinScriptQuery: result.isGherkinScriptQuery },
+            //         role: 'system'
+            //     }
+            // ];
+
+            // await isometricQuery.saveChats(chats);
+            // return res.status(200).json({
+            //     uuid,
+            //     message: result.feedback,
+            //     messageType: !!result.result?.length ? 'json' : 'text', // json or text check
+            //     metadata: { content: result.result, action: result.action, needFeedback: result.needFeedback, isEmailQuery: result.isEmailQuery, emailId: result.email, isPdfUploaded: fileType === 'pdf', isGherkinScriptQuery: result.isGherkinScriptQuery },
+            //     role: 'system'
+            // });
         } catch (e) {
             next(e)
         }
