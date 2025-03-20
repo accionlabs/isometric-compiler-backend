@@ -8,6 +8,8 @@ import ShapeController from './controllers/shape.controller'
 import CategoriesController from './controllers/categories.controller'
 import UserController from './controllers/user.controller'
 import DiagramController from './controllers/diagram.controller'
+import ChatController from './controllers/chat.controller'
+import { fileUpload } from './middlewares/fileUpload'
 
 var router = express.Router();
 
@@ -15,7 +17,8 @@ export const controllers = [
   ShapeController,
   CategoriesController,
   UserController,
-  DiagramController
+  DiagramController,
+  ChatController
 ]
 
 controllers.forEach(controller => {
@@ -29,18 +32,21 @@ controllers.forEach(controller => {
   // creating all routes with express routes
   routes.forEach(route => {
     console.log(`Route Registerd path: ${prefix + route.path} method: ${route.requestMethod}`)
-    if (route.validSchema) {
-      router[route.requestMethod as 'get' | 'post' | 'delete' | 'put'](prefix + route.path,
-        authenticate(route.isAuthenticated), // Authentication 
-        validateRequest(route.validSchema), // Validate request before serving it
-        instance[route.methodName].bind(instance)
-      )
-    } else {
-      router[route.requestMethod as 'get' | 'post' | 'delete' | 'put'](prefix + route.path,
-        authenticate(route.isAuthenticated),
-        instance[route.methodName].bind(instance)
-      )
+    const middlewares = [authenticate(route.isAuthenticated)];
+
+    if (route.fileUpload) {
+      console.log("fileupload middle ware")
+      const fileUploadMid = fileUpload(route.fileUplaodOptions ?? {})
+      if (fileUploadMid) middlewares.push(fileUploadMid)
     }
+
+    if (route.validSchema) {
+      middlewares.push(validateRequest(route.validSchema));
+    }
+
+    middlewares.push(instance[route.methodName].bind(instance));
+
+    router[route.requestMethod as 'get' | 'post' | 'delete' | 'put'](prefix + route.path, ...middlewares);
   })
 })
 

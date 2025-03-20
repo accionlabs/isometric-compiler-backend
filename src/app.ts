@@ -1,6 +1,6 @@
 import express from 'express'
 import ApiError from './utils/apiError'
-import { ApiResponse }  from './utils/apiResponse'
+import { ApiResponse } from './utils/apiResponse'
 import { Request, Response, NextFunction } from 'express'
 import router from './routes'
 import { Container } from "typedi";
@@ -9,6 +9,7 @@ import morganLogger from 'morgan'
 import swaggerUi from 'swagger-ui-express';
 import path from 'path'
 import cors from "cors";
+import bodyParser from 'body-parser';
 
 // import './dbconnection'
 
@@ -16,30 +17,34 @@ const app = express()
 
 app.use(morganLogger('dev'));
 app.use(cors());
+
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 
 
 
-  const swaggerFilePath = path.resolve(__dirname, '../swagger.json');
-  console.log("swaggerFilePath", swaggerFilePath)
-  app.get('/swagger.json', (req, res) => {
-    res.sendFile(swaggerFilePath);
-  });
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(undefined, { swaggerUrl: '/swagger.json' }));
+const swaggerFilePath = path.resolve(__dirname, '../swagger.json');
+console.log("swaggerFilePath", swaggerFilePath)
+app.get('/swagger.json', (req, res) => {
+  res.sendFile(swaggerFilePath);
+});
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(undefined, { swaggerUrl: '/swagger.json' }));
 
 
 app.use('/', router);
 // app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  const err  = new ApiError('Resourse not found!', 404)
+app.use(function (req, res, next) {
+  const err = new ApiError('Resourse not found!', 404)
   next(err)
 });
 
 // error handler
-app.use(function(err: any, req: Request, res: Response, next: NextFunction) {
+app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
   let errMessage = err.message
   let errStatus = err.status || 500
   if (errStatus === 500) {
@@ -54,15 +59,15 @@ app.use(function(err: any, req: Request, res: Response, next: NextFunction) {
 
 
 const errorHandler = (error: any) => {
-    const logger = Container.get(LoggerService);
-    logger.error("UncaughtException: ", error);
-  };
-  
-  process.on("uncaughtException", function (error) {
-    errorHandler(error);
-  });
-  process.on("unhandledRejection", function (error) {
-    errorHandler(error);
-  });
+  const logger = Container.get(LoggerService);
+  logger.error("UncaughtException: ", error);
+};
+
+process.on("uncaughtException", function (error) {
+  errorHandler(error);
+});
+process.on("unhandledRejection", function (error) {
+  errorHandler(error);
+});
 
 export default app

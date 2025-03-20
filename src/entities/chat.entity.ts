@@ -2,9 +2,9 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { BaseEntity } from './base.entity';
 
 @Entity('chats')
-export class Chat  extends BaseEntity {
+export class Chat extends BaseEntity {
 
-  @Column({ type: 'varchar', length: 255, unique: true })
+  @Column({ type: 'varchar', length: 255 })
   uuid: string;
 
   @Column({ type: 'text', nullable: true })
