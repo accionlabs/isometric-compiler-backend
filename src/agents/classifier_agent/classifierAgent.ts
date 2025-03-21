@@ -1,23 +1,20 @@
-// import { __LLM_PLATFORM, generateJsonWithConversation } from "../../services/llm";
-// import { fetchChatHistory, saveChatContext } from "../../services/chat_service";
-import { StructuredOutputParser } from "langchain/output_parsers";
 import * as fs from "fs";
 import { Inject, Service } from "typedi";
-import { ChatService } from "../../services/chat.service";
 import { LlmService } from "../../services/llm.service";
 import { LLM_PLATFORM } from "../../enums";
+import { LLMConversationService } from "../../services/llm_conversation.service";
 
 const __CLASSIFIER_PROMPT__ = fs.readFileSync("./src/agents/classifier_agent/CLASSIFIER_AGENT_PROMPT.md", "utf8");
 
 @Service()
-class ClassifierAgentService {
+export class ClassifierAgent {
     private classifierPrompt: string;
 
     @Inject(() => LlmService)
     private readonly llmService: LlmService
 
-    @Inject(() => ChatService)
-    private readonly chatService: ChatService
+    @Inject(() => LLMConversationService)
+    private readonly llmConversationService: LLMConversationService
 
     constructor() {
         this.classifierPrompt = __CLASSIFIER_PROMPT__;
@@ -27,7 +24,7 @@ class ClassifierAgentService {
         if (!uuid) {
             return [];
         }
-        const oldHistory = await this.chatService.fetchChatHistory("chat-" + uuid);
+        const oldHistory = await this.llmConversationService.fetchChatHistory("chat-" + uuid);
         let conversations = oldHistory?.conversations;
         return conversations && conversations.length > 0 ? JSON.parse(conversations) : [];
     }
@@ -46,10 +43,8 @@ class ClassifierAgentService {
         if (uuid) {
             conversations.push(question);
             conversations.push(JSON.stringify(result));
-            await saveChatContext("chat-" + uuid, { context: "", metadata: "", conversations: JSON.stringify(conversations) });
+            await this.llmConversationService.saveChatContext({ key: "chat-" + uuid, context: "", metadata: "", conversations: JSON.stringify(conversations) });
         }
         return result;
     }
 }
-
-export default ClassifierAgentService;

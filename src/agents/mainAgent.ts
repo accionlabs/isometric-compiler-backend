@@ -1,143 +1,112 @@
-// import { getDocumentByUUID } from '../services/isometricQuery';
-// import { processClassifierAgent } from './classifier_agent/classifierAgent';
-// import { processDiagramModifierAgent } from './diagram_modifier_agent/diagramModifierAgent';
-// import { generateIsometricJSONFromBlueprint, generateIsometricJSONFromImage } from './diagram_generator_agent/diagramGeneratorAgent';
-// import { generalQuery } from './general_query_agent/generalQueryAgent';
-// import { getGherkinScript } from './gherkin_agent/gherkinAgent';
+import { Inject, Service } from 'typedi';
+import { DocumentService } from '../services/document.service';
+import { ClassifierAgent } from './classifier_agent/classifierAgent';
+import { GherkinAgent } from './gherkin_agent/gherkinAgent';
+import { DiagramGeneratorAgent } from './diagram_generator_agent/diagramGeneratorAgent';
+import { GeneralQueryAgent } from './general_query_agent/generalQueryAgent';
+import { DiagramModifierAgent } from './diagram_modifier_agent/diagramModifierAgent';
 
-// interface File {
-//     originalname?: string;
-//     mime?: string;
-//     buffer?: Buffer;
-// }
+type DefaultResponse = {
+    feedback: string;
+    action: any[];
+    result: any;
+    needFeedback: boolean;
+    isEmailQuery?: boolean;
+    email?: string;
+    isGherkinScriptQuery?: boolean;
+};
 
-// interface DocumentDetail {
-//     metadata: { filename: string };
-// }
+@Service()
+export class MainAgent {
 
-// interface ClassifierResult {
-//     feedback: string;
-//     isEmailQuery?: boolean;
-//     email?: string;
-//     isGherkinScriptQuery?: boolean;
-//     isDiagramCreationQuery?: boolean;
-//     documentReferences?: string[];
-//     transformedQuery?: string;
-//     isGeneralQuery?: boolean;
-//     isDiagramModifyQuery?: boolean;
-// }
+    @Inject(() => DocumentService)
+    private readonly documentService: DocumentService
 
-// interface DefaultResponse {
-//     feedback: string;
-//     action: any[];
-//     result: any;
-//     needFeedback: boolean;
-//     isEmailQuery?: boolean;
-//     email?: string;
-//     isGherkinScriptQuery?: boolean;
-// }
+    @Inject(() => ClassifierAgent)
+    private readonly classifierAgent: ClassifierAgent
 
-// const getImage = (documents: string | string[]): string | null => {
-//     if (typeof documents === 'string') {
-//         documents = [documents];
-//     }
-//     for (const doc of documents) {
-//         if (doc?.match(/\.(jpg|jpeg|png|svg)$/i)) {
-//             return doc;
-//         }
-//     }
-//     return null;
-// };
+    @Inject(() => GherkinAgent)
+    private readonly gherKinAgent: GherkinAgent
 
-// export const processRequest = async (
-//     question: string,
-//     uuid: string,
-//     currentState: any = [],
-//     file?: File
-// ): Promise<DefaultResponse> => {
-//     const documentDetails: DocumentDetail[] = await getDocumentByUUID(uuid);
-//     const availableDocuments: string[] = documentDetails?.map(doc => doc.metadata.filename) || [];
+    @Inject(() => DiagramGeneratorAgent)
+    private readonly diagramGeneratorAgent: DiagramGeneratorAgent
 
-//     const newDocumentUpload = file?.originalname || null;
-//     const classifierResult: ClassifierResult = await processClassifierAgent(
-//         question,
-//         availableDocuments,
-//         newDocumentUpload,
-//         `classifier_${uuid}`
-//     );
+    @Inject(() => GeneralQueryAgent)
+    private readonly generalQueryAgent: GeneralQueryAgent
 
-//     global.logger.info(`[Agent] Classifier Agent response with documents ${availableDocuments}: `, classifierResult);
+    @Inject(() => DiagramModifierAgent)
+    private readonly diagramModifierAgent: DiagramModifierAgent
 
-//     if (typeof currentState === 'string') {
-//         currentState = JSON.parse(currentState);
-//     }
 
-//     let defaultResponse: DefaultResponse = {
-//         feedback: classifierResult.feedback,
-//         action: [],
-//         result: currentState,
-//         needFeedback: true,
-//         isEmailQuery: classifierResult.isEmailQuery,
-//         email: classifierResult.email,
-//         isGherkinScriptQuery: classifierResult.isGherkinScriptQuery
-//     };
 
-//     if (classifierResult.isGherkinScriptQuery) {
-//         const gherkinResult = await getGherkinScript(uuid, question);
-//         defaultResponse.result = gherkinResult;
-//     }
+    private getImage(documents: string | string[]): string | null {
+        if (typeof documents === 'string') {
+            documents = [documents];
+        }
+        for (const doc of documents) {
+            if (doc?.match(/\.(jpg|jpeg|png|svg)$/i)) {
+                return doc;
+            }
+        }
+        return null;
+    }
 
-//     if (classifierResult.isDiagramCreationQuery) {
-//         let image: string | null = null;
-//         if (newDocumentUpload) {
-//             image = getImage(newDocumentUpload);
-//         } else {
-//             image = getImage(classifierResult.documentReferences || []);
-//         }
+    public async processRequest(question: string, uuid: string, currentState: any = [], file?: Express.Multer.File): Promise<DefaultResponse> {
+        const documentDetails = await this.documentService.getDocumentsByUUID(uuid);
+        const availableDocuments = documentDetails?.map((doc: any) => doc.metadata.filename) || [];
 
-//         if (image && !question.includes('blueprint')) {
-//             global.logger.info('[Main Agent]: Generating isometric from image ', image);
-//             const creationResult = await generateIsometricJSONFromImage(image, uuid, documentDetails);
+        const newDocumentUpload = file?.originalname || null;
+        const classifierResult = await this.classifierAgent.processClassifierAgent(question, availableDocuments, newDocumentUpload || '', `classifier_${uuid}`);
 
-//             if (!creationResult.isometric) {
-//                 defaultResponse.needFeedback = true;
-//                 defaultResponse.feedback = creationResult.message;
-//             } else {
-//                 defaultResponse.needFeedback = false;
-//                 defaultResponse.result = creationResult.isometric;
-//                 defaultResponse.feedback = creationResult.message;
-//             }
-//         } else {
-//             global.logger.info('[Main Agent]: Generating blueprint');
-//             const creationResult = await generateIsometricJSONFromBlueprint(uuid);
+        if (typeof currentState === 'string') {
+            currentState = JSON.parse(currentState);
+        }
 
-//             if (!creationResult.isometric) {
-//                 defaultResponse.needFeedback = true;
-//                 defaultResponse.feedback = creationResult.message;
-//             } else {
-//                 defaultResponse.needFeedback = false;
-//                 defaultResponse.result = creationResult.isometric;
-//                 defaultResponse.feedback = creationResult.message;
-//             }
-//         }
-//     } else if (classifierResult.isGeneralQuery) {
-//         const generalQueryResult = await generalQuery(classifierResult.transformedQuery || '', currentState, uuid);
-//         defaultResponse.feedback = generalQueryResult || classifierResult.feedback;
-//     } else if (classifierResult.isEmailQuery) {
-//         if (classifierResult.email) {
-//             // send email logic here
-//         }
-//     } else if (classifierResult.isDiagramModifyQuery) {
-//         const result = await processDiagramModifierAgent(classifierResult.transformedQuery || '', currentState, uuid);
+        let defaultResponse: DefaultResponse = {
+            feedback: classifierResult.feedback,
+            action: [],
+            result: currentState,
+            needFeedback: true,
+            isEmailQuery: classifierResult.isEmailQuery,
+            email: classifierResult.email,
+            isGherkinScriptQuery: classifierResult.isGherkinScriptQuery,
+        };
 
-//         if (result.needFeedback === false) {
-//             defaultResponse.action = result.action;
-//             defaultResponse.result = result.result;
-//             defaultResponse.needFeedback = false;
-//         } else {
-//             defaultResponse.feedback = result.feedback;
-//         }
-//     }
+        if (classifierResult.isGherkinScriptQuery) {
+            defaultResponse.result = await this.gherKinAgent.getGherkinScript(uuid, question);
+        } else if (classifierResult.isDiagramCreationQuery) {
+            let image = newDocumentUpload ? this.getImage(newDocumentUpload) : this.getImage(classifierResult.documentReferences);
 
-//     return defaultResponse;
-// };
+            if (image && !question.includes('blueprint')) {
+                const creationResult = await this.diagramGeneratorAgent.generateIsometricJSONFromImage(image, uuid, documentDetails);
+                defaultResponse = {
+                    ...defaultResponse,
+                    needFeedback: !creationResult.isometric,
+                    result: creationResult.isometric || defaultResponse.result,
+                    feedback: creationResult.message,
+                };
+            } else {
+                const creationResult = await this.diagramGeneratorAgent.generateIsometricJSONFromBlueprint(uuid);
+                defaultResponse = {
+                    ...defaultResponse,
+                    needFeedback: !creationResult.isometric,
+                    result: creationResult.isometric || defaultResponse.result,
+                    feedback: creationResult.message,
+                };
+            }
+        } else if (classifierResult.isGeneralQuery) {
+            const generalQueryResult = await this.generalQueryAgent.generalQuery(classifierResult.transformedQuery, currentState, uuid);
+            defaultResponse.feedback = generalQueryResult || classifierResult.feedback;
+        } else if (classifierResult.isDiagramModifyQuery) {
+            const result = await this.diagramModifierAgent.processDiagramModifierAgent(classifierResult.transformedQuery, currentState, uuid);
+
+            if (!result.needFeedback) {
+                defaultResponse = { ...defaultResponse, action: result.action, result: result.result, needFeedback: false };
+            } else {
+                defaultResponse.feedback = result.feedback;
+            }
+        }
+
+        return defaultResponse;
+    }
+}

@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column } from 'typeorm';
 import { BaseEntity } from './base.entity';
+import { MessageRoles, MessageTypes } from '../enums';
 
 @Entity('chats')
 export class Chat extends BaseEntity {
@@ -7,16 +8,16 @@ export class Chat extends BaseEntity {
   @Column({ type: 'varchar', length: 255 })
   uuid: string;
 
-  @Column({ type: 'text', nullable: true })
-  message?: string;
+  @Column({ type: 'text' })
+  message: string;
 
-  @Column({ type: 'varchar', length: 50 })
-  message_type: 'file' | 'text' | 'json';
+  @Column({ type: 'enum', enum: MessageTypes })
+  messageType: MessageTypes;
 
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any>;
 
-  @Column({ type: 'varchar', length: 50 })
-  role: 'system' | 'user';
+  @Column({ type: 'enum', enum: MessageRoles })
+  role: MessageRoles
 
 }

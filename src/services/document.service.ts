@@ -8,7 +8,7 @@ import { Document as VectorDocument } from "@langchain/core/documents"
 import { UnifiedModelGenerator } from "../agents/unifiedModel";
 
 @Service()
-export class Documentervice extends BaseService<Document> {
+export class DocumentService extends BaseService<Document> {
     constructor() {
         super(AppDataSource.getRepository(Document));
     }
@@ -70,5 +70,9 @@ export class Documentervice extends BaseService<Document> {
         const indexedDoc = await this.pgVectorService.indexDocument(file, fileContent);
         // await regenerateUnifiedModel(uuid);
         return { savedDocument };
+    }
+
+    async getDocumentsByUUID(uuid: string) {
+        return this.getRepository().find({ where: { uuid } });
     }
 }

@@ -19,3 +19,14 @@ export enum SemanticModelStatus {
   GENERATING_BREEZE_SPEC = 'generating_breeze_spec',
   INACTIVE = Status.INACTIVE
 }
+
+export enum MessageTypes {
+  FILE = 'file',
+  TEXT = 'text',
+  JSON = 'json'
+}
+
+export enum MessageRoles {
+  SYSTEM = 'system',
+  USER = 'user'
+}

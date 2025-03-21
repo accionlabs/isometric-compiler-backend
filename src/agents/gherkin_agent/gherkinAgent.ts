@@ -30,7 +30,7 @@ interface SemanticModel {
 }
 
 @Service()
-class GherkinScriptService {
+export class GherkinAgent {
     private gherkinPrompt: string;
 
     @Inject(() => LlmService)
@@ -88,4 +88,3 @@ class GherkinScriptService {
     }
 }
 
-export default GherkinScriptService;

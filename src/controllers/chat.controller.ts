@@ -1,18 +1,14 @@
 import { Inject, Service } from "typedi"
 import { Controller, Delete, Get, Post, Put } from "../core"
-import { CategoryService } from "../services/categories.service"
-import { CategoryUpadteValidation, CategoryValidation } from "../validations/category.validation";
 import { NextFunction, Request, Response } from 'express';
-import { ObjectId } from "mongodb";
-import { Category } from "../entities/categories.entity";
-import ApiError from "../utils/apiError";
-import { ShapeService } from "../services/shape.service";
-import { FilterUtils } from "../utils/filterUtils";
 import { ChatValidation } from "../validations/chat.validation";
 import { ChatService } from "../services/chat.service";
 import { AWSService } from "../services/aws.service";
 import config from "../configs";
-import { Documentervice } from "../services/document.service";
+import { DocumentService } from "../services/document.service";
+import { MainAgent } from "../agents/mainAgent";
+import { Chat } from "../entities/chat.entity";
+import { MessageRoles, MessageTypes } from "../enums";
 
 class ChatResp {
     resp: string
@@ -28,8 +24,13 @@ export default class CategoriesController {
     @Inject(() => AWSService)
     private readonly awsService: AWSService
 
-    @Inject(() => Documentervice)
-    private readonly documentService: Documentervice
+    @Inject(() => DocumentService)
+    private readonly documentService: DocumentService
+
+    @Inject(() => MainAgent)
+    private readonly mainAgent: MainAgent
+
+
 
 
     @Post('/', ChatValidation, {
@@ -43,11 +44,11 @@ export default class CategoriesController {
 
             const { uuid, query, currentState } = req.body
             const { file } = req
-            let messageType = 'text';
+            let messageType: MessageTypes = MessageTypes.TEXT;
             let handledDoc = null;
             let fileType;
             if (file) {
-                messageType = 'file';
+                messageType = MessageTypes.FILE;
                 switch (file?.mimetype) {
                     case 'image/jpeg':
                     case 'image/png':
@@ -64,38 +65,35 @@ export default class CategoriesController {
                         return res.status(400).json({ error: 'File format not allowed!' });
                 }
             }
-            return res.json(handledDoc)
-            // const payload = await isometricService.classifyAndRouteQuery(uuid, query, currentState, handledDoc?.savedDocument.id);
-            // const agrentResponse = await isometricService.processWithAgents(payload);
-            // const result = await processRequest(query, uuid, currentState, file)
-            // const chats = [
-            //     {
-            //         uuid,
-            //         message: query,
-            //         messageType: messageType,
-            //         metadata: {
-            //             ...(!!handledDoc?.savedDocument.id && { documentId: handledDoc.savedDocument.id }), ...(!!handledDoc?.savedDocument.metadata.fileUrl && { fileUrl: handledDoc?.savedDocument.metadata.fileUrl }),
-            //             ...(fileType && { fileType: fileType })
-            //         },
-            //         role: 'user'
-            //     },
-            //     {
-            //         uuid,
-            //         message: result.feedback,
-            //         messageType: !!result.result?.length ? 'json' : 'text', // json or text check
-            //         metadata: { content: result.result, action: result.action, needFeedback: result.needFeedback, isGherkinScriptQuery: result.isGherkinScriptQuery },
-            //         role: 'system'
-            //     }
-            // ];
+            const result = await this.mainAgent.processRequest(query, uuid, currentState, file)
+            const chats: Partial<Chat>[] = [
+                {
+                    uuid: uuid as string,
+                    message: query as string,
+                    messageType: messageType,
+                    metadata: {
+                        ...(!!handledDoc?.savedDocument._id && { documentId: handledDoc.savedDocument._id }), ...(!!handledDoc?.savedDocument?.metadata?.fileUrl && { fileUrl: handledDoc?.savedDocument.metadata.fileUrl }),
+                        ...(fileType && { fileType: fileType })
+                    },
+                    role: MessageRoles.USER
+                },
+                {
+                    uuid,
+                    message: result.feedback,
+                    messageType: !!result.result?.length ? MessageTypes.JSON : MessageTypes.TEXT, // json or text check
+                    metadata: { content: result.result, action: result.action, needFeedback: result.needFeedback, isGherkinScriptQuery: result.isGherkinScriptQuery },
+                    role: MessageRoles.SYSTEM
+                }
+            ];
 
-            // await isometricQuery.saveChats(chats);
-            // return res.status(200).json({
-            //     uuid,
-            //     message: result.feedback,
-            //     messageType: !!result.result?.length ? 'json' : 'text', // json or text check
-            //     metadata: { content: result.result, action: result.action, needFeedback: result.needFeedback, isEmailQuery: result.isEmailQuery, emailId: result.email, isPdfUploaded: fileType === 'pdf', isGherkinScriptQuery: result.isGherkinScriptQuery },
-            //     role: 'system'
-            // });
+            await this.chatService.createMany(chats)
+            return res.status(200).json({
+                uuid,
+                message: result.feedback,
+                messageType: !!result.result?.length ? 'json' : 'text', // json or text check
+                metadata: { content: result.result, action: result.action, needFeedback: result.needFeedback, isEmailQuery: result.isEmailQuery, emailId: result.email, isPdfUploaded: fileType === 'pdf', isGherkinScriptQuery: result.isGherkinScriptQuery },
+                role: 'system'
+            });
         } catch (e) {
             next(e)
         }
