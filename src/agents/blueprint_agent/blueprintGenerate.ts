@@ -6,7 +6,7 @@ import { LlmService } from '../../services/llm.service';
 import { LLM_PLATFORM } from '../../enums';
 import * as fs from "fs";
 
-const __BLUEPRINT_PROMPT__ = fs.readFileSync("./agents/blueprint_agent/BREEZE_EXTRACTOR_PROMPT.md", "utf8");
+const __BLUEPRINT_PROMPT__ = fs.readFileSync("./src/agents/blueprint_agent/BREEZE_EXTRACTOR_PROMPT.md", "utf8");
 
 
 type Blueprint = any; // Define a proper interface for Blueprint as needed

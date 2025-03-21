@@ -1,5 +1,5 @@
-const shapes = require('../config/shapesv3.json');
-const layers_master = shapes['layers'];
+import Shapes from '../configs/shapesv3.json'
+const layers_master: any = Shapes['layers'];
 
 // Define types
 interface Shape {
@@ -36,6 +36,7 @@ interface Layer {
     dimentions: LayerDimensions;
 }
 
+const shapes: any = Shapes
 
 // Function to get shape details
 const getShapeDetailsFromMaster = (shapeName: string) => {

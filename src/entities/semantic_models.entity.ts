@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BaseEntity } from 'typeorm';
+import { Entity, Column } from 'typeorm';
 import { SemanticModelStatus } from '../enums';
+import { BaseEntity } from './base.entity';
 
 @Entity('semantic_models')
 export class SemanticModel extends BaseEntity {
@@ -15,8 +16,8 @@ export class SemanticModel extends BaseEntity {
     @Column({
         type: 'varchar',
         length: 50,
-        default: SemanticModelStatus.ACTIVE,
+        default: SemanticModelStatus.INITIATED,
         enum: SemanticModelStatus
     })
-    status: SemanticModelStatus;
+    declare status: SemanticModelStatus = SemanticModelStatus.INITIATED;
 }

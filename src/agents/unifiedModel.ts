@@ -1,97 +1,103 @@
-// import { generateQUMBusinessSpec, generateQUMDesignSpec } from './qum_agent/qumAgent';
-// import { vectorSearch } from '../services/isomtericPgVector';
-// import { extractScenarios } from './helpers';
-// import { saveSemanticModel } from '../services/isometricQuery';
-// import { SemanticModelStatus } from '../config/isometric_db';
-// import { getCache } from './cache';
+import { extractScenarios } from "./helpers";
+import { getCache } from "./cache";
+import { Inject, Service } from "typedi";
+import { SemanticModelService } from "../services/semanticModel.service";
+import { PgVectorService } from "../services/pgVector.service";
+import { SemanticModelStatus } from "../enums";
+import { QUMAgent } from "./qum_agent/qumAgent";
+import { LoggerService } from "../services/logger.service";
 
-// // Define Interfaces
-// interface Scenario {
-//     scenario: string;
-//     steps?: any[];
-// }
+interface Scenario {
+    scenario: string;
+    steps?: any[];
+}
 
-// interface Outcome {
-//     scenarios: Scenario[];
-// }
+interface Outcome {
+    scenarios: Scenario[];
+}
 
-// interface Persona {
-//     outcomes: Outcome[];
-// }
+interface Persona {
+    outcomes: Outcome[];
+}
 
-// interface BusinessSpec {
-//     qum_business?: {
-//         personas: Persona[];
-//     };
-// }
+interface BusinessSpec {
+    qum_business?: {
+        personas: Persona[];
+    };
+}
 
-// interface DesignSpec {
-//     qum_design?: {
-//         scenarios: Scenario[];
-//     };
-// }
+interface DesignSpec {
+    qum_design?: {
+        scenarios: Scenario[];
+    };
+}
 
-// // Helper Function
-// const getDesignSpec = (scenario: string, design?: Scenario[]): any[] => {
-//     for (let i = 0; i < (design?.length ?? 0); i++) {
-//         if (scenario.toLowerCase() === design![i].scenario.toLowerCase()) {
-//             return design![i].steps ?? [];
-//         }
-//     }
-//     return [];
-// };
+@Service()
+export class UnifiedModelGenerator {
 
-// // Merges Business and Design Specifications
-// const mergeBusinessDesignSpec = (business: BusinessSpec, design: DesignSpec): Persona[] | undefined => {
-//     const personas = business?.qum_business?.personas;
-//     if (!personas) return undefined;
+    @Inject(() => SemanticModelService)
+    private readonly semanticModelService: SemanticModelService;
 
-//     for (const persona of personas) {
-//         for (const outcome of persona.outcomes) {
-//             for (const scenario of outcome.scenarios) {
-//                 scenario.steps = getDesignSpec(scenario.scenario, design?.qum_design?.scenarios);
-//             }
-//         }
-//     }
-//     return personas;
-// };
+    @Inject(() => PgVectorService)
+    private readonly pgVectorService: PgVectorService
 
-// // Main Function: Regenerate Unified Model
-// export const regenerateUnifiedModel = async (uuid: string, filename: string): Promise<void> => {
-//     const cache = await getCache(filename);
-//     if (cache !== null) {
-//         await saveSemanticModel(uuid, { metadata: cache, visualModel: [], status: SemanticModelStatus.ACTIVE });
-//         return;
-//     }
+    @Inject(() => QUMAgent)
+    private readonly qumAgent: QUMAgent
 
-//     try {
-//         let context = '';
-//         await saveSemanticModel(uuid, { metadata: {}, visualModel: [], status: SemanticModelStatus.INITIATED });
+    @Inject(() => LoggerService)
+    private readonly loggerService: LoggerService
 
-//         const documents = await vectorSearch("", { uuid });
-//         documents.forEach((x: any) => (context += `\n\n---\n${x.pageContent}`));
+    private getDesignSpec(scenario: string, designScenarios?: Scenario[]): any[] {
+        if (!designScenarios) return [];
+        for (const designScenario of designScenarios) {
+            if (scenario.toLowerCase() === designScenario.scenario.toLowerCase()) {
+                return designScenario.steps || [];
+            }
+        }
+        return [];
+    }
 
-//         await saveSemanticModel(uuid, { metadata: {}, visualModel: [], status: SemanticModelStatus.GENERATING_BUSINESS_SPEC });
+    private mergeBusinessDesignSpec(business: BusinessSpec, design: DesignSpec): Persona[] {
+        const personas = business.qum_business?.personas || [];
+        for (const persona of personas) {
+            for (const outcome of persona.outcomes) {
+                for (const scen of outcome.scenarios) {
+                    scen.steps = this.getDesignSpec(scen.scenario, design.qum_design?.scenarios);
+                }
+            }
+        }
+        return personas;
+    }
 
-//         const businessSpec: BusinessSpec = await generateQUMBusinessSpec(context);
-//         global.logger.info(`[Unified Model] QUM Business SPEC generated for ${uuid}`);
+    public async regenerateUnifiedModel(uuid: string, filename?: string): Promise<void> {
+        const cache = await getCache(filename);
+        if (cache !== null) {
+            await this.semanticModelService.saveSemanticModel({ uuid, metadata: cache, visualModel: [], status: SemanticModelStatus.ACTIVE });
+            return;
+        }
 
-//         const scenarios = extractScenarios(businessSpec?.qum_business?.personas);
-//         global.logger.info(`[Unified Model] QUM Scenarios SPEC generated for ${uuid}`);
+        try {
+            let context = "";
+            await this.semanticModelService.saveSemanticModel({ uuid, metadata: {}, visualModel: [], status: SemanticModelStatus.INITIATED });
+            const documents = await this.pgVectorService.vectorSearch("", { uuid });
+            documents.forEach((x) => (context += "\n\n---\n" + x.pageContent));
 
-//         await saveSemanticModel(uuid, { metadata: {}, visualModel: [], status: SemanticModelStatus.GENERATING_QUM_DESIGN_SPEC });
+            await this.semanticModelService.saveSemanticModel({ uuid, metadata: {}, visualModel: [], status: SemanticModelStatus.GENERATING_BUSINESS_SPEC });
+            const businessSpec = await this.qumAgent.generateQUMBusinessSpec(context);
+            this.loggerService.info(`[Unified Model] QUM Business SPEC generated for ${uuid}`);
 
-//         const designSpec: DesignSpec = await generateQUMDesignSpec(JSON.stringify(scenarios), context);
-//         global.logger.info(`[Unified Model] QUM Design SPEC generated for ${uuid}`);
+            const scenarios = extractScenarios(businessSpec?.qum_business?.personas);
+            this.loggerService.info(`[Unified Model] QUM Scenarios SPEC generated for ${uuid}`);
 
-//         const qumBlueprint = mergeBusinessDesignSpec(businessSpec, designSpec) ?? [];
+            await this.semanticModelService.saveSemanticModel({ uuid, metadata: {}, visualModel: [], status: SemanticModelStatus.GENERATING_QUM_DESIGN_SPEC });
+            const designSpec = await this.qumAgent.generateQUMDesignSpec(JSON.stringify(scenarios), context);
+            this.loggerService.info(`[Unified Model] QUM Design SPEC generated for ${uuid}`);
 
-//         const unifiedModel = {
-//             qum: qumBlueprint
-//         };
-
-//         await saveSemanticModel(uuid, { metadata: unifiedModel, visualModel: [], status: SemanticModelStatus.ACTIVE });
-//     } catch (error: any) {
-//         global.logger.error("[Unified Model] Error generating unified model:", error.message);
-//     }
-// };
+            const qumBlueprint = this.mergeBusinessDesignSpec(businessSpec, designSpec);
+            const unifiedModel = { qum: qumBlueprint };
+            await this.semanticModelService.saveSemanticModel({ uuid, metadata: unifiedModel, visualModel: [], status: SemanticModelStatus.ACTIVE });
+        } catch (error: any) {
+            this.loggerService.error("[Unified Model] Error generating unified model:", error.message);
+        }
+    }
+}

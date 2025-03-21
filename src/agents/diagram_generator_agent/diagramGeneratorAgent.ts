@@ -17,9 +17,9 @@ import { AWSService } from '../../services/aws.service';
 import { SemanticModelService } from '../../services/semanticModel.service';
 import { BlueprintConverterAgent } from '../blueprint_agent/blueprintGenerate';
 
-const IMAGE_PROMPT = fs.readFileSync("./agents/diagram_generator_agent/DIAGRAM_GENERATOR_AGENT.md", 'utf8');
-const IMAGE_EXTRACTOR_PROMPT = fs.readFileSync("./agents/diagram_generator_agent/IMAGE_EXTRACTOR_AGENT.md", 'utf8');
-const QUM_MAPPER_PROMPT = fs.readFileSync("./agents/diagram_generator_agent/DIAGRAM_QUM_MAPPER.md", 'utf8');
+const IMAGE_PROMPT = fs.readFileSync("./src/agents/diagram_generator_agent/DIAGRAM_GENERATOR_AGENT.md", 'utf8');
+const IMAGE_EXTRACTOR_PROMPT = fs.readFileSync("./src/agents/diagram_generator_agent/IMAGE_EXTRACTOR_AGENT.md", 'utf8');
+const QUM_MAPPER_PROMPT = fs.readFileSync("./src/agents/diagram_generator_agent/DIAGRAM_QUM_MAPPER.md", 'utf8');
 
 const COMPONENTS = Object.keys(shapes['components']);
 const SHAPES_3D = Object.keys(shapes['3dshapes']);

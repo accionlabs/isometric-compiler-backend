@@ -3,6 +3,9 @@ import { AppDataSource } from "../configs/database";
 import { BaseService } from "./base.service";
 import { Document, FileType } from "../entities/document.entity";
 import { PgVectorService } from "./pgVector.service";
+import { DiagramGeneratorAgent } from "../agents/diagram_generator_agent/diagramGeneratorAgent";
+import { Document as VectorDocument } from "@langchain/core/documents"
+import { UnifiedModelGenerator } from "../agents/unifiedModel";
 
 @Service()
 export class Documentervice extends BaseService<Document> {
@@ -13,11 +16,17 @@ export class Documentervice extends BaseService<Document> {
     @Inject(() => PgVectorService)
     private readonly pgVectorService: PgVectorService
 
+    @Inject(() => DiagramGeneratorAgent)
+    private readonly diagramGeneratorAgent: DiagramGeneratorAgent
+
+    @Inject(() => UnifiedModelGenerator)
+    private readonly unifiedModelGenerator: UnifiedModelGenerator
+
     async handleImage(file: Express.Multer.File, uuid: string, fileUrl: string) {
-        // const result = await extractInfoFromImage(file.mimetype, file.buffer, uuid);
+        const result = await this.diagramGeneratorAgent.extractInfoFromImage(file.mimetype, file.buffer);
         const savedDocument = await this.create({
             uuid,
-            content: '',// result from above
+            content: result?.toString(), // result from above
             metadata: {
                 filename: file.fieldname,
                 fileType: FileType.image,
@@ -26,18 +35,18 @@ export class Documentervice extends BaseService<Document> {
 
             }
         });
-        // const fileContent = {
-        //     pageContent: result,
-        //     metadata: {
-        //         documentId: savedDocument.id,
-        //         fileName: file.originalname,
-        //         fileUrl,
-        //         fileType: 'image',
-        //         uuid: uuid
-        //     }
-        // }
-        // await isometricPgVector.indexDocument(file, [fileContent]);
-        // await regenerateUnifiedModel(uuid);
+        const fileContent: VectorDocument = {
+            pageContent: result?.toString() || '',
+            metadata: {
+                documentId: savedDocument._id,
+                fileName: file.originalname,
+                fileUrl,
+                fileType: 'image',
+                uuid: uuid
+            }
+        }
+        await this.pgVectorService.indexDocument(file, [fileContent]);
+        await this.unifiedModelGenerator.regenerateUnifiedModel(uuid);
         return { savedDocument };
     }
 
