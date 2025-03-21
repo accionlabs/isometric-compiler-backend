@@ -103,4 +103,18 @@ export abstract class BaseService<T extends ObjectLiteral> {
       .execute();
     return result.affected || 0;
   }
+
+  async createMany(data: DeepPartial<T>[]): Promise<T[]> {
+    try {
+      const entities = this.repository.create(data);
+      return await this.repository.save(entities);
+    } catch (e) {
+      if (this.isDuplicateError(e)) {
+        const duplicateInfo = this.getDuplicateKeyInfo(e);
+        throw new ApiError(`Duplicate entry found for key: ${duplicateInfo.key}, value: ${duplicateInfo.value}`, 409);
+      }
+      throw e;
+    }
+  }
+
 }
