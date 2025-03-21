@@ -1,9 +1,7 @@
-import Container, { Service } from 'typedi';
+import { Service } from 'typedi';
 import { OpenAIEmbeddings, ChatOpenAI } from '@langchain/openai';
-import { AIMessageChunk, HumanMessage, MessageContent } from '@langchain/core/messages';
+import { HumanMessage } from '@langchain/core/messages';
 import config from '../configs';
-import { HuggingFaceInference } from '@langchain/community/llms/hf';
-import { HuggingFaceInferenceEmbeddings } from '@langchain/community/embeddings/hf';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings } from '@langchain/google-genai';
 import { HarmBlockThreshold, HarmCategory, TaskType } from '@google/generative-ai';
@@ -15,8 +13,6 @@ import fs from 'fs';
 @Service()
 export class LlmService {
 
-    private readonly HF_KEY = config.HUGGING_FACE_KEY;
-    private readonly HF_DEFAULT_MODEL = config.HUGGING_FACE_DEFAULT_MODEL;
     private readonly OPENAI_KEY = config.OPENAI_KEY;
     private readonly OPENAI_DEFAULT_MODEL = config.OPENAI_DEFAULT_MODEL;
     private readonly OPENAI_MATURE_MODEL = config.OPENAI_MATURE_MODEL;
@@ -63,12 +59,6 @@ export class LlmService {
                     modelName: this.OPENAI_MATURE_MODEL,
                     openAIApiKey: this.OPENAI_KEY,
                     temperature: 0
-                });
-
-            case this.LLM_PLATFORM.HUGGINGFACE:
-                return new HuggingFaceInference({
-                    model: this.HF_DEFAULT_MODEL,
-                    apiKey: this.HF_KEY
                 });
 
             case this.LLM_PLATFORM.GOOGLEAI:
@@ -144,11 +134,6 @@ export class LlmService {
                 return new OpenAIEmbeddings({
                     openAIApiKey: this.OPENAI_KEY,
                     modelName: 'text-embedding-3-large'
-                });
-
-            case this.LLM_PLATFORM.HUGGINGFACE:
-                return new HuggingFaceInferenceEmbeddings({
-                    apiKey: this.HF_KEY
                 });
 
             case this.LLM_PLATFORM.GOOGLEAI:
