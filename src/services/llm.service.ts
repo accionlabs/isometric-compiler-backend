@@ -10,17 +10,10 @@ import { HarmBlockThreshold, HarmCategory, TaskType } from '@google/generative-a
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import fs from 'fs';
-import { BedrockChat } from '@langchain/community/chat_models/bedrock/web';
-import { AwsBedrockService } from './awsbedrock.service';
 
 
 @Service()
 export class LlmService {
-    private bedrockService: AwsBedrockService;
-
-    constructor() {
-        this.bedrockService = Container.get(AwsBedrockService);
-    }
 
     private readonly HF_KEY = config.HUGGING_FACE_KEY;
     private readonly HF_DEFAULT_MODEL = config.HUGGING_FACE_DEFAULT_MODEL;
@@ -32,16 +25,13 @@ export class LlmService {
     private readonly GEMINI_DEFAULT_MODEL = config.GEMINI_DEFAULT_MODEL;
     private readonly DEFAULT_EMBEDDING_LLM_PLATFORM = config.DEFAULT_EMBEDDING_LLM_PLATFORM;
 
-    private static readonly LLM_PLATFORM = {
+    private readonly LLM_PLATFORM = {
         OPENAI: "OPENAI",
         OPENAI_MATURE: "OPENAI_MATURE",
         HUGGINGFACE: "HF",
         GOOGLEAI: "GEMINI",
         AWSBEDROCK: 'AWSBEDROCK'
     };
-    static getPlatform() {
-        return this.LLM_PLATFORM;
-    }
 
 
     private readonly PROMPT_CACHE: Record<string, string> = {};
@@ -61,27 +51,27 @@ export class LlmService {
 
     getModel(llmPlatform: string = this.DEFAULT_CHAT_LLM_PLATFORM) {
         switch (llmPlatform) {
-            case LlmService.LLM_PLATFORM.OPENAI:
+            case this.LLM_PLATFORM.OPENAI:
                 return new ChatOpenAI({
                     modelName: this.OPENAI_DEFAULT_MODEL,
                     openAIApiKey: this.OPENAI_KEY,
                     temperature: 0
                 });
 
-            case LlmService.LLM_PLATFORM.OPENAI_MATURE:
+            case this.LLM_PLATFORM.OPENAI_MATURE:
                 return new ChatOpenAI({
                     modelName: this.OPENAI_MATURE_MODEL,
                     openAIApiKey: this.OPENAI_KEY,
                     temperature: 0
                 });
 
-            case LlmService.LLM_PLATFORM.HUGGINGFACE:
+            case this.LLM_PLATFORM.HUGGINGFACE:
                 return new HuggingFaceInference({
                     model: this.HF_DEFAULT_MODEL,
                     apiKey: this.HF_KEY
                 });
 
-            case LlmService.LLM_PLATFORM.GOOGLEAI:
+            case this.LLM_PLATFORM.GOOGLEAI:
                 return new ChatGoogleGenerativeAI({
                     model: this.GEMINI_DEFAULT_MODEL,
                     apiKey: this.GEMINI_KEY,
@@ -97,16 +87,6 @@ export class LlmService {
                             threshold: HarmBlockThreshold.BLOCK_NONE
                         }
                     ]
-                });
-
-            case LlmService.LLM_PLATFORM.AWSBEDROCK:
-                return new BedrockChat({
-                    model: config.BEDROCK_AWS_MODELID,
-                    credentials: {
-                        accessKeyId: config.BEDROCK_AWS_ACCESS_KEY_ID,
-                        secretAccessKey: config.BEDROCK_AWS_SECRET_ACCESS_KEY,
-                    },
-                    region: config.BEDROCK_AWS_REGION
                 });
 
             default:
@@ -137,17 +117,13 @@ export class LlmService {
         if (!model) return "Error: No model found";
 
         try {
-            if (llm_model === LlmService.LLM_PLATFORM.AWSBEDROCK) {
-                return await this.bedrockService.chatWithBedrock([{ role: "user", content: formattedPrompt }]);
+            const response = await model.invoke(formattedPrompt);
+            if (typeof response === 'string') {
+                return response
             } else {
-                const response = await model.invoke(formattedPrompt);
-                if (typeof response === 'string') {
-                    return response
-                } else {
-                    return response.content
-                }
-
+                return response.content
             }
+
         } catch (err: any) {
             console.error("Error generating AI response:", err.message);
             return "We're experiencing technical difficulties. Please try again later.";
@@ -163,19 +139,19 @@ export class LlmService {
 
     getEmbeddings(llmPlatform: string = this.DEFAULT_EMBEDDING_LLM_PLATFORM) {
         switch (llmPlatform) {
-            case LlmService.LLM_PLATFORM.OPENAI:
-            case LlmService.LLM_PLATFORM.OPENAI_MATURE:
+            case this.LLM_PLATFORM.OPENAI:
+            case this.LLM_PLATFORM.OPENAI_MATURE:
                 return new OpenAIEmbeddings({
                     openAIApiKey: this.OPENAI_KEY,
                     modelName: 'text-embedding-3-large'
                 });
 
-            case LlmService.LLM_PLATFORM.HUGGINGFACE:
+            case this.LLM_PLATFORM.HUGGINGFACE:
                 return new HuggingFaceInferenceEmbeddings({
                     apiKey: this.HF_KEY
                 });
 
-            case LlmService.LLM_PLATFORM.GOOGLEAI:
+            case this.LLM_PLATFORM.GOOGLEAI:
                 return new GoogleGenerativeAIEmbeddings({
                     apiKey: this.GEMINI_KEY,
                     model: "text-embedding-004",
@@ -346,18 +322,14 @@ export class LlmService {
         const input = await promptTemplate.format(partialVariables);
         let response: any;
 
-        if (llmModel === LlmService.LLM_PLATFORM.AWSBEDROCK) {
-            response = await this.bedrockService.chatWithBedrock([{ role: "user", content: input }]);
-        } else {
-            if (!!model) {
-                const modelResponse = await model.invoke(input);
-                if (typeof modelResponse === 'string') {
-                    response = modelResponse
-                } else {
-                    response = modelResponse.content
-                }
-                // response = modelResponse.content || modelResponse;
+        if (!!model) {
+            const modelResponse = await model.invoke(input);
+            if (typeof modelResponse === 'string') {
+                response = modelResponse
+            } else {
+                response = modelResponse.content
             }
+
         }
         try {
             return JSON.parse(response.replace(/^[^\[\{]*|[^\]\}]*$/g, ""));
