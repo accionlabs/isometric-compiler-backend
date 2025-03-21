@@ -1,13 +1,14 @@
 import { Service } from 'typedi';
 import { OpenAIEmbeddings, ChatOpenAI } from '@langchain/openai';
 import { HumanMessage } from '@langchain/core/messages';
-import config from '../configs';
+import config from '../configs/llmmodel';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings } from '@langchain/google-genai';
 import { HarmBlockThreshold, HarmCategory, TaskType } from '@google/generative-ai';
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import fs from 'fs';
+import { LLM_PLATFORM } from '../enums';
 
 
 @Service()
@@ -20,14 +21,6 @@ export class LlmService {
     private readonly DEFAULT_CHAT_LLM_PLATFORM = config.DEFAULT_CHAT_LLM_PLATFORM;
     private readonly GEMINI_DEFAULT_MODEL = config.GEMINI_DEFAULT_MODEL;
     private readonly DEFAULT_EMBEDDING_LLM_PLATFORM = config.DEFAULT_EMBEDDING_LLM_PLATFORM;
-
-    private readonly LLM_PLATFORM = {
-        OPENAI: "OPENAI",
-        OPENAI_MATURE: "OPENAI_MATURE",
-        HUGGINGFACE: "HF",
-        GOOGLEAI: "GEMINI",
-        AWSBEDROCK: 'AWSBEDROCK'
-    };
 
 
     private readonly PROMPT_CACHE: Record<string, string> = {};
@@ -47,21 +40,22 @@ export class LlmService {
 
     getModel(llmPlatform: string = this.DEFAULT_CHAT_LLM_PLATFORM) {
         switch (llmPlatform) {
-            case this.LLM_PLATFORM.OPENAI:
+
+            case LLM_PLATFORM.OPENAI:
                 return new ChatOpenAI({
                     modelName: this.OPENAI_DEFAULT_MODEL,
                     openAIApiKey: this.OPENAI_KEY,
                     temperature: 0
                 });
 
-            case this.LLM_PLATFORM.OPENAI_MATURE:
+            case LLM_PLATFORM.OPENAI_MATURE:
                 return new ChatOpenAI({
                     modelName: this.OPENAI_MATURE_MODEL,
                     openAIApiKey: this.OPENAI_KEY,
                     temperature: 0
                 });
 
-            case this.LLM_PLATFORM.GOOGLEAI:
+            case LLM_PLATFORM.GOOGLEAI:
                 return new ChatGoogleGenerativeAI({
                     model: this.GEMINI_DEFAULT_MODEL,
                     apiKey: this.GEMINI_KEY,
@@ -129,14 +123,14 @@ export class LlmService {
 
     getEmbeddings(llmPlatform: string = this.DEFAULT_EMBEDDING_LLM_PLATFORM) {
         switch (llmPlatform) {
-            case this.LLM_PLATFORM.OPENAI:
-            case this.LLM_PLATFORM.OPENAI_MATURE:
+            case LLM_PLATFORM.OPENAI:
+            case LLM_PLATFORM.OPENAI_MATURE:
                 return new OpenAIEmbeddings({
                     openAIApiKey: this.OPENAI_KEY,
                     modelName: 'text-embedding-3-large'
                 });
 
-            case this.LLM_PLATFORM.GOOGLEAI:
+            case LLM_PLATFORM.GOOGLEAI:
                 return new GoogleGenerativeAIEmbeddings({
                     apiKey: this.GEMINI_KEY,
                     model: "text-embedding-004",
