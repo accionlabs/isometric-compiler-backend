@@ -1,9 +1,18 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, UpdateDateColumn, CreateDateColumn, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
 import { SemanticModelStatus } from '../enums';
-import { BaseEntity } from './base.entity';
 
 @Entity('semantic_models')
-export class SemanticModel extends BaseEntity {
+export class SemanticModel {
+    @PrimaryGeneratedColumn()
+    _id: number;
+
+    @CreateDateColumn({ type: 'timestamp' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ type: 'timestamp' })
+    updatedAt: Date;
+
+
     @Column({ type: 'text', unique: true, nullable: false })
     uuid: string;
 
@@ -19,5 +28,5 @@ export class SemanticModel extends BaseEntity {
         default: SemanticModelStatus.INITIATED,
         enum: SemanticModelStatus
     })
-    declare status: SemanticModelStatus = SemanticModelStatus.INITIATED;
+    status: SemanticModelStatus = SemanticModelStatus.INITIATED
 }
