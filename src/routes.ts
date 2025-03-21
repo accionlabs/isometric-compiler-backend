@@ -35,7 +35,6 @@ controllers.forEach(controller => {
     const middlewares = [authenticate(route.isAuthenticated)];
 
     if (route.fileUpload) {
-      console.log("fileupload middle ware")
       const fileUploadMid = fileUpload(route.fileUplaodOptions ?? {})
       if (fileUploadMid) middlewares.push(fileUploadMid)
     }

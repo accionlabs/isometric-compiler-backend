@@ -12,6 +12,7 @@ import { ChatValidation } from "../validations/chat.validation";
 import { ChatService } from "../services/chat.service";
 import { AWSService } from "../services/aws.service";
 import config from "../configs";
+import { Documentervice } from "../services/document.service";
 
 class ChatResp {
     resp: string
@@ -26,6 +27,9 @@ export default class CategoriesController {
 
     @Inject(() => AWSService)
     private readonly awsService: AWSService
+
+    @Inject(() => Documentervice)
+    private readonly documentService: Documentervice
 
 
     @Post('/', ChatValidation, {
@@ -54,13 +58,13 @@ export default class CategoriesController {
                     case 'application/pdf':
                         const uploadedDoc = await this.awsService.uploadFile(config.ISOMETRIC_DOC_FOLDER, file);
                         fileType = 'pdf'
-                        // handledDoc = await isometricService.handlePdf(file, uuid, uploadedDoc.s3Url);
+                        handledDoc = await this.documentService.handlePdf(file, uuid, uploadedDoc.s3Url);
                         break;
                     default:
                         return res.status(400).json({ error: 'File format not allowed!' });
                 }
             }
-
+            return res.json(handledDoc)
             // const payload = await isometricService.classifyAndRouteQuery(uuid, query, currentState, handledDoc?.savedDocument.id);
             // const agrentResponse = await isometricService.processWithAgents(payload);
             // const result = await processRequest(query, uuid, currentState, file)

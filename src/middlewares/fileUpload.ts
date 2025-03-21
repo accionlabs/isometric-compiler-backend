@@ -14,12 +14,10 @@ export function fileUpload({ maxSize = 2 * 1024 * 1024,
     fileNo = 'single',
     maxCount = 20
 }: FileUploadOptions) {
-    console.log("file uploadddddddddddddddddddddd")
     const upload = multer({
         storage,
         limits: { fileSize: maxSize }, // Set file size limit
         fileFilter: (req, file, cb) => {
-            console.log("file filter444444444444")
             if (!allowedMimeTypes.includes(file.mimetype)) {
                 return cb(new Error(`Invalid file type! Only ${allowedMimeTypes.join(", ")} allowed.`));
             }
@@ -34,7 +32,6 @@ export function fileUpload({ maxSize = 2 * 1024 * 1024,
             if (err) {
                 return res.status(400).json({ message: err.message });
             }
-            console.log("File uploaded successfully!");
             next();
         });
     }

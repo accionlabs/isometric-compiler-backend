@@ -112,7 +112,6 @@ export class CategoryService extends BaseService<Category> {
     `;
 
     const categories = await repository.query(query);
-    console.log("categories", categories)
     return this.createNestedStructure(categories);
   }
 

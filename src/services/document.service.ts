@@ -1,13 +1,17 @@
-import { Service } from "typedi";
+import { Inject, Service } from "typedi";
 import { AppDataSource } from "../configs/database";
 import { BaseService } from "./base.service";
-import { Document, FileType } from "../entities/document";
+import { Document, FileType } from "../entities/document.entity";
+import { PgVectorService } from "./pgVector.service";
 
 @Service()
 export class Documentervice extends BaseService<Document> {
     constructor() {
         super(AppDataSource.getRepository(Document));
     }
+
+    @Inject(() => PgVectorService)
+    private readonly pgVectorService: PgVectorService
 
     async handleImage(file: Express.Multer.File, uuid: string, fileUrl: string) {
         // const result = await extractInfoFromImage(file.mimetype, file.buffer, uuid);
@@ -38,11 +42,11 @@ export class Documentervice extends BaseService<Document> {
     }
 
     async handlePdf(file: Express.Multer.File, uuid: string, fileUrl: string) {
-        // let fileContent = await isometricPgVector.parsePdf(file, uuid);
-        // const fileContentText = fileContent.map((content) => content.pageContent).join("\n\n");
+        let fileContent = await this.pgVectorService.parsePdf(file, uuid);
+        const fileContentText = fileContent.map((content) => content.pageContent).join("\n\n");
         const savedDocument = await this.create({
             uuid,
-            content: '',// fileContentText from above
+            content: fileContentText,// fileContentText from above
             metadata: {
                 filename: file.fieldname,
                 fileType: FileType.image,
@@ -51,10 +55,10 @@ export class Documentervice extends BaseService<Document> {
 
             }
         });
-        // fileContent = fileContent.map((content) => {
-        //     return { ...content, metadata: { ...content.metadata, fileName: file.originalname, documentId: savedDocument.id, fileUrl, fileType: 'pdf' } };
-        // });
-        // await isometricPgVector.indexDocument(file, fileContent);
+        fileContent = fileContent.map((content) => {
+            return { ...content, metadata: { ...content.metadata, fileName: file.originalname, documentId: savedDocument._id, fileUrl, fileType: 'pdf' } };
+        });
+        const indexedDoc = await this.pgVectorService.indexDocument(file, fileContent);
         // await regenerateUnifiedModel(uuid);
         return { savedDocument };
     }

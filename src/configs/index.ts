@@ -15,7 +15,7 @@ const config = {
     API_KEY: process.env.API_KEY,
     ISOMETRIC_DOC_FOLDER: process.env.ISOMETRIC_DOC_FOLDER || 'isometric/document/',
     ISOMETRIC_IMAGE_FOLDER: process.env.ISOMETRIC_IMAGE_FOLDER || 'isometric/image/',
-    BEDROCK_AWS_REGION: process.env.BEDROCK_AWS_REGION || '',
+    BEDROCK_AWS_REGION: process.env.BEDROCK_AWS_REGION || 'us-west-2',
     BEDROCK_AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEYID || '',
     BEDROCK_AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_KEY || '',
     BEDROCK_AWS_MODELID: process.env.BEDROCK_AWS_MODELID || '',
@@ -43,7 +43,5 @@ const config = {
 
 
 }
-
-console.log("config", config)
 
 export default config;
