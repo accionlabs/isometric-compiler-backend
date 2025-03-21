@@ -14,7 +14,7 @@ export class SemanticModel {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: 'text', unique: true })
+    @Column({ type: 'text', unique: true, nullable: false })
     uuid: string;
 
     @Column({ type: 'jsonb', nullable: true })

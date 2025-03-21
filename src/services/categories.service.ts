@@ -2,9 +2,7 @@ import { Service } from 'typedi';
 import { BaseService } from './base.service';
 import { AppDataSource } from '../configs/database';
 import { Category } from '../entities/categories.entity';
-import { ObjectId } from 'mongodb'
 import ApiError from '../utils/apiError';
-import { FindOptionsWhere } from 'typeorm';
 
 type CategoryWithCount = Category & { shapeCount: number }
 
