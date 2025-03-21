@@ -1,61 +1,55 @@
-// import { LlmService } from "../../services/llm.service";
+// import { __LLM_PLATFORM, generateJsonWithConversation } from "../../services/llm";
+// import { fetchChatHistory, saveChatContext } from "../../services/chat_service";
+import { StructuredOutputParser } from "langchain/output_parsers";
+import * as fs from "fs";
+import { Inject, Service } from "typedi";
+import { ChatService } from "../../services/chat.service";
+import { LlmService } from "../../services/llm.service";
+import { LLM_PLATFORM } from "../../enums";
 
-// import { fetchChatHistory, saveChatContext } from '../../services/chat_service'
-// import fs from 'fs'
-// import Container from 'typedi';
+const __CLASSIFIER_PROMPT__ = fs.readFileSync("./src/agents/classifier_agent/CLASSIFIER_AGENT_PROMPT.md", "utf8");
 
-// const __CLASSIFIER_PROMPT__ = fs.readFileSync(
-//   './agents/classifier_agent/CLASSIFIER_AGENT_PROMPT.md',
-//   'utf8',
-// )
+@Service()
+class ClassifierAgentService {
+    private classifierPrompt: string;
 
-// const fetchOldConversationContext = async (uuid?: string): Promise<any[]> => {
-//   if (!uuid) {
-//     return []
-//   }
-//   const oldHistory = await fetchChatHistory('chat-' + uuid)
-//   const conversations = oldHistory?.conversations
-//   return conversations && conversations.length > 0
-//     ? JSON.parse(conversations)
-//     : []
-// }
+    @Inject(() => LlmService)
+    private readonly llmService: LlmService
 
-// interface ClassifierResult {
-//   // Define the structure of the result returned by generateJsonWithConversation
-//   [key: string]: any
-// }
+    @Inject(() => ChatService)
+    private readonly chatService: ChatService
 
-// const processClassifierAgent = async (
-//   question: string,
-//   availableDocuments: string[] = [],
-//   newDocument: string,
-//   uuid?: string,
-// ): Promise<ClassifierResult> => {
-//   const conversations = await fetchOldConversationContext(uuid)
-//   const placeholders = {
-//     conversations,
-//     uploadedDocuments: availableDocuments.map((x) => `"${x}"`).join(','),
-//     uploadedFile: newDocument,
-//     question,
-//   }
-//   const llmServiceInstance = Container.get(LlmService)
-//   const result = await llmServiceInstance.generateJsonWithConversation(
-//     __CLASSIFIER_PROMPT__,
-//     placeholders,
-//     LlmService.getPlatform().OPENAI,
-//   )
+    constructor() {
+        this.classifierPrompt = __CLASSIFIER_PROMPT__;
+    }
 
-//   if (uuid) {
-//     conversations.push(question)
-//     conversations.push(JSON.stringify(result))
-//     await saveChatContext('chat-' + uuid, {
-//       context: '',
-//       metadata: '',
-//       conversations: JSON.stringify(conversations),
-//     })
-//   }
+    private async fetchOldConversationContext(uuid?: string): Promise<string[]> {
+        if (!uuid) {
+            return [];
+        }
+        const oldHistory = await this.chatService.fetchChatHistory("chat-" + uuid);
+        let conversations = oldHistory?.conversations;
+        return conversations && conversations.length > 0 ? JSON.parse(conversations) : [];
+    }
 
-//   return result
-// }
+    public async processClassifierAgent(question: string, availableDocuments: string[] = [], newDocument: string, uuid?: string): Promise<any> {
+        const conversations = await this.fetchOldConversationContext(uuid);
+        const placeholders = {
+            conversations: conversations,
+            uploadedDocuments: availableDocuments.map(x => `"${x}"`).join(","),
+            uploadedFile: newDocument,
+            question: question
+        };
 
-// export { processClassifierAgent }
+        const result = await this.llmService.generateJsonWithConversation(this.classifierPrompt, placeholders, LLM_PLATFORM.OPENAI);
+
+        if (uuid) {
+            conversations.push(question);
+            conversations.push(JSON.stringify(result));
+            await saveChatContext("chat-" + uuid, { context: "", metadata: "", conversations: JSON.stringify(conversations) });
+        }
+        return result;
+    }
+}
+
+export default ClassifierAgentService;
