@@ -10,17 +10,10 @@ import { HarmBlockThreshold, HarmCategory, TaskType } from '@google/generative-a
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import fs from 'fs';
-import { BedrockChat } from '@langchain/community/chat_models/bedrock/web';
-import { AwsBedrockService } from './awsbedrock.service';
 
 
 @Service()
 export class LlmService {
-    private bedrockService: AwsBedrockService;
-
-    constructor() {
-        this.bedrockService = Container.get(AwsBedrockService);
-    }
 
     private readonly HF_KEY = config.HUGGING_FACE_KEY;
     private readonly HF_DEFAULT_MODEL = config.HUGGING_FACE_DEFAULT_MODEL;
@@ -99,16 +92,6 @@ export class LlmService {
                     ]
                 });
 
-            case LlmService.LLM_PLATFORM.AWSBEDROCK:
-                return new BedrockChat({
-                    model: config.BEDROCK_AWS_MODELID,
-                    credentials: {
-                        accessKeyId: config.BEDROCK_AWS_ACCESS_KEY_ID,
-                        secretAccessKey: config.BEDROCK_AWS_SECRET_ACCESS_KEY,
-                    },
-                    region: config.BEDROCK_AWS_REGION
-                });
-
             default:
                 return null;
         }
@@ -137,17 +120,13 @@ export class LlmService {
         if (!model) return "Error: No model found";
 
         try {
-            if (llm_model === LlmService.LLM_PLATFORM.AWSBEDROCK) {
-                return await this.bedrockService.chatWithBedrock([{ role: "user", content: formattedPrompt }]);
+            const response = await model.invoke(formattedPrompt);
+            if (typeof response === 'string') {
+                return response
             } else {
-                const response = await model.invoke(formattedPrompt);
-                if (typeof response === 'string') {
-                    return response
-                } else {
-                    return response.content
-                }
-
+                return response.content
             }
+
         } catch (err: any) {
             console.error("Error generating AI response:", err.message);
             return "We're experiencing technical difficulties. Please try again later.";
@@ -346,18 +325,14 @@ export class LlmService {
         const input = await promptTemplate.format(partialVariables);
         let response: any;
 
-        if (llmModel === LlmService.LLM_PLATFORM.AWSBEDROCK) {
-            response = await this.bedrockService.chatWithBedrock([{ role: "user", content: input }]);
-        } else {
-            if (!!model) {
-                const modelResponse = await model.invoke(input);
-                if (typeof modelResponse === 'string') {
-                    response = modelResponse
-                } else {
-                    response = modelResponse.content
-                }
-                // response = modelResponse.content || modelResponse;
+        if (!!model) {
+            const modelResponse = await model.invoke(input);
+            if (typeof modelResponse === 'string') {
+                response = modelResponse
+            } else {
+                response = modelResponse.content
             }
+
         }
         try {
             return JSON.parse(response.replace(/^[^\[\{]*|[^\]\}]*$/g, ""));
