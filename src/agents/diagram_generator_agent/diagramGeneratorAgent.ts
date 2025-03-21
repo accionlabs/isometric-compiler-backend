@@ -1,173 +1,208 @@
 // import { generateMultiModel, generateJsonWithConversation, __LLM_PLATFORM } from '../../services/llm';
-// import shapes from '../../configs/shapesv3.json';
-// import ShapeManager from '../shapesManager';
+import shapes from '../../configs/shapesv3.json';
+import ShapeManager from '../shapesManager';
 // import { vectorSearch } from '../../services/isomtericPgVector';
-// import { getLayerByLength, nextPositionOnLayer, filterQumByScenarios, extractScenarios } from '../helpers';
+import { getLayerByLength, nextPositionOnLayer, filterQumByScenarios, extractScenarios } from '../helpers';
 // import { getSemanticModelByUUID, saveSemanticModel } from '../../services/isometricQuery';
-// import fs from 'fs';
+import * as fs from 'fs';
 // import { convertBlueprintToIsometric } from '../blueprint_agent/blueprintGenerate';
 // import { generateBreezeSpec } from '../blueprint_agent/breezeAgent';
 // import { SemanticModelStatus } from '../../config/isometric_db';
-// import { getPresignedUrlFromUrl } from '../../services/signedUrl';
-// import axios from 'axios';
+import axios from 'axios';
+import { Inject, Service } from 'typedi';
+import { PgVectorService } from '../../services/pgVector.service';
+import { LlmService } from '../../services/llm.service';
+import { LLM_PLATFORM, SemanticModelStatus } from '../../enums'
+import { AWSService } from '../../services/aws.service';
+import { SemanticModelService } from '../../services/semanticModel.service';
+import { BlueprintConverterAgent } from '../blueprint_agent/blueprintGenerate';
 
-// const __IMAGE_PROMPT__: string = fs.readFileSync("./agents/diagram_generator_agent/DIAGRAM_GENERATOR_AGENT.md", 'utf8');
-// const __IMAGE_EXTRACTOR_PROMPT__: string = fs.readFileSync("./agents/diagram_generator_agent/IMAGE_EXTRACTOR_AGENT.md", 'utf8');
-// const __QUM_MAPPER_PROMPT__: string = fs.readFileSync("./agents/diagram_generator_agent/DIAGRAM_QUM_MAPPER.md", 'utf8');
+const IMAGE_PROMPT = fs.readFileSync("./agents/diagram_generator_agent/DIAGRAM_GENERATOR_AGENT.md", 'utf8');
+const IMAGE_EXTRACTOR_PROMPT = fs.readFileSync("./agents/diagram_generator_agent/IMAGE_EXTRACTOR_AGENT.md", 'utf8');
+const QUM_MAPPER_PROMPT = fs.readFileSync("./agents/diagram_generator_agent/DIAGRAM_QUM_MAPPER.md", 'utf8');
 
-// const __COMPONENTS__: string[] = Object.keys(shapes['components']);
-// const __3DSHAPES__: string[] = Object.keys(shapes['3dshapes']);
-// const __2DSHAPES__: string[] = Object.keys(shapes['2dshapes']);
-// const __SHAPES__: string[] = [...__2DSHAPES__, ...__COMPONENTS__];
+const COMPONENTS = Object.keys(shapes['components']);
+const SHAPES_3D = Object.keys(shapes['3dshapes']);
+const SHAPES_2D = Object.keys(shapes['2dshapes']);
+const ALL_SHAPES = [...SHAPES_2D, ...COMPONENTS];
 
-// const getExactShapeName = (shape: string): string => {
-//     const index = __SHAPES__.indexOf(shape);
-//     if (index >= 0) {
-//         return shape;
-//     } else {
-//         for (const originalShape of __SHAPES__) {
-//             if (originalShape.toLowerCase() === shape.toLowerCase() || originalShape.toLowerCase().includes(shape.toLowerCase())) {
-//                 console.info(`Incorrect shape ${shape} detected for ${originalShape}`);
-//                 return originalShape;
-//             }
-//         }
-//         console.info(`No shape detected for ${shape}`);
-//         return 'Generic Server-L';
-//     }
-// };
 
-// const convertFlatToIsometric = (result: any[]): any[] => {
-//     const playlist = result;
-//     const manager = new ShapeManager([]);
-//     let lastAddedLayerId: string | null = null;
+interface Subcomponent {
+    name: string;
+}
 
-//     for (const item of playlist) {
-//         if (item.layer && item.components?.length > 0) {
-//             const selectedLayer = getLayerByLength(item.components.length);
-//             const currentLayer = manager.addShape(lastAddedLayerId, selectedLayer.name, 'LAYER', item.layer, lastAddedLayerId ? 'front-left' : "top");
-//             lastAddedLayerId = currentLayer.id;
-//             let __current_position_on_layer = 'top-a0';
+interface Component {
+    name: string;
+    componentShape: string;
+    scenarios: string[];
+    subcomponents: Subcomponent[];
+}
 
-//             for (const comp of item.components) {
-//                 if (comp.name && comp.componentShape) {
-//                     let default_shape_type = "COMPONENT";
-//                     let default_shape = getExactShapeName(comp.componentShape);
-//                     let decorator: string | null = null;
+interface Layer {
+    layer: string;
+    components: Component[];
+}
 
-//                     if (__2DSHAPES__.includes(default_shape)) {
-//                         default_shape_type = "COMPONENT";
-//                         decorator = default_shape;
-//                         default_shape = 'Generic Server-L';
-//                     }
+interface ServiceLayerResult {
+    result: Layer[];
+}
 
-//                     if (item.components.length === 1) {
-//                         manager.addShape(lastAddedLayerId, default_shape, default_shape_type, comp.name, 'top-c1', decorator, { qum: comp.qum }, true);
-//                     } else {
-//                         __current_position_on_layer = nextPositionOnLayer(__current_position_on_layer, selectedLayer.dimentions?.col, selectedLayer.dimentions?.row);
-//                         manager.addShape(lastAddedLayerId, default_shape, default_shape_type, comp.name, __current_position_on_layer, decorator, { qum: comp.qum });
-//                     }
-//                 }
-//             }
-//         }
-//     }
 
-//     return manager.getAll();
-// };
+@Service()
+export class DiagramGeneratorAgent {
 
-// const generateIsometricJSONFromBlueprint = async (uuid: string): Promise<any> => {
-//     let context: string | null = null;
-//     const semanticModel = await getSemanticModelByUUID(uuid);
-//     const documents = await vectorSearch("", { uuid });
+    @Inject(() => PgVectorService)
+    private readonly pgVectorService: PgVectorService
 
-//     if (!documents || documents.length === 0) {
-//         return { message: "Please upload some artifacts like Requirement Documents, SRS, architecture diagrams to generate blueprint!" };
-//     }
+    @Inject(() => LlmService)
+    private readonly llmService: LlmService
 
-//     const scenarios = extractScenarios(semanticModel?.metadata?.qum);
-//     documents.forEach((x: { pageContent: string; }) => context += "\n\n---\n" + x.pageContent);
-//     const breeze_blueprint = await generateBreezeSpec(scenarios, context || '');
+    @Inject(() => AWSService)
+    private readonly awsService: AWSService
 
-//     const unifiedModel = { qum: semanticModel?.metadata?.qum, blueprint: breeze_blueprint };
+    @Inject(() => SemanticModelService)
+    private readonly semanticModelService: SemanticModelService
 
-//     if (semanticModel?.status === 'active') {
-//         saveSemanticModel(uuid, { metadata: unifiedModel, visualModel: [], status: SemanticModelStatus.ACTIVE });
-//     }
+    @Inject(() => BlueprintConverterAgent)
+    private readonly blueprintConvertorAgent: BlueprintConverterAgent
 
-//     if (!breeze_blueprint) {
-//         return { message: "Unable to fetch blueprint right now!" };
-//     }
+    private getExactShapeName(shape: string): string {
+        const index = ALL_SHAPES.indexOf(shape);
+        if (index >= 0) return shape;
 
-//     const isometric = convertBlueprintToIsometric(breeze_blueprint, semanticModel?.metadata?.qum);
-//     return {
-//         message: semanticModel?.status === 'active' ?
-//             "Blueprint is successfully generated!" :
-//             "Blueprint generated without mapping functional and design requirements as functional unified artifacts are still under process!",
-//         isometric
-//     };
-// };
+        for (const originalShape of ALL_SHAPES) {
+            if (originalShape.toLowerCase().includes(shape.toLowerCase())) {
+                // global.logger.info(`Incorrect shape ${shape} detected for ${originalShape}`);
+                return originalShape;
+            }
+        }
+        // global.logger.info(`No shape detected for ${shape}`);
+        return 'Generic Server-L';
+    }
 
-// const generateIsometricJSONFromImage = async (image: string, uuid: string, availableDocuments: any[]): Promise<any> => {
-//     const docImage = availableDocuments.find(doc => doc.metadata.filename === image);
-//     if (!docImage) {
-//         return { message: "Please provide a valid image!" };
-//     }
+    async extractInfoFromImage(mimeType: string, image: any) {
+        const placeholders = {
+        }
+        if (image) {
+            return await this.llmService.generateMultiModel(mimeType, image, IMAGE_EXTRACTOR_PROMPT, placeholders, LLM_PLATFORM.OPENAI_MATURE)
+        }
+    }
 
-//     const imageUrl = await getPresignedUrlFromUrl(docImage.metadata.fileUrl);
-//     const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-//     const imageBuffer = Buffer.from(response.data);
+    async generateIsometricJSONFromBlueprint(uuid: string): Promise<any> {
+        const semanticModel = await this.semanticModelService.findByUuid(uuid);
+        const documents = await this.pgVectorService.vectorSearch("", { uuid });
 
-//     return extractIsometricAndMappingFromImage(docImage.metadata.mimetype, imageBuffer, uuid);
-// };
+        if (!documents?.length) {
+            return { message: "Please upload some artifacts like Requirement Documents, SRS, architecture diagrams to generate blueprint!" };
+        }
 
-// const extractInfoFromImage = async (mimeType: string, image: Buffer, uuid: string): Promise<any> => {
-//     if (image) {
-//         return await generateMultiModel(mimeType, image, __IMAGE_EXTRACTOR_PROMPT__, {}, __LLM_PLATFORM.OPENAI_MATURE);
-//     }
-// };
+        const scenarios = extractScenarios(semanticModel?.metadata?.qum);
+        const context = documents.map(x => x.pageContent).join('\n\n---\n');
+        const blueprint = await this.blueprintConvertorAgent.generateBreezeSpec(scenarios, context);
 
-// const extractIsometricAndMappingFromImage = async (mimeType: string, image: Buffer, uuid: string): Promise<any> => {
-//     const placeholders = { __SHAPES__: __SHAPES__.map(x => `"${x}"`).join(",") };
-//     let response: any = null, result: any = null;
+        if (!blueprint) {
+            return { message: "Unable to fetch blueprint right now!" };
+        }
 
-//     if (image) {
-//         response = await generateMultiModel(mimeType, image, __IMAGE_PROMPT__, placeholders, __LLM_PLATFORM.OPENAI_MATURE);
-//         result = parseJSON(response);
-//     } else {
-//         result = await generateJsonWithConversation(__IMAGE_PROMPT__, placeholders, __LLM_PLATFORM.OPENAI);
-//     }
+        if (semanticModel?.status === 'active') {
+            this.semanticModelService.saveSemanticModel({ uuid, metadata: { qum: semanticModel?.metadata?.qum, blueprint }, visualModel: [], status: SemanticModelStatus.ACTIVE });
+        }
 
-//     const mappedIsometric = await mapQumWithIsometricModel(result.result, uuid);
-//     const isometric = mappedIsometric ? convertFlatToIsometric(mappedIsometric) : convertFlatToIsometric(result.result);
+        return {
+            message: semanticModel?.status === 'active' ? "Blueprint is successfully generated!" : "Blueprint generated without mapping functional and design requirements as functional unified artifacts are still under process!",
+            isometric: this.blueprintConvertorAgent.convertBlueprintToIsometric(blueprint, semanticModel?.metadata?.qum)
+        };
+    }
 
-//     return {
-//         message: "Successfully generated diagram from given image!",
-//         description: result.description,
-//         isometric,
-//         result: result.result
-//     };
-// };
+    async generateIsometricJSONFromImage(image: string, uuid: string, availableDocuments: any[]): Promise<any> {
+        const docImage = availableDocuments.find(doc => doc.metadata.filename === image);
+        if (!docImage) {
+            return { message: "Please provide a valid image!" };
+        }
 
-// const mapQumWithIsometricModel = async (generatedModel: any, uuid: string): Promise<any> => {
-//     const semanticModel = await getSemanticModelByUUID(uuid);
-//     if (!semanticModel?.metadata?.qum) return;
+        const imageUrl = await this.awsService.getPresignedUrlFromUrl(docImage.metadata.fileUrl);
+        if (!imageUrl) throw new Error("Image not found!!!")
+        const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+        return this.extractIsometricAndMappingFromImage(docImage.metadata.mimetype, Buffer.from(response.data), uuid);
+    }
 
-//     const qum = semanticModel.metadata.qum;
-//     const scenarios = extractScenarios(qum);
-//     const placeholders = { __CONTEXT__: JSON.stringify(generatedModel), __SCENARIOS__: JSON.stringify(scenarios) };
+    async extractIsometricAndMappingFromImage(mimeType: string, image: Buffer, uuid: string): Promise<any> {
+        const placeholders = { __SHAPES__: ALL_SHAPES.map(x => `"${x}"`).join(",") };
+        const response = image ? await this.llmService.generateMultiModel(mimeType, image, IMAGE_PROMPT, placeholders, LLM_PLATFORM.OPENAI_MATURE) :
+            await this.llmService.generateJsonWithConversation(IMAGE_PROMPT, placeholders, LLM_PLATFORM.OPENAI);
+        const result = this.parseJSON(response);
+        const mappedIsometric = await this.mapQumWithIsometricModel(result.result, uuid);
+        return {
+            description: result.description,
+            isometric: this.convertFlatToIsometric(mappedIsometric || result.result),
+            result: result.result
+        };
+    }
 
-//     const result = await generateJsonWithConversation(__QUM_MAPPER_PROMPT__, placeholders, __LLM_PLATFORM.OPENAI);
-//     return result.result.map((res: any) => ({
-//         layer: res.layer,
-//         components: res.components.map((r: any) => ({ ...r, qum: filterQumByScenarios(qum, r.scenarios) }))
-//     }));
-// };
+    private parseJSON(input: string): any {
+        try {
+            return JSON.parse(input.replace(/^[^\{]+|[^\}]+$/g, ""));
+        } catch {
+            throw new Error("Model responded with malformed JSON. Please try again:");
+        }
+    }
 
-// const parseJSON = (input: string): any => {
-//     try {
-//         return JSON.parse(input.replace(/^[^\{]+|[^\}]+$/g, ""));
-//     } catch (error) {
-//         throw new Error(`Model responded with malformed JSON. Please try again: ${input}`);
-//     }
-// };
+    private async convertFlatToIsometric(result: any) {
+        const playlist = result;
+        const manager = new ShapeManager([]);
+        let lastAddedLayerId = null;
+        for (let i = 0; i < playlist.length; i++) {
+            if (playlist[i].layer && playlist[i].components?.length > 0) {
+                const selectedLayer = getLayerByLength(playlist[i].components?.length)
+                const currentLayer = manager.addShape(lastAddedLayerId, selectedLayer.name, 'LAYER', playlist[i].layer, lastAddedLayerId ? 'front-left' : "top");
+                lastAddedLayerId = currentLayer.id;
+                let __current_poistion_on_layer = 'top-a0';
+                for (let j = 0; j < playlist[i].components.length; j++) {
+                    const comp = playlist[i].components[j];
+                    if (comp.name && comp.componentShape) {
+                        let default_shape_type = "COMPONENT";
+                        let default_shape = this.getExactShapeName(comp.componentShape);
+                        let decorator = null;
+                        if (SHAPES_2D.indexOf(default_shape) != -1) {
+                            default_shape_type = "COMPONENT";
+                            decorator = default_shape;
+                            default_shape = 'Generic Server-L';
+                        }
+                        //center align on 2x2 layer
+                        if (playlist[i].components.length === 1) {
+                            manager.addShape(lastAddedLayerId, default_shape, default_shape_type, comp.name, 'top-c1', decorator, { qum: comp.qum }, true);
+                        } else {
+                            __current_poistion_on_layer = nextPositionOnLayer(__current_poistion_on_layer, selectedLayer.dimentions?.col, selectedLayer.dimentions?.row);
+                            manager.addShape(lastAddedLayerId, default_shape, default_shape_type, comp.name, __current_poistion_on_layer, decorator, { qum: comp.qum });
+                        }
+                    }
+                }
+            }
+        }
+        return manager.getAll();
+    }
 
-// export { generateIsometricJSONFromBlueprint, generateIsometricJSONFromImage, extractInfoFromImage };
+    private async mapQumWithIsometricModel(generatedModel: any, uuid: string) {
+        const semanticModel = await this.semanticModelService.findByUuid(uuid);
+        if (!semanticModel?.metadata?.qum) {
+            return
+        }
+        const qum = semanticModel?.metadata?.qum;
+        const scenarios = extractScenarios(qum);
+        const placeholders = {
+            __CONTEXT__: JSON.stringify(generatedModel),
+            __SCENARIOS__: JSON.stringify(scenarios)
+        }
+        const result: ServiceLayerResult = await this.llmService.generateJsonWithConversation(QUM_MAPPER_PROMPT, placeholders, LLM_PLATFORM.OPENAI);
+        return result.result.map((res) => {
+            const comp = res.components.map((r) => {
+                return {
+                    ...r,
+                    qum: filterQumByScenarios(qum, r.scenarios)
+                }
+            })
+            return { layer: res.layer, components: comp }
+        })
+
+    }
+}

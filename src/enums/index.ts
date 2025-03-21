@@ -10,3 +10,12 @@ export enum LLM_PLATFORM {
   GOOGLEAI = "GEMINI",
   AWSBEDROCK = 'AWSBEDROCK'
 };
+
+export enum SemanticModelStatus {
+  ACTIVE = 'active',
+  INITIATED = 'initiated',
+  GENERATING_BUSINESS_SPEC = 'generating_business_spec',
+  GENERATING_QUM_DESIGN_SPEC = 'generating_qum_desing_spec',
+  GENERATING_BREEZE_SPEC = 'generating_breeze_spec',
+  INACTIVE = 'inactive'
+}

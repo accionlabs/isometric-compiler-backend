@@ -15,7 +15,7 @@ interface Attached2DShape {
 interface Shape {
     id: string;
     shape: string;
-    type: 'layer' | 'shape' | 'component'; 
+    type: 'layer' | 'shape' | 'component';
     attached2DShapes: Attached2DShape[];
     position?: any;
     relativeToId?: string | null;
@@ -39,10 +39,10 @@ class ShapeManager {
         relativeTo: string | null,
         shapeName: string,
         type: string,
-        name?: string,
-        position?: any,
-        decorator?: string | string[],
-        metadata?: Metadata,
+        name?: string | null,
+        position?: any | null,
+        decorator?: string | string[] | null,
+        metadata?: Metadata | null,
         skipAutomatedPlacement: boolean = false
     ): Shape {
         if (!skipAutomatedPlacement) {

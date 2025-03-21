@@ -53,7 +53,7 @@ export default class CategoriesController {
                     case 'image/png':
                         const uploadedImage = await this.awsService.uploadFile(config.ISOMETRIC_IMAGE_FOLDER, file);
                         fileType = 'image'
-                        // handledDoc = await isometricService.handleImage(file, uuid, uploadedImage.s3Url);
+                        handledDoc = await this.documentService.handleImage(file, uuid, uploadedImage.s3Url);
                         break;
                     case 'application/pdf':
                         const uploadedDoc = await this.awsService.uploadFile(config.ISOMETRIC_DOC_FOLDER, file);

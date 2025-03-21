@@ -1,19 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-
-export enum SemanticModelStatus {
-    ACTIVE = 'active',
-    INITIATED = 'initiated',
-    GENERATING_BUSINESS_SPEC = 'generating_business_spec',
-    GENERATING_QUM_DESIGN_SPEC = 'generating_qum_design_spec',
-    GENERATING_BREEZE_SPEC = 'generating_breeze_spec',
-    INACTIVE = 'inactive'
-}
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BaseEntity } from 'typeorm';
+import { SemanticModelStatus } from '../enums';
 
 @Entity('semantic_models')
-export class SemanticModel {
-    @PrimaryGeneratedColumn()
-    id: number;
-
+export class SemanticModel extends BaseEntity {
     @Column({ type: 'text', unique: true, nullable: false })
     uuid: string;
 
@@ -30,10 +19,4 @@ export class SemanticModel {
         enum: SemanticModelStatus
     })
     status: SemanticModelStatus;
-
-    @CreateDateColumn({ type: 'timestamp' })
-    createdAt: Date;
-
-    @UpdateDateColumn({ type: 'timestamp' })
-    updatedAt: Date;
 }
