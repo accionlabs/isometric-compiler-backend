@@ -1,6 +1,6 @@
 import { IsEnum, IsNotEmpty, IsOptional, IsString, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
-import { SemanticModelStatus } from "../entities/semantic_models.entity";
+import { SemanticModelStatus } from "../enums";
 
 class MetadataDto {
     [key: string]: any;

@@ -10,6 +10,8 @@ import UserController from './controllers/user.controller'
 import DiagramController from './controllers/diagram.controller'
 import ChatController from './controllers/chat.controller'
 import { fileUpload } from './middlewares/fileUpload'
+import { DocumentController } from './controllers/document.controller'
+import SematicModelController from './controllers/semanticModel.controller'
 
 var router = express.Router();
 
@@ -18,7 +20,9 @@ export const controllers = [
   CategoriesController,
   UserController,
   DiagramController,
-  ChatController
+  ChatController,
+  DocumentController,
+  SematicModelController
 ]
 
 controllers.forEach(controller => {

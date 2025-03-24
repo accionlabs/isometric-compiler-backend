@@ -7,14 +7,14 @@ import ApiError from "../utils/apiError";
 import { SaveSemanticModelDto } from "../validations/semanticModel.validation";
 
 @Service()
-@Controller('/isometric')
+@Controller('/semantic-model')
 export default class SematicModelController {
 
     @Inject(() => SemanticModelService)
     private readonly semanticModelService: SemanticModelService
 
 
-    @Get('/:id', {
+    @Get('/byUUID/:uuid', {
         isAuthenticated: true,
         authorizedRole: 'all'
     },

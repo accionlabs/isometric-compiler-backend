@@ -11,7 +11,19 @@ import { Chat } from "../entities/chat.entity";
 import { MessageRoles, MessageTypes } from "../enums";
 
 class ChatResp {
-    resp: string
+    uuid: string;
+    message: string;
+    messageType: 'text' | 'json';
+    metadata: {
+        content: any[];
+        action: any[];
+        needFeedback: boolean;
+        isEmailQuery?: boolean;
+        emailId?: string;
+        isPdfUploaded?: boolean;
+        isGherkinScriptQuery?: boolean;
+    };
+    role: string;
 }
 
 
@@ -35,7 +47,7 @@ export default class CategoriesController {
 
     @Post('/', ChatValidation, {
         authorizedRole: 'all',
-        isAuthenticated: false,
+        isAuthenticated: true,
         fileUpload: true
     }, ChatResp
     )
@@ -99,6 +111,21 @@ export default class CategoriesController {
         }
     }
 
+    @Get('/byUUID/:uuid', {
+        authorizedRole: 'all',
+        isAuthenticated: true
+    }, Array<Chat>)
+    async getChats(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { uuid } = req.params;
+            const limit = parseInt(req.query.limit as string) || 20;
+            const chats = await this.chatService.getChatsByUUID(uuid, limit, 0);
+            return res.status(200).json({ data: chats });
+
+        } catch (e) {
+            next(e)
+        }
+    }
 
 
 }

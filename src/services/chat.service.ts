@@ -8,4 +8,9 @@ export class ChatService extends BaseService<Chat> {
     constructor() {
         super(AppDataSource.getRepository(Chat));
     }
+
+    async getChatsByUUID(uuid: string, limit: number = 10, skip: number = 0) {
+        return this.getRepository().find({ where: { uuid }, take: limit, skip });
+    }
+
 }

@@ -1,4 +1,4 @@
-import { IsString, IsOptional, MinLength, IsObject, MaxLength } from 'class-validator';
+import { IsString, IsOptional, MinLength, IsObject, MaxLength, ValidateNested, IsArray, ValidateIf } from 'class-validator';
 // Metadata class to define the structure and validation of metadat
 // Category validation class
 export class ChatValidation {
@@ -14,6 +14,5 @@ export class ChatValidation {
     uuid: string
 
     @IsOptional()
-    @IsObject()
-    currentState: any
+    currentState?: any[]
 }
