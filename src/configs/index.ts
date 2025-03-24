@@ -20,6 +20,8 @@ const config = {
     PG_VECTOR_ISOMETRIC_DB_TABLENAME: process.env.PG_VECTOR_ISOMETRIC_DB_TABLENAME || 'isometric_vector',
     DATABASE_CLIENT: process.env.DATABASE_CLIENT,
 
+    SOURCE_EMAIL_ID: process.env.SOURCE_EMAIL_ID,
+
 
 }
 

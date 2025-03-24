@@ -11,7 +11,7 @@ export class Chat extends BaseEntity {
   @Column({ type: 'text' })
   message: string;
 
-  @Column({ type: 'enum', enum: MessageTypes })
+  @Column({ type: 'enum', enum: MessageTypes, nullable: false })
   messageType: MessageTypes;
 
   @Column({ type: 'jsonb', nullable: true })
