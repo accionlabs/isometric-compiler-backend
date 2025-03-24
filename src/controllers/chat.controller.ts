@@ -74,7 +74,7 @@ export default class CategoriesController {
                         handledDoc = await this.documentService.handlePdf(file, uuid, uploadedDoc.s3Url);
                         break;
                     default:
-                        return res.status(400).json({ error: 'File format not allowed!' });
+                        return res.status(400).json({ message: 'File format not allowed!' });
                 }
             }
             const result = await this.mainAgent.processRequest(query, uuid, currentState, file)
@@ -114,14 +114,14 @@ export default class CategoriesController {
     @Get('/byUUID/:uuid', {
         authorizedRole: 'all',
         isAuthenticated: true
-    }, Array<Chat>)
+    }, { data: Array<Chat>, total: Number })
     async getChats(req: Request, res: Response, next: NextFunction) {
         try {
-            const { uuid } = req.params;
-            const limit = parseInt(req.query.limit as string) || 20;
-            const chats = await this.chatService.getChatsByUUID(uuid, limit, 0);
-            return res.status(200).json({ data: chats });
+            const { page = 1, limit = 10, sortName = 'createdAt', sortOrder = 'asc' } = req.query
+            const sort: Record<string, 1 | -1> = { [sortName as string]: sortOrder === 'asc' ? 1 : -1 };
+            const { data, total } = await this.chatService.findWithFilters({ uuid: req.params.uuid }, parseInt(page as string, 10), parseInt(limit as string, 10), sort);
 
+            res.status(200).json({ data, total });
         } catch (e) {
             next(e)
         }
