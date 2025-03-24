@@ -5,8 +5,9 @@ import { GherkinAgent } from './gherkin_agent/gherkinAgent';
 import { DiagramGeneratorAgent } from './diagram_generator_agent/diagramGeneratorAgent';
 import { GeneralQueryAgent } from './general_query_agent/generalQueryAgent';
 import { DiagramModifierAgent } from './diagram_modifier_agent/diagramModifierAgent';
+import { LoggerService } from '../services/logger.service';
 
-type DefaultResponse = {
+type MainAgentRespone = {
     feedback: string;
     action: any[];
     result: any;
@@ -37,6 +38,9 @@ export class MainAgent {
     @Inject(() => DiagramModifierAgent)
     private readonly diagramModifierAgent: DiagramModifierAgent
 
+    @Inject(() => LoggerService)
+    private readonly loggerService: LoggerService
+
 
 
     private getImage(documents: string | string[]): string | null {
@@ -51,18 +55,19 @@ export class MainAgent {
         return null;
     }
 
-    public async processRequest(question: string, uuid: string, currentState: any = [], file?: Express.Multer.File): Promise<DefaultResponse> {
+    public async processRequest(question: string, uuid: string, currentState: any = [], file?: Express.Multer.File): Promise<MainAgentRespone> {
         const documentDetails = await this.documentService.getDocumentsByUUID(uuid);
-        const availableDocuments = documentDetails?.map((doc: any) => doc.metadata.filename) || [];
-
+        const availableDocuments = documentDetails?.map((doc) => doc.metadata?.filename || '') || [];
+        this.loggerService.info(`Processing documents documents ${availableDocuments.join(",")}`)
         const newDocumentUpload = file?.originalname || null;
         const classifierResult = await this.classifierAgent.processClassifierAgent(question, availableDocuments, newDocumentUpload || '', `classifier_${uuid}`);
 
+        this.loggerService.info(`Classifier agent Response ${JSON.stringify(classifierResult, undefined, 2)}`)
         if (typeof currentState === 'string') {
             currentState = JSON.parse(currentState);
         }
 
-        let defaultResponse: DefaultResponse = {
+        let defaultResponse: MainAgentRespone = {
             feedback: classifierResult.feedback,
             action: [],
             result: currentState,
@@ -83,7 +88,7 @@ export class MainAgent {
                     ...defaultResponse,
                     needFeedback: !creationResult.isometric,
                     result: creationResult.isometric || defaultResponse.result,
-                    feedback: creationResult.message,
+                    feedback: creationResult.message || '',
                 };
             } else {
                 const creationResult = await this.diagramGeneratorAgent.generateIsometricJSONFromBlueprint(uuid);
@@ -91,7 +96,7 @@ export class MainAgent {
                     ...defaultResponse,
                     needFeedback: !creationResult.isometric,
                     result: creationResult.isometric || defaultResponse.result,
-                    feedback: creationResult.message,
+                    feedback: creationResult.message || '',
                 };
             }
         } else if (classifierResult.isGeneralQuery) {

@@ -1,6 +1,6 @@
 // import { generateMultiModel, generateJsonWithConversation, __LLM_PLATFORM } from '../../services/llm';
 import shapes from '../../configs/shapesv3.json';
-import ShapeManager from '../shapesManager';
+import ShapeManager, { IShape } from '../shapesManager';
 // import { vectorSearch } from '../../services/isomtericPgVector';
 import { getLayerByLength, nextPositionOnLayer, filterQumByScenarios, extractScenarios } from '../helpers';
 // import { getSemanticModelByUUID, saveSemanticModel } from '../../services/isometricQuery';
@@ -15,7 +15,9 @@ import { LlmService } from '../../services/llm.service';
 import { LLM_PLATFORM, SemanticModelStatus } from '../../enums'
 import { AWSService } from '../../services/aws.service';
 import { SemanticModelService } from '../../services/semanticModel.service';
-import { BlueprintConverterAgent } from '../blueprint_agent/blueprintGenerate';
+import { BreezeExtractorAgent } from '../blueprint_agent/blueprintGenerate';
+import { Document } from '../../entities/document.entity';
+import { DiagramManager } from '../diagramManager';
 
 const IMAGE_PROMPT = fs.readFileSync("./src/agents/diagram_generator_agent/DIAGRAM_GENERATOR_AGENT.md", 'utf8');
 const IMAGE_EXTRACTOR_PROMPT = fs.readFileSync("./src/agents/diagram_generator_agent/IMAGE_EXTRACTOR_AGENT.md", 'utf8');
@@ -47,6 +49,13 @@ interface ServiceLayerResult {
     result: Layer[];
 }
 
+export interface IsometricJsonAgenResp {
+    description?: string,
+    isometric?: IShape[]
+    result?: any,
+    message?: string
+}
+
 
 @Service()
 export class DiagramGeneratorAgent {
@@ -63,8 +72,8 @@ export class DiagramGeneratorAgent {
     @Inject(() => SemanticModelService)
     private readonly semanticModelService: SemanticModelService
 
-    @Inject(() => BlueprintConverterAgent)
-    private readonly blueprintConvertorAgent: BlueprintConverterAgent
+    @Inject(() => BreezeExtractorAgent)
+    private readonly breezeExtractorAgent: BreezeExtractorAgent
 
     private getExactShapeName(shape: string): string {
         const index = ALL_SHAPES.indexOf(shape);
@@ -88,7 +97,7 @@ export class DiagramGeneratorAgent {
         }
     }
 
-    async generateIsometricJSONFromBlueprint(uuid: string): Promise<any> {
+    async generateIsometricJSONFromBlueprint(uuid: string): Promise<IsometricJsonAgenResp> {
         const semanticModel = await this.semanticModelService.findByUuid(uuid);
         const documents = await this.pgVectorService.vectorSearch("", { uuid });
 
@@ -98,7 +107,7 @@ export class DiagramGeneratorAgent {
 
         const scenarios = extractScenarios(semanticModel?.metadata?.qum);
         const context = documents.map(x => x.pageContent).join('\n\n---\n');
-        const blueprint = await this.blueprintConvertorAgent.generateBreezeSpec(scenarios, context);
+        const blueprint = await this.breezeExtractorAgent.generateBreezeSpec(scenarios, context);
 
         if (!blueprint) {
             return { message: "Unable to fetch blueprint right now!" };
@@ -108,25 +117,26 @@ export class DiagramGeneratorAgent {
             this.semanticModelService.saveSemanticModel({ uuid, metadata: { qum: semanticModel?.metadata?.qum, blueprint }, visualModel: [], status: SemanticModelStatus.ACTIVE });
         }
 
+        const diagrmaManger = new DiagramManager()
         return {
             message: semanticModel?.status === 'active' ? "Blueprint is successfully generated!" : "Blueprint generated without mapping functional and design requirements as functional unified artifacts are still under process!",
-            isometric: this.blueprintConvertorAgent.convertBlueprintToIsometric(blueprint, semanticModel?.metadata?.qum)
+            isometric: diagrmaManger.convertBlueprintToIsometric(blueprint, semanticModel?.metadata?.qum)
         };
     }
 
-    async generateIsometricJSONFromImage(image: string, uuid: string, availableDocuments: any[]): Promise<any> {
-        const docImage = availableDocuments.find(doc => doc.metadata.filename === image);
+    async generateIsometricJSONFromImage(image: string, uuid: string, availableDocuments: Document[]): Promise<IsometricJsonAgenResp> {
+        const docImage = availableDocuments.find(doc => doc.metadata?.filename === image);
         if (!docImage) {
             return { message: "Please provide a valid image!" };
         }
 
-        const imageUrl = await this.awsService.getPresignedUrlFromUrl(docImage.metadata.fileUrl);
+        const imageUrl = await this.awsService.getPresignedUrlFromUrl(docImage?.metadata?.fileUrl || '');
         if (!imageUrl) throw new Error("Image not found!!!")
         const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-        return this.extractIsometricAndMappingFromImage(docImage.metadata.mimetype, Buffer.from(response.data), uuid);
+        return this.extractIsometricAndMappingFromImage(docImage.metadata?.mimetype || '', Buffer.from(response.data), uuid);
     }
 
-    async extractIsometricAndMappingFromImage(mimeType: string, image: Buffer, uuid: string): Promise<any> {
+    async extractIsometricAndMappingFromImage(mimeType: string, image: Buffer, uuid: string) {
         const placeholders = { __SHAPES__: ALL_SHAPES.map(x => `"${x}"`).join(",") };
         const response = image ? await this.llmService.generateMultiModel(mimeType, image, IMAGE_PROMPT, placeholders, LLM_PLATFORM.OPENAI_MATURE) :
             await this.llmService.generateJsonWithConversation(IMAGE_PROMPT, placeholders, LLM_PLATFORM.OPENAI);
@@ -147,7 +157,7 @@ export class DiagramGeneratorAgent {
         }
     }
 
-    private async convertFlatToIsometric(result: any) {
+    private convertFlatToIsometric(result: any): IShape[] {
         const playlist = result;
         const manager = new ShapeManager([]);
         let lastAddedLayerId = null;

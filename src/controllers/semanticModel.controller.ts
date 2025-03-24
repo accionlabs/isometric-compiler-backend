@@ -25,7 +25,7 @@ export default class SematicModelController {
             if (!sematicModel) {
                 throw new ApiError('Shape not found', 404)
             }
-            res.status(200).json(sematicModel);
+            res.status(200).json(sematicModel.metadata);
         } catch (e) {
             next(e)
         }

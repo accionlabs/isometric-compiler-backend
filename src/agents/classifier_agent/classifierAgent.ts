@@ -6,6 +6,18 @@ import { LLMConversationService } from "../../services/llm_conversation.service"
 
 const __CLASSIFIER_PROMPT__ = fs.readFileSync("./src/agents/classifier_agent/CLASSIFIER_AGENT_PROMPT.md", "utf8");
 
+interface ClassifierAgentResp {
+    transformedQuery: string
+    isDiagramCreationQuery: boolean
+    isDiagramModifyQuery: boolean
+    isGeneralQuery: boolean
+    isEmailQuery: boolean
+    isGherkinScriptQuery: boolean
+    email: string
+    documentReferences: string[],
+    feedback: string
+}
+
 @Service()
 export class ClassifierAgent {
     private classifierPrompt: string;
@@ -29,7 +41,7 @@ export class ClassifierAgent {
         return conversations && conversations.length > 0 ? JSON.parse(conversations) : [];
     }
 
-    public async processClassifierAgent(question: string, availableDocuments: string[] = [], newDocument: string, uuid?: string): Promise<any> {
+    public async processClassifierAgent(question: string, availableDocuments: string[], newDocument: string, uuid?: string): Promise<ClassifierAgentResp> {
         const conversations = await this.fetchOldConversationContext(uuid);
         const placeholders = {
             conversations: conversations,

@@ -12,7 +12,7 @@ interface Attached2DShape {
     attachedTo: string;
 }
 
-interface Shape {
+export interface IShape {
     id: string;
     shape: string;
     type: 'layer' | 'shape' | 'component';
@@ -24,9 +24,9 @@ interface Shape {
 }
 
 class ShapeManager {
-    private shapes: Shape[];
+    private shapes: IShape[];
 
-    constructor(initialShapes: Shape[] | string = []) {
+    constructor(initialShapes: IShape[] | string = []) {
         if (typeof initialShapes === 'string') {
             this.shapes = JSON.parse(initialShapes);
         } else {
@@ -44,14 +44,14 @@ class ShapeManager {
         decorator?: string | string[] | null,
         metadata?: Metadata | null,
         skipAutomatedPlacement: boolean = false
-    ): Shape {
+    ): IShape {
         if (!skipAutomatedPlacement) {
             const validPlacements = validate3DPlacement(this.shapes, type, relativeTo, position);
             relativeTo = validPlacements.relativeToId;
             position = validPlacements.position;
         }
 
-        const newShape: Shape = {
+        const newShape: IShape = {
             id: shapeName.trim() + Math.random().toString(36).substr(2, 5),
             shape: shapeName,
             type: type === 'LAYER' ? 'layer' : 'shape',
@@ -86,7 +86,7 @@ class ShapeManager {
         return newShape;
     }
 
-    add2DShape(relativeTo: string, name: string): Shape {
+    add2DShape(relativeTo: string, name: string): IShape {
         if (!relativeTo) {
             throw new Error('No target shape specified. Could you please let me know where to place it?');
         }
@@ -100,7 +100,7 @@ class ShapeManager {
         return shape;
     }
 
-    move3DShape(shapeId: string, relativeTo: string, position: any): Shape | undefined {
+    move3DShape(shapeId: string, relativeTo: string, position: any): IShape | undefined {
         const shape = this.shapes.find(s => s.id === shapeId);
         if (shape) {
             const validPlacements = validate3DPlacement(this.shapes, shape.type === 'layer' ? 'LAYER' : 'shape', relativeTo, position);
@@ -110,7 +110,7 @@ class ShapeManager {
         return shape;
     }
 
-    rename(shapeId: string, name: string): Shape | undefined {
+    rename(shapeId: string, name: string): IShape | undefined {
         const shape = this.shapes.find(s => s.id === shapeId);
         if (shape) {
             shape.type = shape.type ?? 'shape'; // Ensure it's 'shape' not 'service'
@@ -132,7 +132,7 @@ class ShapeManager {
         }
     }
 
-    remove3DShape(shapeId: string): Shape | undefined {
+    remove3DShape(shapeId: string): IShape | undefined {
         const index = this.shapes.findIndex(obj => obj.id === shapeId);
         if (index !== -1) {
             return this.shapes.splice(index, 1)[0]; // Remove 1 element at the found index
@@ -149,11 +149,11 @@ class ShapeManager {
         }
     }
 
-    getAll(): Shape[] {
+    getAll(): IShape[] {
         return this.shapes;
     }
 
-    getById(id: string): Shape | null {
+    getById(id: string): IShape | null {
         return this.shapes.find(shape => shape.id === id) ?? null;
     }
 }

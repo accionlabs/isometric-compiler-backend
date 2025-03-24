@@ -1,4 +1,5 @@
 import Shapes from '../configs/shapesv3.json'
+import { PersonaResp, ScenarioResp } from './qum_agent/qumAgent';
 const layers_master: any = Shapes['layers'];
 
 // Define types
@@ -234,7 +235,7 @@ const nextEmptyPositionOnLayer = (layerId: string, position: string, occupiedPos
     return position;
 };
 
-const filterQumByScenarios = (qum: any[], scenariosFilter: string | string[]): any[] => {
+const filterQumByScenarios = (qum: PersonaResp[], scenariosFilter: string | string[]): any[] => {
     const scenariosSet = new Set(
         (Array.isArray(scenariosFilter) ? scenariosFilter : [scenariosFilter])
             .map(scenario => scenario?.trim().toLowerCase())
@@ -244,23 +245,23 @@ const filterQumByScenarios = (qum: any[], scenariosFilter: string | string[]): a
         ?.map(persona => ({
             ...persona,
             outcomes: persona?.outcomes
-                ?.map((outcome: { scenarios: any[]; }) => ({
+                ?.map((outcome) => ({
                     ...outcome,
                     scenarios: outcome?.scenarios?.filter(scenario => scenariosSet.has(scenario.scenario?.trim().toLowerCase()))
                 }))
-                ?.filter((outcome: { scenarios: string | any[]; }) => outcome?.scenarios?.length > 0)
+                ?.filter((outcome) => (outcome?.scenarios?.length || 0) > 0)
         }))
-        ?.filter(persona => persona?.outcomes?.length > 0);
+        ?.filter(persona => (persona?.outcomes?.length || 0) > 0);
 };
 
-const extractScenarios = (personas: any[]): string[] => {
+const extractScenarios = (personas: PersonaResp[]): string[] => {
     const out: string[] = [];
     for (let i = 0; i < personas?.length; i++) {
         const outcomes = personas[i].outcomes;
-        for (let j = 0; j < outcomes.length; j++) {
-            const scenarios = outcomes[j].scenarios;
-            for (let k = 0; k < scenarios.length; k++) {
-                out.push(scenarios[k].scenario);
+        for (let j = 0; j < (outcomes?.length || 0); j++) {
+            const scenarios = outcomes?.[j].scenarios;
+            for (let k = 0; k < (scenarios?.length || 0); k++) {
+                out.push(scenarios?.[k].scenario || '');
             }
         }
     }

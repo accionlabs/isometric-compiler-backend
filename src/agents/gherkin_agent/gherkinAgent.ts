@@ -58,7 +58,7 @@ export class GherkinAgent {
         return scenarios;
     }
 
-    private async generateGherkinScriptFromScenario(context: string, question: string): Promise<any> {
+    private async generateGherkinScriptFromScenario(context: string, question: string): Promise<string> {
         const placeholders = {
             __CONTEXT__: context,
             question: question

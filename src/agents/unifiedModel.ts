@@ -4,33 +4,8 @@ import { Inject, Service } from "typedi";
 import { SemanticModelService } from "../services/semanticModel.service";
 import { PgVectorService } from "../services/pgVector.service";
 import { SemanticModelStatus } from "../enums";
-import { QUMAgent } from "./qum_agent/qumAgent";
+import { QUMAgent, QumBusinessSpecAgenResp, QumDesignSpecAgentResp, ScenarioResp } from "./qum_agent/qumAgent";
 import { LoggerService } from "../services/logger.service";
-
-interface Scenario {
-    scenario: string;
-    steps?: any[];
-}
-
-interface Outcome {
-    scenarios: Scenario[];
-}
-
-interface Persona {
-    outcomes: Outcome[];
-}
-
-interface BusinessSpec {
-    qum_business?: {
-        personas: Persona[];
-    };
-}
-
-interface DesignSpec {
-    qum_design?: {
-        scenarios: Scenario[];
-    };
-}
 
 @Service()
 export class UnifiedModelGenerator {
@@ -47,7 +22,7 @@ export class UnifiedModelGenerator {
     @Inject(() => LoggerService)
     private readonly loggerService: LoggerService
 
-    private getDesignSpec(scenario: string, designScenarios?: Scenario[]): any[] {
+    private getDesignSpec(scenario: string, designScenarios?: ScenarioResp[]): any[] {
         if (!designScenarios) return [];
         for (const designScenario of designScenarios) {
             if (scenario.toLowerCase() === designScenario.scenario.toLowerCase()) {
@@ -57,11 +32,11 @@ export class UnifiedModelGenerator {
         return [];
     }
 
-    private mergeBusinessDesignSpec(business: BusinessSpec, design: DesignSpec): Persona[] {
+    private mergeBusinessDesignSpec(business: QumBusinessSpecAgenResp, design: QumDesignSpecAgentResp) {
         const personas = business.qum_business?.personas || [];
         for (const persona of personas) {
-            for (const outcome of persona.outcomes) {
-                for (const scen of outcome.scenarios) {
+            for (const outcome of (persona?.outcomes || [])) {
+                for (const scen of (outcome?.scenarios || [])) {
                     scen.steps = this.getDesignSpec(scen.scenario, design.qum_design?.scenarios);
                 }
             }
@@ -86,7 +61,7 @@ export class UnifiedModelGenerator {
             const businessSpec = await this.qumAgent.generateQUMBusinessSpec(context);
             this.loggerService.info(`[Unified Model] QUM Business SPEC generated for ${uuid}`);
 
-            const scenarios = extractScenarios(businessSpec?.qum_business?.personas);
+            const scenarios = extractScenarios(businessSpec?.qum_business?.personas || []);
             this.loggerService.info(`[Unified Model] QUM Scenarios SPEC generated for ${uuid}`);
 
             await this.semanticModelService.saveSemanticModel({ uuid, metadata: {}, visualModel: [], status: SemanticModelStatus.GENERATING_QUM_DESIGN_SPEC });
