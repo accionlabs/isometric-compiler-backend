@@ -7,7 +7,6 @@ import { ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings } from '@langchain
 import { HarmBlockThreshold, HarmCategory, TaskType } from '@google/generative-ai';
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
-import fs from 'fs';
 import { LLM_PLATFORM } from '../enums';
 
 
@@ -22,21 +21,6 @@ export class LlmService {
     private readonly GEMINI_DEFAULT_MODEL = config.GEMINI_DEFAULT_MODEL;
     private readonly DEFAULT_EMBEDDING_LLM_PLATFORM = config.DEFAULT_EMBEDDING_LLM_PLATFORM;
 
-
-    private readonly PROMPT_CACHE: Record<string, string> = {};
-    private readonly PROMPT_PATHS: Record<string, string> = {
-        SYSTEM: "./prompts/SYS_PROMPT_v3.txt",
-        QUERY_ANALYSIS: "./prompts/QUERY_ANALYSIS_PROMPT.txt",
-        QUERY_EMPLOYEE_ANALYSIS: "./prompts/QUERY_EMPLOYEE_ANALYSIS.txt",
-        ISOMETRIC_DIAGRAM_PROMPT: "./prompts/ISOMETRIC_DIAGRAM_PROMPT.txt",
-        ISOMETRIC_VISUAL_MODEL_PROMPT: "./prompts/ISOMETRIC_VISUAL_MODEL_PROMPT.txt",
-        ISOMETRIC_VISUAL_MODEL_PROMPT_V2: "./prompts/ISOMETRIC_VISUAL_MODEL_PROMPT_V2.txt",
-        ISOMETRIC_AGENT_1: "./prompts/ISOMETRIC_AGENT_1.txt",
-        ISOMETRIC_AGENT_0: "./prompts/ISOMETRIC_AGENT_0.txt",
-        ISOMETRIC_AGENT_INIT: "./prompts/ISOMETRIC_AGENT_init.txt",
-        ISOMETRIC_IMAGE_TO_DIAGRAM: "./prompts/ISOMETRIC_IMAGE_TO_DIAGRAM.txt",
-        BREEZE: "./prompts/breeze_prompt.txt"
-    };
 
     getModel(llmPlatform: string = this.DEFAULT_CHAT_LLM_PLATFORM) {
         switch (llmPlatform) {
@@ -75,23 +59,6 @@ export class LlmService {
 
             default:
                 return null;
-        }
-    }
-
-    getPrompt(type: string = "SYSTEM"): string | null {
-        if (this.PROMPT_CACHE[type]) {
-            return this.PROMPT_CACHE[type];
-        }
-        if (!this.PROMPT_PATHS[type]) {
-            throw new Error("Unsupported type to fetch prompt");
-        }
-        try {
-            const data = fs.readFileSync(this.PROMPT_PATHS[type], 'utf8');
-            this.PROMPT_CACHE[type] = data;
-            return data;
-        } catch (err) {
-            console.error('Error reading file:', err);
-            return null;
         }
     }
 
