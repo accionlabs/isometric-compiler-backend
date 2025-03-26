@@ -1,0 +1,1483 @@
+{
+    "layers": {
+      "4x3 arrow layer": {
+        "name": "4x3 arrow layer",
+        "description": "",
+        "dimentions": { "row": 4, "col": 3 },
+        "attachmentPoint": [
+          "front-left",
+          "front-right",
+          "top-a1",
+          "top-a2",
+          "top-a3",
+          "top-b1",
+          "top-b2",
+          "top-b3",
+          "top-c1",
+          "top-c2",
+          "top-c3",
+          "top-d1",
+          "top-d2",
+          "top-d3"
+        ]
+      },
+      "layer 2x2": {
+        "name": "layer 2x2",
+        "description": "",
+        "dimentions": { "row": 2, "col": 2 },
+        "attachmentPoint": [
+          "front-left",
+          "front-right",
+          "top-a1",
+          "top-a2",
+          "top-b1",
+          "top-b2"
+        ]
+      },
+      "layer 3x3": {
+        "name": "layer 3x3",
+        "description": "",
+        "dimentions": { "row": 3, "col": 3 },
+        "attachmentPoint": [
+          "front-left",
+          "front-right",
+          "top-a1",
+          "top-a2",
+          "top-a3",
+          "top-b1",
+          "top-b2",
+          "top-b3",
+          "top-c1",
+          "top-c2",
+          "top-c3"
+        ]
+      },
+      "layer 4x2": {
+        "name": "layer 4x2",
+        "description": "",
+        "dimentions": { "row": 2, "col": 4 },
+        "attachmentPoint": [
+          "front-left",
+          "front-right",
+          "top-a1",
+          "top-a2",
+          "top-b1",
+          "top-b2",
+          "top-c1",
+          "top-c2",
+          "top-d1",
+          "top-d2"
+        ]
+      },
+      "layer 4x2-2": {
+        "name": "layer 4x2-2",
+        "description": "",
+        "dimentions": { "row": 2, "col": 4 },
+        "attachmentPoint": [
+          "front-left",
+          "front-right",
+          "top-a1",
+          "top-a2",
+          "top-b1",
+          "top-b2",
+          "top-c1",
+          "top-c2",
+          "top-d1",
+          "top-d2"
+        ]
+      },
+      "layer 4x3": {
+        "name": "layer 4x3",
+        "description": "",
+        "dimentions": { "row": 3, "col": 4 },
+        "attachmentPoint": [
+          "front-left",
+          "front-right",
+          "top-a1",
+          "top-a2",
+          "top-a3",
+          "top-b1",
+          "top-b2",
+          "top-b3",
+          "top-c1",
+          "top-c2",
+          "top-c3",
+          "top-d1",
+          "top-d2",
+          "top-d3"
+        ]
+      },
+      "layer 4x3-2": {
+        "name": "layer 4x3-2",
+        "description": "",
+        "dimentions": { "row": 4, "col": 3 },
+        "attachmentPoint": [
+          "front-left",
+          "front-right",
+          "top-a1",
+          "top-a2",
+          "top-a3",
+          "top-b1",
+          "top-b2",
+          "top-b3",
+          "top-c1",
+          "top-c2",
+          "top-c3",
+          "top-d1",
+          "top-d2",
+          "top-d3"
+        ]
+      },
+      "layer 4x8": {
+        "name": "layer 4x8",
+        "description": "",
+        "dimentions": { "row": 8, "col": 4 },
+        "attachmentPoint": [
+          "front-left",
+          "front-right",
+          "top-a1",
+          "top-a2",
+          "top-a3",
+          "top-a4",
+          "top-a5",
+          "top-a6",
+          "top-a7",
+          "top-a8",
+          "top-b1",
+          "top-b2",
+          "top-b3",
+          "top-b4",
+          "top-b5",
+          "top-b6",
+          "top-b7",
+          "top-b8",
+          "top-c1",
+          "top-c2",
+          "top-c3",
+          "top-c4",
+          "top-c5",
+          "top-c6",
+          "top-c7",
+          "top-c8"
+        ]
+      },
+      "sublayer 2x2": {
+        "name": "sublayer 2x2",
+        "description": "",
+        "dimentions": { "row": 2, "col": 2 },
+        "attachmentPoint": [
+          "front-left",
+          "front-right",
+          "top-a1",
+          "top-a2",
+          "top-b1",
+          "top-b2"
+        ]
+      }
+    },
+    "3dshapes": {
+      "admin-L": {
+        "name": "admin-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "bus-L": {
+        "name": "bus-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "connectors-L": {
+        "name": "connectors-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "database-L": {
+        "name": "database-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "database-M": {
+        "name": "database-M",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "database-S": {
+        "name": "database-S",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "desktop-L": {
+        "name": "desktop-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "filter cone-L": {
+        "name": "filter cone-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "filter walls-L": {
+        "name": "filter walls-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "glass sphere-L": {
+        "name": "glass sphere-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "hexagon-L": {
+        "name": "hexagon-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "hexagon-M": {
+        "name": "hexagon-M",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "laptop-L": {
+        "name": "laptop-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "logo round base-L": {
+        "name": "logo round base-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "logo round base-M": {
+        "name": "logo round base-M",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "support admin-L": {
+        "name": "support admin-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "tablet-L": {
+        "name": "tablet-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "user 2-L": {
+        "name": "user 2-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "user group-L": {
+        "name": "user group-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "user-L": {
+        "name": "user-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "wall-L": {
+        "name": "wall-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "long server": {
+        "name": "long server",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "mainframe-L": {
+        "name": "mainframe-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "server-L": {
+        "name": "server-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "server-M": {
+        "name": "server-M",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "server-S": {
+        "name": "server-S",
+        "description": "",
+        "attachmentPoint": "top"
+      }
+    },
+    "2dshapes": {
+      "accionlabs full-L": {
+        "name": "accionlabs full-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "accionlabs icon-L": {
+        "name": "accionlabs icon-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "ai icon-L": {
+        "name": "ai icon-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "analytics ui-L": {
+        "name": "analytics ui-L",
+        "description": "",
+        "attachmentPoint": "screen"
+      },
+      "android logo-L": {
+        "name": "android logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "angular logo-L": {
+        "name": "angular logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "ansible logo-L": {
+        "name": "ansible logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "apache airflow logo-L": {
+        "name": "apache airflow logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "apache camel logo-L": {
+        "name": "apache camel logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "apache hbase logo-L": {
+        "name": "apache hbase logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "apache hive logo-L": {
+        "name": "apache hive logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "apache hudi logo-L": {
+        "name": "apache hudi logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "apache impala logo-L": {
+        "name": "apache impala logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "apache nifi logo-L": {
+        "name": "apache nifi logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "apache spark logo-L": {
+        "name": "apache spark logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "api gateway-L": {
+        "name": "api gateway-L",
+        "description": "",
+        "attachmentPoint": "front-left"
+      },
+      "avro logo-L": {
+        "name": "avro logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws api gateway logo-L": {
+        "name": "aws api gateway logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws appflow logo-L": {
+        "name": "aws appflow logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws appmesh logo-L": {
+        "name": "aws appmesh logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws appmesh virtual gateway logo-L": {
+        "name": "aws appmesh virtual gateway logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws athena logo-L": {
+        "name": "aws athena logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws cloudwatch logo-L": {
+        "name": "aws cloudwatch logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws datasync logo-L": {
+        "name": "aws datasync logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws dms logo-L": {
+        "name": "aws dms logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws dynamodb logo-L": {
+        "name": "aws dynamodb logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws ecs fargate logo-L": {
+        "name": "aws ecs fargate logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws eventbridge logo-L": {
+        "name": "aws eventbridge logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws glue logo-L": {
+        "name": "aws glue logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws lambda logo-L": {
+        "name": "aws lambda logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws logo-L": {
+        "name": "aws logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws msk logo-L": {
+        "name": "aws msk logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws rds logo-L": {
+        "name": "aws rds logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws redshift logo-L": {
+        "name": "aws redshift logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws s3 galcier logo-L": {
+        "name": "aws s3 galcier logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws s3 logo-L": {
+        "name": "aws s3 logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws sftp logo-L": {
+        "name": "aws sftp logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws sns logo-L": {
+        "name": "aws sns logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws sqs logo-L": {
+        "name": "aws sqs logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "aws tranfer for sftp logo-L": {
+        "name": "aws tranfer for sftp logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "axtract flat-L": {
+        "name": "axtract flat-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "axtract logo-L": {
+        "name": "axtract logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "axtract ui-L": {
+        "name": "axtract ui-L",
+        "description": "",
+        "attachmentPoint": "screen"
+      },
+      "azure blob logo-L": {
+        "name": "azure blob logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "azure logo-L": {
+        "name": "azure logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "azure synapse analytics logo-L": {
+        "name": "azure synapse analytics logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "bar graph-L": {
+        "name": "bar graph-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "bash logo-L": {
+        "name": "bash logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "bigquery logo-L": {
+        "name": "bigquery logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "business integration-L": {
+        "name": "business integration-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "camunda logo-L": {
+        "name": "camunda logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "cassandra logo-L": {
+        "name": "cassandra logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "cloud api-L": {
+        "name": "cloud api-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "cloud file directory-l": {
+        "name": "cloud file directory-l",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "cloud functions logo-L": {
+        "name": "cloud functions logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "cloud operations-L": {
+        "name": "cloud operations-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "cloud-L": {
+        "name": "cloud-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "consul logo-L": {
+        "name": "consul logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "continuous arrows-L": {
+        "name": "continuous arrows-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "custom ui": {
+        "name": "custom ui",
+        "description": "",
+        "attachmentPoint": "screen"
+      },
+      "databricks logo-L": {
+        "name": "databricks logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "dbt logo-L": {
+        "name": "dbt logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "desktop binary": {
+        "name": "desktop binary",
+        "description": "",
+        "attachmentPoint": "screen"
+      },
+      "desktop ui": {
+        "name": "desktop ui",
+        "description": "",
+        "attachmentPoint": "screen"
+      },
+      "dial-L": {
+        "name": "dial-L",
+        "description": "",
+        "attachmentPoint": "front-left"
+      },
+      "digital ocean logo-L": {
+        "name": "digital ocean logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "distribution chart-L": {
+        "name": "distribution chart-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "dns logo-L": {
+        "name": "dns logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "docker logo-L": {
+        "name": "docker logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "documents-L": {
+        "name": "documents-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "dot grill-L": {
+        "name": "dot grill-L",
+        "description": "",
+        "attachmentPoint": "front-left"
+      },
+      "dot grill-M": {
+        "name": "dot grill-M",
+        "description": "",
+        "attachmentPoint": "front-left"
+      },
+      "dot grill-S": {
+        "name": "dot grill-S",
+        "description": "",
+        "attachmentPoint": "front-left"
+      },
+      "elastic logo-L": {
+        "name": "elastic logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "elixir logo-L": {
+        "name": "elixir logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "email-L": {
+        "name": "email-L",
+        "description": "",
+        "attachmentPoint": "screen"
+      },
+      "envoy proxy logo-L": {
+        "name": "envoy proxy logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "event bus-L": {
+        "name": "event bus-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "event feed-L": {
+        "name": "event feed-L",
+        "description": "",
+        "attachmentPoint": "front-left"
+      },
+      "exact logo-L": {
+        "name": "exact logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "excel logo-L": {
+        "name": "excel logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "exchange arrows-L": {
+        "name": "exchange arrows-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "factory-L": {
+        "name": "factory-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "flink logo-L": {
+        "name": "flink logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "flow chart-L": {
+        "name": "flow chart-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "gear spanner-L": {
+        "name": "gear spanner-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "git logo-L": {
+        "name": "git logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "gitlab logo-L": {
+        "name": "gitlab logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "glass box-L": {
+        "name": "glass box-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "glass cylinder-L": {
+        "name": "glass cylinder-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "grafana logo-L": {
+        "name": "grafana logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "graphql logo-L": {
+        "name": "graphql logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "hadoop logo-L": {
+        "name": "hadoop logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "haproxy logo-L": {
+        "name": "haproxy logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "hashicorp logo-L": {
+        "name": "hashicorp logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "java logo-L": {
+        "name": "java logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "jenkins logo-L": {
+        "name": "jenkins logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "jigsaw-L": {
+        "name": "jigsaw-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "jira logo-L": {
+        "name": "jira logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "json-L": {
+        "name": "json-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "kafka logo-L": {
+        "name": "kafka logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "key-L": {
+        "name": "key-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "keycloak logo-L": {
+        "name": "keycloak logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "knowage logo-L": {
+        "name": "knowage logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "kong logo-L": {
+        "name": "kong logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "kubernetes logo-L": {
+        "name": "kubernetes logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "laptop binary": {
+        "name": "laptop binary",
+        "description": "",
+        "attachmentPoint": "screen"
+      },
+      "laptop ui": {
+        "name": "laptop ui",
+        "description": "",
+        "attachmentPoint": "screen"
+      },
+      "line grill-L": {
+        "name": "line grill-L",
+        "description": "",
+        "attachmentPoint": "front-right"
+      },
+      "line grill-M": {
+        "name": "line grill-M",
+        "description": "",
+        "attachmentPoint": "front-right"
+      },
+      "line grill-S": {
+        "name": "line grill-S",
+        "description": "",
+        "attachmentPoint": "front-right"
+      },
+      "linux logo-L": {
+        "name": "linux logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "local file directory-L": {
+        "name": "local file directory-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "magnifying glass-L": {
+        "name": "magnifying glass-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "mainframe dials": {
+        "name": "mainframe dials",
+        "description": "",
+        "attachmentPoint": "screen"
+      },
+      "mainframe process": {
+        "name": "mainframe process",
+        "description": "",
+        "attachmentPoint": "screen"
+      },
+      "master data": {
+        "name": "master data",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "metadata-L": {
+        "name": "metadata-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "microchip": {
+        "name": "microchip",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "microservice app logo-L": {
+        "name": "microservice app logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "mongodb logo-L": {
+        "name": "mongodb logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "mulesoft logo-L": {
+        "name": "mulesoft logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "mysql logo-L": {
+        "name": "mysql logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "net core logo-L": {
+        "name": "net core logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "new relic logo-L": {
+        "name": "new relic logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "node logo-L": {
+        "name": "node logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "notification bell-L": {
+        "name": "notification bell-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "openai logo-L": {
+        "name": "openai logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "operations-L": {
+        "name": "operations-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "opsgenie logo-L": {
+        "name": "opsgenie logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "package-L": {
+        "name": "package-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "pagerduty logo-L": {
+        "name": "pagerduty logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "partner-L": {
+        "name": "partner-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "pos system-L": {
+        "name": "pos system-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "postgresql logo-L": {
+        "name": "postgresql logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "powerbi logo-L": {
+        "name": "powerbi logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "prometheus logo-L": {
+        "name": "prometheus logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "prompt synthesis-L": {
+        "name": "prompt synthesis-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "pull model-L": {
+        "name": "pull model-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "push model-L": {
+        "name": "push model-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "python logo-L": {
+        "name": "python logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "qa check-L": {
+        "name": "qa check-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "react logo-L": {
+        "name": "react logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "revenue-L": {
+        "name": "revenue-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "round plate-L": {
+        "name": "round plate-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "salesforce logo-L": {
+        "name": "salesforce logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "schedule-L": {
+        "name": "schedule-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "schema-L": {
+        "name": "schema-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "search screen-L": {
+        "name": "search screen-L",
+        "description": "",
+        "attachmentPoint": "screen"
+      },
+      "security key-L": {
+        "name": "security key-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "skarabee logo-L": {
+        "name": "skarabee logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "slack logo-L": {
+        "name": "slack logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "sms-L": {
+        "name": "sms-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "snowflake logo-L": {
+        "name": "snowflake logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "snowpipe logo-L": {
+        "name": "snowpipe logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "splunk oncall logo-L": {
+        "name": "splunk oncall logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "spreadsheets-L": {
+        "name": "spreadsheets-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "spring boot logo-L": {
+        "name": "spring boot logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "sql logo-L": {
+        "name": "sql logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "square plate-L": {
+        "name": "square plate-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "subscription-L": {
+        "name": "subscription-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "synthesis chart-L": {
+        "name": "synthesis chart-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "table-L": {
+        "name": "table-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "tableau logo-L": {
+        "name": "tableau logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "tech stack-L": {
+        "name": "tech stack-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "vector points-L": {
+        "name": "vector points-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "vector polygon 2-L": {
+        "name": "vector polygon 2-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "vector polygon-L": {
+        "name": "vector polygon-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "vend logo-L": {
+        "name": "vend logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "vend-L": {
+        "name": "vend-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "vent grill-M": {
+        "name": "vent grill-M",
+        "description": "",
+        "attachmentPoint": "front-right"
+      },
+      "webhook logo-L": {
+        "name": "webhook logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "zeebe logo-L": {
+        "name": "zeebe logo-L",
+        "description": "",
+        "attachmentPoint": "top"
+      },
+      "zip-L": {
+        "name": "zip-L",
+        "description": "",
+        "attachmentPoint": "top"
+      }
+    },
+    "components": {
+      "Files and Documents": {
+        "name": "Files and Documents",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Business Processes": {
+        "name": "Business Processes",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Business API": {
+        "name": "Business API",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Legacy Data Sources": {
+        "name": "Legacy Data Sources",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Operational Database": {
+        "name": "Operational Database",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Enterprise Application": {
+        "name": "Enterprise Application",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Data Connectors": {
+        "name": "Data Connectors",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Event Queue": {
+        "name": "Event Queue",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Data Enrichment": {
+        "name": "Data Enrichment",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Extraction, Transformation & Loading (ETL)": {
+        "name": "Extraction, Transformation & Loading (ETL)",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Master Data Management": {
+        "name": "Master Data Management",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Feature Extraction for AI": {
+        "name": "Feature Extraction for AI",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Semantic Data Models": {
+        "name": "Semantic Data Models",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Reporting and Analytics": {
+        "name": "Reporting and Analytics",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Search and Custom Reporting": {
+        "name": "Search and Custom Reporting",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Data analytics and Dashboards": {
+        "name": "Data analytics and Dashboards",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Self Service Analytics": {
+        "name": "Self Service Analytics",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Personalized Ux": {
+        "name": "Personalized Ux",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Event Based Orchestration": {
+        "name": "Event Based Orchestration",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Business Entity Services": {
+        "name": "Business Entity Services",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "API Management, Role Based Access Control": {
+        "name": "API Management, Role Based Access Control",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Front End Application-Laptop": {
+        "name": "Front End Application-Laptop",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Front end application-Desktop": {
+        "name": "Front end application-Desktop",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Admin and support": {
+        "name": "Admin and support",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Business Work Flow Services-1": {
+        "name": "Business Work Flow Services-1",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Business Work Flow Services-2": {
+        "name": "Business Work Flow Services-2",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Application Integration services-1": {
+        "name": "Application Integration services-1",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Application Integration services-2": {
+        "name": "Application Integration services-2",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Data Warehouse": {
+        "name": "Data Warehouse",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "MasterData Management": {
+        "name": "MasterData Management",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Front End Applications": {
+        "name": "Front End Applications",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Data Warehouses": {
+        "name": "Data Warehouses",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Semantic Encoder": {
+        "name": "Semantic Encoder",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Knowledge Graph": {
+        "name": "Knowledge Graph",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Prompt Synthesis Module": {
+        "name": "Prompt Synthesis Module",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Query Vectorizer": {
+        "name": "Query Vectorizer",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Response Filter": {
+        "name": "Response Filter",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "User Interface Connector": {
+        "name": "User Interface Connector",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "AI Inference Engine": {
+        "name": "AI Inference Engine",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Contextual Retrieval Engine": {
+        "name": "Contextual Retrieval Engine",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Performance Data Warehouses": {
+        "name": "Performance Data Warehouses",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Configuration Manager": {
+        "name": "Configuration Manager",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Evaluation Scheduler": {
+        "name": "Evaluation Scheduler",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Prompt Database": {
+        "name": "Prompt Database",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Event scheduler": {
+        "name": "Event scheduler",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Generic Server-L": {
+        "name": "Generic Server-L",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Generic Server-M": {
+        "name": "Generic Server-M",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Generic Server-S": {
+        "name": "Generic Server-S",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Server-L group-4": {
+        "name": "Server-L group-4",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Server-M group-4": {
+        "name": "Server-M group-4",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Server-S group-9": {
+        "name": "Server-S group-9",
+        "description": "",
+        "attachmentPoint": []
+      },
+      "Server-S group-4": {
+        "name": "Server-S group-4",
+        "description": "",
+        "attachmentPoint": []
+      }
+    },
+    "positions": ["top", "front-left", "front-right"],
+    "gridPositions": [
+      "top",
+      "front-left",
+      "front-right",
+      "top-a1",
+      "top-a2",
+      "top-a3",
+      "top-a4",
+      "top-a5",
+      "top-a6",
+      "top-a7",
+      "top-a8",
+      "top-b1",
+      "top-b2",
+      "top-b3",
+      "top-b4",
+      "top-b5",
+      "top-b6",
+      "top-b7",
+      "top-b8",
+      "top-c1",
+      "top-c2",
+      "top-c3",
+      "top-c4",
+      "top-c5",
+      "top-c6",
+      "top-c7",
+      "top-c8",
+      "top-d1",
+      "top-d2",
+      "top-d3",
+      "top-d4",
+      "top-d5",
+      "top-d6",
+      "top-d7",
+      "top-d8"
+    ]
+  }
+  

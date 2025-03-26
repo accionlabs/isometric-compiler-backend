@@ -56,7 +56,6 @@ export class FilterUtils {
     console.log("query", query)
     const filters: FindOptionsWhere<T> = {};
     const parsedFilters = this.parseFilters(query);
-    console.log("parsedFilters", parsedFilters)
 
     for (const [key, value] of Object.entries(parsedFilters)) {
       if (allowedFields.includes(key as keyof T) && value !== undefined) {

@@ -12,9 +12,17 @@ const config = {
     },
     logLocation: process.env.LOG_LOCATION,
     microserviceName: process.env.MICROSERVICE_NAME,
-    API_KEY:process.env.API_KEY
-}
+    API_KEY: process.env.API_KEY,
+    ISOMETRIC_DOC_FOLDER: process.env.ISOMETRIC_DOC_FOLDER || 'isometric/document/',
+    ISOMETRIC_IMAGE_FOLDER: process.env.ISOMETRIC_IMAGE_FOLDER || 'isometric/image/',
 
-console.log("config", config)
+
+    PG_VECTOR_ISOMETRIC_DB_TABLENAME: process.env.PG_VECTOR_ISOMETRIC_DB_TABLENAME || 'isometric_vector',
+    DATABASE_CLIENT: process.env.DATABASE_CLIENT,
+
+    SOURCE_EMAIL_ID: process.env.SOURCE_EMAIL_ID,
+
+
+}
 
 export default config;
