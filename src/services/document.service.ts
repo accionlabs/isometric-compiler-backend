@@ -28,7 +28,7 @@ export class DocumentService extends BaseService<Document> {
             uuid,
             content: result?.toString(), // result from above
             metadata: {
-                filename: file.fieldname,
+                filename: file.originalname,
                 fileType: FileType.image,
                 fileUrl,
                 mimetype: file.mimetype
