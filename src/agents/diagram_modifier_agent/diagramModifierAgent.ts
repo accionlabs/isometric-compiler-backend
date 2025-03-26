@@ -43,43 +43,90 @@ export class DiagramModifierAgent {
     private manipulateJson(agent2_result: any, metadata: any) {
         const manager = new ShapeManager(metadata);
         let { action, id, shapeName, position, relativeTo: relativeTo3dShapeId, name, decorator } = agent2_result;
-        let shapeType: string | null = null;
-
-        const actionMap: { [key: string]: string } = {
-            addLayer: "LAYER", addComponent: "COMPONENT", add3D: "3D", addDecorator: "2D",
-            moveDecorator: "2D", move: "3D", remove: "3D", removeDecorator: "2D"
-        };
-        if (action in actionMap) shapeType = actionMap[action];
+        let shapeType = null;
+        if (action === "addLayer") {
+            shapeType = 'LAYER';
+            action = 'add';
+        }
+        if (action === "addComponent") {
+            shapeType = 'COMPONENT';
+            action = 'add';
+        }
+        if (action === "add3D") {
+            shapeType = '3D';
+            action = 'add';
+        }
+        if (action === "addDecorator") {
+            shapeType = '2D';
+            action = 'add';
+        }
+        if (action === "moveDecorator") {
+            shapeType = '2D';
+            action = 'move';
+        }
+        if (action === "move" || action === "remove") {
+            shapeType = '3D';
+        }
+        if (action === "removeDecorator") {
+            shapeType = '2D';
+            action = 'remove';
+        }
         if (shapeName) {
-            const valid = getShapeDetailsFromMaster(decorator || shapeName);
+            //pass decorator
+            const valid = getShapeDetailsFromMaster(decorator ? decorator : shapeName);
             shapeName = valid.name;
             shapeType = valid.type;
-            if (valid.decorator && !decorator) decorator = valid.decorator;
+            if (valid.decorator && !decorator) {
+                decorator = valid.decorator;
+            }
         }
         switch (action) {
             case "add":
-                if (["3D", "COMPONENT", "LAYER"].includes(shapeType!)) {
-                    manager.addShape(relativeTo3dShapeId, shapeName, shapeType || '', name, position, decorator);
-                } else if (shapeType === "2D") {
-                    manager.add2DShape(relativeTo3dShapeId, decorator);
+                switch (shapeType) {
+                    case "3D":
+                    case "COMPONENT":
+                    case "LAYER":
+                        manager.addShape(relativeTo3dShapeId, shapeName, shapeType, name, position, decorator);
+                        break;
+                    case "2D":
+                        manager.add2DShape(relativeTo3dShapeId, decorator);
+                        break;
+                    default:
+                        break;
                 }
                 break;
             case "remove":
-                if (["3D", "COMPONENT", "LAYER"].includes(shapeType!)) {
-                    manager.remove3DShape(id);
-                } else if (shapeType === "2D") {
-                    manager.remove2DShape(relativeTo3dShapeId, decorator);
+                switch (shapeType) {
+                    case "3D":
+                    case "COMPONENT":
+                    case "LAYER":
+                        manager.remove3DShape(id)
+                        break;
+                    case "2D":
+                        manager.remove2DShape(relativeTo3dShapeId, decorator)
+                        break;
+                    default:
+                        break;
                 }
                 break;
             case "move":
-                if (["3D", "COMPONENT", "LAYER"].includes(shapeType!)) {
-                    manager.move3DShape(id, relativeTo3dShapeId, position);
-                } else if (shapeType === "2D") {
-                    manager.move2DShape(id, decorator, relativeTo3dShapeId);
+                switch (shapeType) {
+                    case "3D":
+                    case "COMPONENT":
+                    case "LAYER":
+                        manager.move3DShape(id, relativeTo3dShapeId, position)
+                        break;
+                    case "2D":
+                        manager.move2DShape(id, decorator, relativeTo3dShapeId)
+                        break;
+                    default:
+                        break;
                 }
                 break;
             case "rename":
                 manager.rename(id, name);
+                break;
+            default:
                 break;
         }
         return manager.getAll();

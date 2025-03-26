@@ -1,20 +1,15 @@
 import ShapeManager, { IShape } from './shapesManager';
 import { filterQumByScenarios } from './helpers';
 import blueprintDescription from './blueprint_service_details.json';
-import { Inject, Service } from 'typedi';
 import { PersonaResp } from './qum_agent/qumAgent';
+import { BlueprintResp } from './blueprint_agent/blueprintGenerate';
 
-
-type Blueprint = any; // Define a proper interface for Blueprint as needed
-type Qum = any; // Define a proper interface for Qum as needed
 
 type LayerPosition = {
     layer: string | null;
     position: string;
 };
 
-
-@Service()
 export class DiagramManager {
     private manager: ShapeManager;
     private layers: string[];
@@ -58,7 +53,7 @@ export class DiagramManager {
         this.manager.addShape(currentLayer.id, "Admin and support", "COMPONENT", "Admin & Support", "top", null, blueprintDescription['admin_support_engine']);
     }
 
-    private attachDefaultDataLakeLayer(blueprint: Blueprint): void {
+    private attachDefaultDataLakeLayer(blueprint: BlueprintResp): void {
         const showLabels = true;
         const layer = this.getNextLayer();
         const currentLayer = this.manager.addShape(layer.layer, 'layer 2x2', "LAYER", "Data Lake, Analytics, AI/ML", 'front-right', null, null, true);
@@ -69,7 +64,7 @@ export class DiagramManager {
         this.manager.addShape(currentLayer.id, "Self Service Analytics", "COMPONENT", showLabels ? "Analytics" : null, 'top', null, showLabels ? blueprintDescription['analytics_engine'] : null);
     }
 
-    private attachEventQueueLayer(blueprint: Blueprint) {
+    private attachEventQueueLayer(blueprint: BlueprintResp) {
 
         let metadata: any = {};
         if (blueprint['event_driven_architecture']) {
@@ -88,8 +83,7 @@ export class DiagramManager {
         this.manager.addShape(currentLayer.id, 'Event Based Orchestration', "COMPONENT", "Event Queue", 'top-c1', null, metadata, true)
     }
 
-    public convertBlueprintToIsometric(blueprint: Blueprint, qum: PersonaResp[]): IShape[] {
-        console.log("blueprint***********", blueprint)
+    public convertBlueprintToIsometric(blueprint: BlueprintResp, qum: PersonaResp[]): IShape[] {
         this.attachDefaultPlatformServicesLayer();
         this.attachDefaultDataLakeLayer(blueprint)
         this.attachEventQueueLayer(blueprint)

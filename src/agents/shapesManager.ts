@@ -15,7 +15,7 @@ interface Attached2DShape {
 export interface IShape {
     id: string;
     shape: string;
-    type: 'layer' | 'shape' | 'component';
+    type: 'layer' | 'shape' | 'component' | 'service';
     attached2DShapes: Attached2DShape[];
     position?: any;
     relativeToId?: string | null;
@@ -54,7 +54,7 @@ class ShapeManager {
         const newShape: IShape = {
             id: shapeName.trim() + Math.random().toString(36).substr(2, 5),
             shape: shapeName,
-            type: type === 'LAYER' ? 'layer' : 'shape',
+            type: type === "LAYER" ? 'layer' : 'service',
             attached2DShapes: [],
             position: position,
             relativeToId: relativeTo ?? null,
