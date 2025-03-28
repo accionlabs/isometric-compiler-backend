@@ -1,4 +1,4 @@
-import { IsString, IsOptional, MinLength, IsObject, MaxLength, ValidateNested, IsArray, ValidateIf } from 'class-validator';
+import { IsString, IsOptional, MinLength, IsObject, MaxLength, ValidateNested, IsArray, ValidateIf, IsBoolean } from 'class-validator';
 // Metadata class to define the structure and validation of metadat
 // Category validation class
 export class ChatValidation {
@@ -15,4 +15,18 @@ export class ChatValidation {
 
     @IsOptional()
     currentState?: any[]
+}
+
+export class GitRepoValidation {
+    @IsString()
+    @MinLength(1)
+    repoUrl: string
+
+    @IsString()
+    @MinLength(1)
+    uuid: string
+
+    @IsOptional()
+    @IsBoolean()
+    isCloudStore: boolean
 }

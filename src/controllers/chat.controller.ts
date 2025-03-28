@@ -1,7 +1,7 @@
 import { Inject, Service } from "typedi"
 import { Controller, Delete, Get, Post, Put } from "../core"
 import { NextFunction, Request, Response } from 'express';
-import { ChatValidation } from "../validations/chat.validation";
+import { ChatValidation, GitRepoValidation } from "../validations/chat.validation";
 import { ChatService } from "../services/chat.service";
 import { AWSService } from "../services/aws.service";
 import config from "../configs";
@@ -122,6 +122,47 @@ export default class CategoriesController {
             const { data, total } = await this.chatService.findWithFilters({ uuid: req.params.uuid }, parseInt(page as string, 10), parseInt(limit as string, 10), sort);
 
             res.status(200).json({ data, total });
+        } catch (e) {
+            next(e)
+        }
+    }
+
+    @Post('/upload-git-repo', GitRepoValidation,
+        {
+            authorizedRole: 'all',
+            isAuthenticated: true,
+
+        }, ChatResp
+    )
+    async uploadGitRepo(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { repoUrl, uuid } = req.body
+            const result = await this.mainAgent.processRequest(repoUrl, uuid)
+            const chats: Partial<Chat>[] = [
+                {
+                    uuid: uuid as string,
+                    message: repoUrl as string,
+                    messageType: MessageTypes.TEXT,
+                    metadata: {},
+                    role: MessageRoles.USER
+                },
+                {
+                    uuid,
+                    message: result.feedback,
+                    messageType: !!result.result?.length ? MessageTypes.JSON : MessageTypes.TEXT, // json or text check
+                    metadata: { content: result.result, action: result.action, needFeedback: result.needFeedback },
+                    role: MessageRoles.SYSTEM
+                }
+            ];
+
+            await this.chatService.createMany(chats)
+            return res.status(200).json({
+                uuid,
+                message: result.feedback,
+                messageType: !!result.result?.length ? 'json' : 'text', // json or text check
+                metadata: { content: result.result, action: result.action, needFeedback: result.needFeedback },
+                role: 'system'
+            });
         } catch (e) {
             next(e)
         }
