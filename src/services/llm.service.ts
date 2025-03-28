@@ -204,6 +204,87 @@ export class LlmService {
         }
     }
 
+    // Utility: Merge chunks to fit within a token limit
+    private mergeChunks(chunks: string[], maxLength: number): string[] {
+        const merged: string[] = [];
+        let current = "";
+
+        for (const chunk of chunks) {
+            if (current.length + chunk.length < maxLength) {
+                current += chunk + "\n";
+            } else {
+                merged.push(current);
+                current = chunk;
+            }
+        }
+        if (current) merged.push(current);
+
+        return merged;
+    }
+
+    // Function: Process PDF chunks efficiently without chat history
+    async generateJsonSequentially(
+        contextChunks: string[],
+        promptTemplate: string,
+        dependentVariales: Record<string, string>,
+        llm_model: string = this.DEFAULT_CHAT_LLM_PLATFORM,
+        maxTokensPerBatch = 5000,
+    ) {
+        const model = this.getModel(llm_model);
+        if (!model) throw new Error("No model has been assigned");
+
+        const combinedChunks = this.mergeChunks(contextChunks, maxTokensPerBatch);
+
+        let accumulatedResult: any = {};
+
+        for (const chunk of combinedChunks) {
+            try {
+                if (!promptTemplate.includes('{__CONTEXT__}')) {
+                    promptTemplate = promptTemplate + '\n```{__CONTEXT__}```';
+                }
+                dependentVariales.__CONTEXT__ = chunk;
+                dependentVariales.previousResult = JSON.stringify(accumulatedResult);
+                promptTemplate = `${promptTemplate}\n\n we are giving context in chunks consider the previously generated result as follows \n{previousResult}\n and merge it with newly generated result`;
+                for (const key in dependentVariales) {
+                    promptTemplate = promptTemplate.replaceAll(`{${key}}`, dependentVariales[key]);
+                }
+
+
+                const chats: [string, string][] = [['system', promptTemplate]];
+
+                if (dependentVariales?.conversations?.length > 0) {
+                    for (let i = 0; i < dependentVariales.conversations.length; i += 2) {
+                        chats.push(['human', dependentVariales.conversations[i]]);
+                        chats.push(['assistant', dependentVariales.conversations[i + 1]]);
+                    }
+                }
+
+                if (dependentVariales?.question) {
+                    chats.push(['human', dependentVariales.question]);
+                }
+
+
+                const response = await model.invoke(chats);
+
+                let res
+                // Parse the new result and merge with accumulated data
+                if (typeof response === 'string') {
+                    res = response
+                } else {
+                    res = response.content as string
+                }
+                accumulatedResult = JSON.parse(res.replace(/^[^\[\{]*|[^\]\}]*$/g, ''));
+
+            } catch (error) {
+                console.error(`Error processing chunk: ___________________ ${error}`);
+                // Continue with next chunk even if current fails
+            }
+        }
+
+        return accumulatedResult;
+    }
+
+
     async generateMultiModel(
         mimeType: string,
         buffer: Buffer,

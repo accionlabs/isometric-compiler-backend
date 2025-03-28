@@ -45,27 +45,28 @@ export class UnifiedModelGenerator {
     }
 
     public async regenerateUnifiedModel(uuid: string, filename?: string): Promise<void> {
-        const cache = await getCache(filename);
-        if (cache !== null) {
-            await this.semanticModelService.saveSemanticModel({ uuid, metadata: cache, visualModel: [], status: SemanticModelStatus.ACTIVE });
-            return;
-        }
-
+        // const cache = await getCache(filename);
+        // if (cache !== null) {
+        //     await this.semanticModelService.saveSemanticModel({ uuid, metadata: cache, visualModel: [], status: SemanticModelStatus.ACTIVE });
+        //     return;
+        // }
+        console.log("regenerateUnifiedModel*************************************");
         try {
             let context = "";
             await this.semanticModelService.saveSemanticModel({ uuid, metadata: {}, visualModel: [], status: SemanticModelStatus.INITIATED });
             const documents = await this.pgVectorService.vectorSearch("", { uuid });
-            documents.forEach((x) => (context += "\n\n---\n" + x.pageContent));
+            // documents.forEach((x) => (context += "\n\n---\n" + x.pageContent));
+            const pdfCOntextChunks = documents.map((x) => x.pageContent);
 
             await this.semanticModelService.saveSemanticModel({ uuid, metadata: {}, visualModel: [], status: SemanticModelStatus.GENERATING_BUSINESS_SPEC });
-            const businessSpec = await this.qumAgent.generateQUMBusinessSpec(context);
+            const businessSpec = await this.qumAgent.generateQUMBusinessSpec(pdfCOntextChunks);
             this.loggerService.info(`[Unified Model] QUM Business SPEC generated for ${uuid}`);
 
             const scenarios = extractScenarios(businessSpec?.qum_business?.personas || []);
             this.loggerService.info(`[Unified Model] QUM Scenarios SPEC generated for ${uuid}`);
 
             await this.semanticModelService.saveSemanticModel({ uuid, metadata: {}, visualModel: [], status: SemanticModelStatus.GENERATING_QUM_DESIGN_SPEC });
-            const designSpec = await this.qumAgent.generateQUMDesignSpec(JSON.stringify(scenarios), context);
+            const designSpec = await this.qumAgent.generateQUMDesignSpec(JSON.stringify(scenarios), pdfCOntextChunks);
             this.loggerService.info(`[Unified Model] QUM Design SPEC generated for ${uuid}`);
 
             const qumBlueprint = this.mergeBusinessDesignSpec(businessSpec, designSpec);

@@ -64,25 +64,25 @@ export class QUMAgent {
     @Inject(() => LlmService)
     private readonly llmService: LlmService
 
-    private async extractPersonas(context: string): Promise<{ personas: PersonaExtractorAgentResp[] }> {
-        const placeholders = { __CONTEXT__: context };
-        return await this.llmService.generateJsonWithConversation(__PERSONAS_PROMPT__, placeholders, LLM_PLATFORM.OPENAI);
+    private async extractPersonas(context: string[]): Promise<{ personas: PersonaExtractorAgentResp[] }> {
+        // const placeholders = { __CONTEXT__: context };
+        return await this.llmService.generateJsonSequentially(context, __PERSONAS_PROMPT__, {}, LLM_PLATFORM.OPENAI);
     }
 
-    public async generateQUMBusinessSpec(context: string): Promise<QumBusinessSpecAgenResp> {
+    public async generateQUMBusinessSpec(context: string[]): Promise<QumBusinessSpecAgenResp> {
         const personas = await this.extractPersonas(context);
         const placeholders = {
-            __CONTEXT__: context,
+            // __CONTEXT__: context,
             __PERSONAS__: JSON.stringify(personas),
         };
-        return await this.llmService.generateJsonWithConversation(__BUSINESS_PROMPT__, placeholders, LLM_PLATFORM.OPENAI_MATURE);
+        return await this.llmService.generateJsonSequentially(context, __BUSINESS_PROMPT__, placeholders, LLM_PLATFORM.OPENAI_MATURE);
     }
 
-    public async generateQUMDesignSpec(scenarios: string, context: string): Promise<QumDesignSpecAgentResp> {
+    public async generateQUMDesignSpec(scenarios: string, context: string[]): Promise<QumDesignSpecAgentResp> {
         const placeholders = {
-            __CONTEXT__: context,
+            // __CONTEXT__: context,
             __SCENARIOS__: scenarios,
         };
-        return await this.llmService.generateJsonWithConversation(__DESIGN_PROMPT__, placeholders, LLM_PLATFORM.OPENAI);
+        return await this.llmService.generateJsonSequentially(context, __DESIGN_PROMPT__, placeholders, LLM_PLATFORM.OPENAI);
     }
 }
