@@ -9,6 +9,7 @@ import { DocumentService } from "../services/document.service";
 import { MainAgent } from "../agents/mainAgent";
 import { Chat } from "../entities/chat.entity";
 import { MessageRoles, MessageTypes } from "../enums";
+import { GitInfoService } from "../services/gitInfo.service";
 
 class ChatResp {
     uuid: string;
@@ -41,6 +42,10 @@ export default class CategoriesController {
 
     @Inject(() => MainAgent)
     private readonly mainAgent: MainAgent
+
+    @Inject(() => GitInfoService)
+    private readonly gitInfoService: GitInfoService
+
 
 
 
@@ -137,7 +142,9 @@ export default class CategoriesController {
     async uploadGitRepo(req: Request, res: Response, next: NextFunction) {
         try {
             const { repoUrl, uuid } = req.body
-            const result = await this.mainAgent.processRequest(repoUrl, uuid)
+            const gitExtractedFile = await this.gitInfoService.extractGitInfoInZip(repoUrl, uuid, false);
+            const uploadedDoc = await this.awsService.uploadFile(config.ISOMETRIC_ZIP_FOLDER, gitExtractedFile);
+            const handledDoc = await this.documentService.handleGitInformation({ repoUrl, file: gitExtractedFile, uuid, fileUrl: uploadedDoc.s3Url });
             const chats: Partial<Chat>[] = [
                 {
                     uuid: uuid as string,
@@ -148,9 +155,9 @@ export default class CategoriesController {
                 },
                 {
                     uuid,
-                    message: result.feedback,
-                    messageType: !!result.result?.length ? MessageTypes.JSON : MessageTypes.TEXT, // json or text check
-                    metadata: { content: result.result, action: result.action, needFeedback: result.needFeedback },
+                    message: 'Git repository uploaded successfully',
+                    messageType: MessageTypes.TEXT, // json or text check
+                    metadata: {},
                     role: MessageRoles.SYSTEM
                 }
             ];
@@ -158,9 +165,9 @@ export default class CategoriesController {
             await this.chatService.createMany(chats)
             return res.status(200).json({
                 uuid,
-                message: result.feedback,
-                messageType: !!result.result?.length ? 'json' : 'text', // json or text check
-                metadata: { content: result.result, action: result.action, needFeedback: result.needFeedback },
+                message: 'Git repository uploaded successfully',
+                messageType: MessageTypes.TEXT, // json or text check
+                metadata: {},
                 role: 'system'
             });
         } catch (e) {

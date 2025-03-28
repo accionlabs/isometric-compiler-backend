@@ -18,6 +18,8 @@
     "@langchain/core": "^0.3.42",
     "@langchain/google-genai": "^0.1.11",
     "@langchain/openai": "^0.4.5",
+    "@vscode/vscode-languagedetection": "^1.0.22",
+    "archiver": "^7.0.1",
     "axios": "^1.7.9",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
@@ -34,6 +36,7 @@
     "pdf-parse": "^1.1.1",
     "pg": "^8.14.1",
     "reflect-metadata": "^0.2.2",
+    "simple-git": "^3.27.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "typedi": "^0.10.0",
@@ -43,6 +46,7 @@
     "zod-to-json-schema": "^3.23.3"
   },
   "devDependencies": {
+    "@types/archiver": "^6.0.3",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.7",
