@@ -15,6 +15,7 @@ const config = {
     API_KEY: process.env.API_KEY,
     ISOMETRIC_DOC_FOLDER: process.env.ISOMETRIC_DOC_FOLDER || 'isometric/document/',
     ISOMETRIC_IMAGE_FOLDER: process.env.ISOMETRIC_IMAGE_FOLDER || 'isometric/image/',
+    ISOMETRIC_ZIP_FOLDER: process.env.ISOMETRIC_ZIP_FOLDER || 'isometric/zip/',
 
 
     PG_VECTOR_ISOMETRIC_DB_TABLENAME: process.env.PG_VECTOR_ISOMETRIC_DB_TABLENAME || 'isometric_vector',
