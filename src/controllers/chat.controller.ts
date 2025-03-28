@@ -1,3 +1,4 @@
+import { RepositoryAnalyzerAgent } from './../agents/git_extractor_agent/gitExtractorAgent';
 import { Inject, Service } from "typedi"
 import { Controller, Delete, Get, Post, Put } from "../core"
 import { NextFunction, Request, Response } from 'express';
@@ -42,6 +43,8 @@ export default class CategoriesController {
     @Inject(() => MainAgent)
     private readonly mainAgent: MainAgent
 
+    @Inject(() => RepositoryAnalyzerAgent)
+    private readonly repositoryAnalyzerAgent: RepositoryAnalyzerAgent
 
 
 
@@ -137,7 +140,7 @@ export default class CategoriesController {
     async uploadGitRepo(req: Request, res: Response, next: NextFunction) {
         try {
             const { repoUrl, uuid } = req.body
-            const result = await this.mainAgent.processRequest(repoUrl, uuid)
+            const result = await this.repositoryAnalyzerAgent.analyzeRepository(repoUrl, uuid)
             const chats: Partial<Chat>[] = [
                 {
                     uuid: uuid as string,

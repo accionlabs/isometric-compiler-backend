@@ -1,14 +1,36 @@
-import fs from "fs";
-import path from "path";
-import { exec } from "child_process";
-import { createWriteStream } from "fs";
-import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-import { ModelOperations } from "@vscode/vscode-languagedetection";
-import simpleGit from 'simple-git';
-import hljs from "highlight.js";
 import archiver from "archiver";
+import { exec } from "child_process";
+import fs, { createWriteStream } from "fs";
+import path from "path";
 
 export class GitInfoService {
+
+    private getRepoName(repoUrl: string): string {
+        return repoUrl.split("/").pop()?.replace(".git", "") || '';
+    }
+
+    private execPromise(command: string): Promise<string> {
+        return new Promise((resolve, reject) => {
+            exec(command, (error, stdout, stderr) => {
+                if (error) return reject(error);
+                resolve(stdout || stderr);
+            });
+        });
+    }
+
+    private zipDirectory(sourceDir: string, outPath: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const output = createWriteStream(outPath);
+            const archive = archiver("zip", { zlib: { level: 9 } });
+
+            output.on("close", resolve);
+            archive.on("error", reject);
+
+            archive.pipe(output);
+            archive.directory(sourceDir, false);
+            archive.finalize();
+        });
+    }
     public async extractGitInfoInZip(repoUrl: string, uuid: string, isCloudStore: boolean): Promise<Express.Multer.File> {
         const repoName = this.getRepoName(repoUrl);
         const tempDir = path.join(__dirname, `repo-${uuid}`);
