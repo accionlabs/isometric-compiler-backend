@@ -124,7 +124,6 @@ export class PgVectorService {
                     throw new Error(`Unsupported file type: ${fileMimeType}`);
             }
             const documents = await loader.load();
-            console.log(documents, 'documents')
             return documents.map((doc) => ({
                 pageContent: doc.pageContent,
                 metadata: {
