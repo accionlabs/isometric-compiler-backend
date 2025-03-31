@@ -43,7 +43,7 @@ export class PgVectorService {
                     ...__PG_ISOMTERIC_CONFIG
                 }
             );
-            // await this.typeOrmVectorStore.ensureTableInDatabase();
+            await this.typeOrmVectorStore.ensureTableInDatabase();
         })()
 
 
