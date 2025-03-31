@@ -10,7 +10,11 @@ export interface FileUploadOptions {
 const storage = multer.memoryStorage();
 
 export function fileUpload({ maxSize = 2 * 1024 * 1024,
-    allowedMimeTypes = ["image/jpeg", "image/png", "application/pdf"],
+    allowedMimeTypes = ["image/jpeg", "image/png", "application/pdf",
+        "application/msword", // DOC (Word 97-2003)
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "text/plain"
+    ],
     fileNo = 'single',
     maxCount = 20
 }: FileUploadOptions) {

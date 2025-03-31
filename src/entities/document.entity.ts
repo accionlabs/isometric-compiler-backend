@@ -4,7 +4,9 @@ import { IsEnum, IsString } from 'class-validator';
 
 export enum FileType {
     pdf = 'pdf',
-    image = 'image'
+    image = 'image',
+    text = 'text',
+    docx = 'docx'
 }
 class Metadata {
 
