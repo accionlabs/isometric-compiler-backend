@@ -77,8 +77,7 @@ export default class CategoriesController {
                         return res.status(400).json({ message: 'File format not allowed!' });
                 }
             }
-            const result = await this.mainAgent.processRequest(query, uuid, currentState, file)
-            const chats: Partial<Chat>[] = [
+            const question: Partial<Chat>[] = [
                 {
                     uuid: uuid as string,
                     message: query as string,
@@ -88,7 +87,11 @@ export default class CategoriesController {
                         ...(fileType && { fileType: fileType })
                     },
                     role: MessageRoles.USER
-                },
+                }
+            ]
+            this.chatService.createMany(question)
+            const result = await this.mainAgent.processRequest(query, uuid, currentState, file)
+            const chats: Partial<Chat>[] = [
                 {
                     uuid,
                     message: result.feedback,
