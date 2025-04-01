@@ -4,6 +4,8 @@ import { Controller, Get, Post } from "../core";
 import { NextFunction, Request, Response } from 'express';
 import { EmailService } from "../services/email.service";
 import { SendEmailDto } from "../validations/document.validation";
+import { DocumentService } from "../services/document.service";
+import { Document } from "../entities/document.entity";
 
 @Service()
 @Controller('/documents')
@@ -12,8 +14,30 @@ export class DocumentController {
     @Inject(() => AWSService)
     private readonly awsService: AWSService
 
+    @Inject(() => DocumentService)
+    private readonly documentService: DocumentService
+
     @Inject(() => EmailService)
     private readonly emailService: EmailService
+
+    @Get('/get-document/:uuid', {
+        isAuthenticated: true,
+        authorizedRole: 'all'
+    }, Array<Document>)
+    async getDocumentByUUID(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            const { uuid } = req.params;
+            const document = await this.documentService.getDocumentsByUUID(uuid);
+
+            if (!document) {
+                return res.status(404).json({ message: 'document not found' });
+            }
+
+            return res.json(document);
+        } catch (e) {
+            next(e);
+        }
+    }
 
 
     @Get('/get-signed-url/:path', {
