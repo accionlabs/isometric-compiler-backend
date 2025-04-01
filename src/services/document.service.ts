@@ -72,6 +72,40 @@ export class DocumentService extends BaseService<Document> {
         return { savedDocument };
     }
 
+    async handleTextOrDoc(file: Express.Multer.File, uuid: string, fileUrl: string) {
+        const fileContent = await this.pgVectorService.parseFile(file, uuid);
+        const fileContentText = fileContent.map((content) => content.pageContent).join("\n\n");
+
+        const savedDocument = await this.create({
+            uuid,
+            content: fileContentText, // Extracted text from the document
+            metadata: {
+                filename: file.originalname,
+                fileType: file.mimetype.includes("text") ? FileType.text : FileType.docx,
+                fileUrl,
+                mimetype: file.mimetype,
+            }
+        });
+
+        // Attach metadata for vector indexing
+        const indexedContent = fileContent.map((content) => ({
+            ...content,
+            metadata: {
+                ...content.metadata,
+                fileName: file.originalname,
+                documentId: savedDocument._id,
+                fileUrl,
+                fileType: file.mimetype.includes("text") ? 'text' : 'docx'
+            }
+        }));
+
+        await this.pgVectorService.indexDocument(file, indexedContent);
+        this.unifiedModelGenerator.regenerateUnifiedModel(uuid);
+
+        return { savedDocument };
+    }
+
+
     async getDocumentsByUUID(uuid: string) {
         return this.getRepository().find({ where: { uuid } });
     }

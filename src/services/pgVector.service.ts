@@ -11,11 +11,17 @@ const __PG_ISOMTERIC_CONFIG = {
 }
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf"
-
+import { TextLoader } from "langchain/document_loaders/fs/text";
+import { DocxLoader } from "@langchain/community/document_loaders/fs/docx";
 import { TypeORMVectorStore } from "@langchain/community/vectorstores/typeorm";
 import { Document } from "@langchain/core/documents"
 import { dataSourceOption } from "../configs/database";
 import { LlmService } from "./llm.service";
+
+import path from "path";
+import os from "os";
+import { promises as fs } from "fs";
+
 
 @Service()
 export class PgVectorService {
@@ -98,4 +104,40 @@ export class PgVectorService {
             status: "active"
         });
     }
+
+    async parseFile(file: Express.Multer.File, uuid: string): Promise<Document[]> {
+        const fileMimeType = file.mimetype;
+        const tempFilePath = path.join(os.tmpdir(), file.originalname);
+        try {
+            let loader;
+
+            await fs.writeFile(tempFilePath, file.buffer);
+            switch (file.mimetype) {
+                case "text/plain":
+                    loader = new TextLoader(tempFilePath);
+                    break;
+                case "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+                    loader = new DocxLoader(tempFilePath);
+                    break;
+                }
+                default:
+                    throw new Error(`Unsupported file type: ${fileMimeType}`);
+            }
+            const documents = await loader.load();
+            return documents.map((doc) => ({
+                pageContent: doc.pageContent,
+                metadata: {
+                    fileContentType: file.mimetype,
+                    fileName: file.originalname,
+                    uuid: uuid,
+                    type: "content",
+                    status: "active",
+                },
+            }));
+
+        } finally {
+            await fs.unlink(tempFilePath).catch(() => { });
+        }
+    }
+
 }

@@ -73,6 +73,11 @@ export default class CategoriesController {
                         fileType = 'pdf'
                         handledDoc = await this.documentService.handlePdf(file, uuid, uploadedDoc.s3Url);
                         break;
+                    case "text/plain":
+                    case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                        const uploadedTxt = await this.awsService.uploadFile(config.ISOMETRIC_DOC_FOLDER, file);
+                        handledDoc = await this.documentService.handleTextOrDoc(file, uuid, uploadedTxt.s3Url);
+                        break;
                     default:
                         return res.status(400).json({ message: 'File format not allowed!' });
                 }
