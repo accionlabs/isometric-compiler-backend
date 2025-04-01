@@ -117,11 +117,11 @@ export default class CategoriesController {
     }, { data: Array<Chat>, total: Number })
     async getChats(req: Request, res: Response, next: NextFunction) {
         try {
-            const { page = 1, limit = 10, sortName = 'createdAt', sortOrder = 'asc' } = req.query
+            const { page = 1, limit = 20, sortName = 'createdAt', sortOrder = 'desc' } = req.query
             const sort: Record<string, 1 | -1> = { [sortName as string]: sortOrder === 'asc' ? 1 : -1 };
             const { data, total } = await this.chatService.findWithFilters({ uuid: req.params.uuid }, parseInt(page as string, 10), parseInt(limit as string, 10), sort);
-
-            res.status(200).json({ data, total });
+            const reversedData = data.reverse();
+            res.status(200).json({ data: reversedData, total });
         } catch (e) {
             next(e)
         }
