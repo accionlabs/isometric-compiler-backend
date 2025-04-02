@@ -9,6 +9,7 @@ import { DocumentService } from "../services/document.service";
 import { MainAgent } from "../agents/mainAgent";
 import { Chat } from "../entities/chat.entity";
 import { Agents, MessageRoles, MessageTypes } from "../enums";
+import ApiError from "../utils/apiError";
 
 class ChatResp {
     uuid: string;
@@ -124,6 +125,22 @@ export default class CategoriesController {
             const { data, total } = await this.chatService.findWithFilters({ uuid: req.params.uuid, agent: agent as string }, parseInt(page as string, 10), parseInt(limit as string, 10), sort);
             const reversedData = data.reverse();
             res.status(200).json({ data: reversedData, total });
+        } catch (e) {
+            next(e)
+        }
+    }
+
+    @Get('/:id', {
+        authorizedRole: 'all',
+        isAuthenticated: true
+    }, Chat)
+    async getChatById(req: Request, res: Response, next: NextFunction) {
+        try {
+            const chat = await this.chatService.findOneById(Number(req.params.id));
+            if (!chat) {
+                throw new ApiError('chat not found', 404)
+            }
+            res.status(200).json(chat);
         } catch (e) {
             next(e)
         }
