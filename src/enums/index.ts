@@ -30,3 +30,9 @@ export enum MessageRoles {
   SYSTEM = 'system',
   USER = 'user'
 }
+
+export enum Agents {
+  REQUIREMENT_AGENT = 'requirement_agent',
+  UX_AGENT = 'ux_agent',
+  ARCHITECTURE_AGENT = 'architecture_agent',
+}

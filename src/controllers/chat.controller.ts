@@ -8,7 +8,8 @@ import config from "../configs";
 import { DocumentService } from "../services/document.service";
 import { MainAgent } from "../agents/mainAgent";
 import { Chat } from "../entities/chat.entity";
-import { MessageRoles, MessageTypes } from "../enums";
+import { Agents, MessageRoles, MessageTypes } from "../enums";
+import ApiError from "../utils/apiError";
 
 class ChatResp {
     uuid: string;
@@ -54,7 +55,7 @@ export default class CategoriesController {
     async processChat(req: Request, res: Response, next: NextFunction) {
         try {
 
-            const { uuid, query, currentState } = req.body
+            const { uuid, query, currentState, agent = Agents.REQUIREMENT_AGENT } = req.body
             const { file } = req
             let messageType: MessageTypes = MessageTypes.TEXT;
             let handledDoc = null;
@@ -66,42 +67,41 @@ export default class CategoriesController {
                     case 'image/png':
                         const uploadedImage = await this.awsService.uploadFile(config.ISOMETRIC_IMAGE_FOLDER, file);
                         fileType = 'image'
-                        handledDoc = await this.documentService.handleImage(file, uuid, uploadedImage.s3Url);
+                        handledDoc = await this.documentService.handleImage(file, uuid, uploadedImage.s3Url, agent);
                         break;
                     case 'application/pdf':
                         const uploadedDoc = await this.awsService.uploadFile(config.ISOMETRIC_DOC_FOLDER, file);
                         fileType = 'pdf'
-                        handledDoc = await this.documentService.handlePdf(file, uuid, uploadedDoc.s3Url);
+                        handledDoc = await this.documentService.handlePdf(file, uuid, uploadedDoc.s3Url, agent);
                         break;
                     default:
                         return res.status(400).json({ message: 'File format not allowed!' });
                 }
             }
-            const question: Partial<Chat>[] = [
-                {
-                    uuid: uuid as string,
-                    message: query as string,
-                    messageType: messageType,
-                    metadata: {
-                        ...(!!handledDoc?.savedDocument._id && { documentId: handledDoc.savedDocument._id }), ...(!!handledDoc?.savedDocument?.metadata?.fileUrl && { fileUrl: handledDoc?.savedDocument.metadata.fileUrl }),
-                        ...(fileType && { fileType: fileType })
-                    },
-                    role: MessageRoles.USER
-                }
-            ]
-            this.chatService.createMany(question)
-            const result = await this.mainAgent.processRequest(query, uuid, currentState, file)
-            const chats: Partial<Chat>[] = [
-                {
-                    uuid,
-                    message: result.feedback,
-                    messageType: !!result.result?.length ? MessageTypes.JSON : MessageTypes.TEXT, // json or text check
-                    metadata: { content: result.result, action: result.action, needFeedback: result.needFeedback, isGherkinScriptQuery: result.isGherkinScriptQuery },
-                    role: MessageRoles.SYSTEM
-                }
-            ];
+            const question: Partial<Chat> =
+            {
+                uuid: uuid as string,
+                message: query as string,
+                messageType: messageType,
+                agent,
+                metadata: {
+                    ...(!!handledDoc?.savedDocument._id && { documentId: handledDoc.savedDocument._id }), ...(!!handledDoc?.savedDocument?.metadata?.fileUrl && { fileUrl: handledDoc?.savedDocument.metadata.fileUrl }),
+                    ...(fileType && { fileType: fileType })
+                },
+                role: MessageRoles.USER
+            }
 
-            await this.chatService.createMany(chats)
+            const result = await this.mainAgent.processRequest(query, uuid, currentState, file)
+            const chats: Partial<Chat> = {
+                uuid,
+                message: result.feedback,
+                messageType: !!result.result?.length ? MessageTypes.JSON : MessageTypes.TEXT, // json or text check
+                metadata: { content: result.result, action: result.action, needFeedback: result.needFeedback, isGherkinScriptQuery: result.isGherkinScriptQuery },
+                role: MessageRoles.SYSTEM
+            }
+
+            await this.chatService.create(question)
+            await this.chatService.create(chats)
             return res.status(200).json({
                 uuid,
                 message: result.feedback,
@@ -120,11 +120,27 @@ export default class CategoriesController {
     }, { data: Array<Chat>, total: Number })
     async getChats(req: Request, res: Response, next: NextFunction) {
         try {
-            const { page = 1, limit = 20, sortName = 'createdAt', sortOrder = 'desc' } = req.query
+            const { page = 1, limit = 20, sortName = 'createdAt', sortOrder = 'desc', agent = Agents.REQUIREMENT_AGENT } = req.query
             const sort: Record<string, 1 | -1> = { [sortName as string]: sortOrder === 'asc' ? 1 : -1 };
-            const { data, total } = await this.chatService.findWithFilters({ uuid: req.params.uuid }, parseInt(page as string, 10), parseInt(limit as string, 10), sort);
+            const { data, total } = await this.chatService.findWithFilters({ uuid: req.params.uuid, agent: agent as string }, parseInt(page as string, 10), parseInt(limit as string, 10), sort);
             const reversedData = data.reverse();
             res.status(200).json({ data: reversedData, total });
+        } catch (e) {
+            next(e)
+        }
+    }
+
+    @Get('/:id', {
+        authorizedRole: 'all',
+        isAuthenticated: true
+    }, Chat)
+    async getChatById(req: Request, res: Response, next: NextFunction) {
+        try {
+            const chat = await this.chatService.findOneById(Number(req.params.id));
+            if (!chat) {
+                throw new ApiError('chat not found', 404)
+            }
+            res.status(200).json(chat);
         } catch (e) {
             next(e)
         }

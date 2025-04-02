@@ -22,11 +22,12 @@ export class DocumentService extends BaseService<Document> {
     @Inject(() => UnifiedModelGenerator)
     private readonly unifiedModelGenerator: UnifiedModelGenerator
 
-    async handleImage(file: Express.Multer.File, uuid: string, fileUrl: string) {
+    async handleImage(file: Express.Multer.File, uuid: string, fileUrl: string, agent: string) {
         const result = await this.diagramGeneratorAgent.extractInfoFromImage(file.mimetype, file.buffer);
         const savedDocument = await this.create({
             uuid,
             content: result?.toString(), // result from above
+            agent,
             metadata: {
                 filename: file.originalname,
                 fileType: FileType.image,
@@ -50,12 +51,13 @@ export class DocumentService extends BaseService<Document> {
         return { savedDocument };
     }
 
-    async handlePdf(file: Express.Multer.File, uuid: string, fileUrl: string) {
+    async handlePdf(file: Express.Multer.File, uuid: string, fileUrl: string, agent: string) {
         let fileContent = await this.pgVectorService.parsePdf(file, uuid);
         const fileContentText = fileContent.map((content) => content.pageContent).join("\n\n");
         const savedDocument = await this.create({
             uuid,
             content: fileContentText,// fileContentText from above
+            agent,
             metadata: {
                 filename: file.originalname,
                 fileType: FileType.image,
