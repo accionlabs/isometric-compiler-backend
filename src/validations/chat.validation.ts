@@ -14,8 +14,9 @@ export class ChatValidation {
     @MaxLength(50)
     uuid: string
 
+    @IsOptional()
     @IsEnum(Agents)
-    agents: Agents
+    agents?: Agents
 
     @IsOptional()
     currentState?: any[]
