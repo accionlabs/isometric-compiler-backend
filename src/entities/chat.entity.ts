@@ -1,6 +1,6 @@
 import { Entity, Column } from 'typeorm';
 import { BaseEntity } from './base.entity';
-import { MessageRoles, MessageTypes } from '../enums';
+import { Agents, MessageRoles, MessageTypes } from '../enums';
 
 @Entity('chats')
 export class Chat extends BaseEntity {
@@ -13,6 +13,9 @@ export class Chat extends BaseEntity {
 
   @Column({ type: 'enum', enum: MessageTypes, nullable: false })
   messageType: MessageTypes;
+
+  @Column({ type: 'varchar', nullable: false, default: Agents.REQUIREMENT_AGENT })
+  agent: string;
 
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any>;
