@@ -67,7 +67,7 @@ export class DocumentController {
                 throw new ApiError("file url not exist", 404)
             }
             const awsResp = await this.awsService.getPresignedUrlFromUrl(document.metadata?.fileUrl);
-            return res.json(awsResp)
+            return res.send(awsResp)
         } catch (e) {
             next(e)
         }
