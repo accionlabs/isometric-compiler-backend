@@ -6,6 +6,7 @@ import { EmailService } from "../services/email.service";
 import { SendEmailDto } from "../validations/document.validation";
 import { DocumentService } from "../services/document.service";
 import { Document } from "../entities/document.entity";
+import ApiError from "../utils/apiError";
 
 @Service()
 @Controller('/documents')
@@ -48,6 +49,24 @@ export class DocumentController {
         try {
             const { path } = req.params
             const awsResp = await this.awsService.getPresignedUrl(path);
+            return res.json(awsResp)
+        } catch (e) {
+            next(e)
+        }
+    }
+
+    @Get('/get-signed-url-by-id/:id', {
+        isAuthenticated: true,
+        authorizedRole: 'all'
+    }, String)
+    async getSignedUrlById(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req.params
+            const document = await this.documentService.findOneById(Number(id))
+            if (!document?.metadata?.fileUrl) {
+                throw new ApiError("file url not exist", 404)
+            }
+            const awsResp = await this.awsService.getPresignedUrlFromUrl(document.metadata?.fileUrl);
             return res.json(awsResp)
         } catch (e) {
             next(e)
