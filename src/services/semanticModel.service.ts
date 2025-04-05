@@ -2,6 +2,7 @@ import { Service } from "typedi";
 import { AppDataSource } from "../configs/database";
 import { SemanticModel } from "../entities/semantic_models.entity";
 import { BaseService } from "./base.service";
+import { Agents, SemanticModelStatus } from "../enums";
 
 @Service()
 export class SemanticModelService extends BaseService<SemanticModel> {
@@ -29,4 +30,13 @@ export class SemanticModelService extends BaseService<SemanticModel> {
 
     }
 
+
+    async getAgentStatus(uuid: string) {
+        const semanticModel = await this.getRepository().findOne({ where: { uuid }, select: ["agentStatus"] });
+        const defaultAgentStaus = Object.values(Agents).reduce((acc, key) => {
+            acc[key] = SemanticModelStatus.ACTIVE;
+            return acc;
+        }, {} as Record<string, SemanticModelStatus>);
+        return { ...defaultAgentStaus, ...semanticModel?.agentStatus }
+    }
 }

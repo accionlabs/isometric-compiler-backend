@@ -33,6 +33,9 @@ export enum MessageRoles {
 
 export enum Agents {
   REQUIREMENT_AGENT = 'requirement_agent',
-  UX_AGENT = 'ux_agent',
+  DESIGN_AGENT = 'design_agent',
   ARCHITECTURE_AGENT = 'architecture_agent',
+  BREEZE_AGENT = 'breeze_agent',
+  ATDD_AGENT = 'atdd_agent',
+  CODE_GENERATION_AGENT = 'code_generation_agent',
 }
