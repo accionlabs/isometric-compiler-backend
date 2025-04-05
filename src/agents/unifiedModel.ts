@@ -44,19 +44,21 @@ export class UnifiedModelGenerator {
         return personas;
     }
 
-    public async regenerateUnifiedModel(uuid: string, agent: string, filename: string): Promise<void> {
-        const cache = await getCache(filename);
-        if (cache !== null) {
-            await this.semanticModelService.saveSemanticModel({
-                uuid,
-                metadata: cache,
-                visualModel: [],
-                status: SemanticModelStatus.ACTIVE
-            });
-            return;
-        }
+    public async regenerateUnifiedModel(uuid: string, agent: string, documentId: number, filename?: string): Promise<void> {
+        console.log("regenerateUnifiedModel checking in cache", uuid, agent, filename);
+        // const cache = await getCache(filename);
+        // if (cache !== null) {
+        //     await this.semanticModelService.saveSemanticModel({
+        //         uuid,
+        //         metadata: cache,
+        //         visualModel: [],
+        //         status: SemanticModelStatus.ACTIVE
+        //     });
+        //     return;
+        // }
 
         try {
+            console.log("regenerateUnifiedModel started", uuid, agent, filename);
             let context = "";
             await this.semanticModelService.saveSemanticModel({
                 uuid,
@@ -65,17 +67,16 @@ export class UnifiedModelGenerator {
                 status: SemanticModelStatus.INITIATED,
                 agentStatus: { [agent]: SemanticModelStatus.INITIATED }
             });
-            // const documents = await this.pgVectorService.vectorSearch("", { uuid });
-            // documents.forEach((x) => (context += "\n\n---\n" + x.pageContent));
 
-            const documents = await this.documentService.getDocumentsByUUID(uuid);
-            console.log("filename", filename);
-            context = documents.find((x) => x.metadata?.filename === filename)?.content || '';
-
-            if (!context) {
-                throw new Error("No context found for the given filename");
+            const document = await this.documentService.findOneById(documentId);
+            if (!document) {
+                throw new Error("Document not found");
             }
-
+            context = document?.content || "";
+            if (!context) {
+                throw new Error("No content found for the given filename");
+            }
+            context = `${context}\n\n---\n documentName: ${document?.metadata?.filename} documentId: ${document?._id}`;
             await this.semanticModelService.saveSemanticModel({
                 uuid,
                 metadata: {},
@@ -109,7 +110,7 @@ export class UnifiedModelGenerator {
                 agentStatus: { [agent]: SemanticModelStatus.ACTIVE }
             });
         } catch (error: any) {
-            this.loggerService.error("[Unified Model] Error generating unified model:", error.message);
+            this.loggerService.error(`[Unified Model] Error generating unified model: for uuid: ${uuid} documentId: ${documentId}`, error);
         }
     }
 }
