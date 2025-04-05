@@ -47,7 +47,7 @@ export class DocumentService extends BaseService<Document> {
             }
         }
         await this.pgVectorService.indexDocument(file, [fileContent]);
-        this.unifiedModelGenerator.regenerateUnifiedModel(uuid, agent);
+        this.unifiedModelGenerator.regenerateUnifiedModel(uuid, agent, file.originalname);
         return { savedDocument };
     }
 
@@ -70,7 +70,7 @@ export class DocumentService extends BaseService<Document> {
             return { ...content, metadata: { ...content.metadata, fileName: file.originalname, documentId: savedDocument._id, fileUrl, fileType: 'pdf' } };
         });
         await this.pgVectorService.indexDocument(file, fileContent);
-        this.unifiedModelGenerator.regenerateUnifiedModel(uuid, agent);
+        this.unifiedModelGenerator.regenerateUnifiedModel(uuid, agent, file.originalname);
         return { savedDocument };
     }
 
