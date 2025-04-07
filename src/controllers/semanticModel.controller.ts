@@ -47,4 +47,17 @@ export default class SematicModelController {
             next(e);
         }
     }
+
+    @Get('/get-agent-status/:uuid', {
+        isAuthenticated: true,
+        authorizedRole: 'all'
+    }, SemanticModel)
+    async getAgentStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const status = await this.semanticModelService.getAgentStatus(req.params.uuid);
+            res.status(200).json(status);
+        } catch (e) {
+            next(e);
+        }
+    }
 }

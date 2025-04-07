@@ -29,4 +29,7 @@ export class SemanticModel {
         enum: SemanticModelStatus
     })
     status: SemanticModelStatus = SemanticModelStatus.INITIATED
+
+    @Column({ type: 'jsonb', nullable: true })
+    agentStatus: Record<string, SemanticModelStatus>;
 }
