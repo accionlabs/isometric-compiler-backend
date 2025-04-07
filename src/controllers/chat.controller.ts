@@ -95,6 +95,7 @@ export default class CategoriesController {
             const chats: Partial<Chat> = {
                 uuid,
                 message: result.feedback,
+                agent,
                 messageType: !!result.result?.length ? MessageTypes.JSON : MessageTypes.TEXT, // json or text check
                 metadata: { content: result.result, action: result.action, needFeedback: result.needFeedback, isGherkinScriptQuery: result.isGherkinScriptQuery },
                 role: MessageRoles.SYSTEM
