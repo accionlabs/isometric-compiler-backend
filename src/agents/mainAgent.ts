@@ -7,7 +7,7 @@ import { GeneralQueryAgent } from './general_query_agent/generalQueryAgent';
 import { DiagramModifierAgent } from './diagram_modifier_agent/diagramModifierAgent';
 import { LoggerService } from '../services/logger.service';
 
-type MainAgentRespone = {
+interface MainAgentRespone {
     feedback: string;
     action: any[];
     result: any;
@@ -16,6 +16,21 @@ type MainAgentRespone = {
     email?: string;
     isGherkinScriptQuery?: boolean;
 };
+
+
+// interface MainAgentResponeMetadata {
+//     isEmailQuery?: boolean;
+//     email?: string;
+//     isGherkinScriptQuery?: boolean;
+//     needFeedback: boolean;
+// };
+
+// export interface AgentResposne<T, R> {
+//     feedback: string;
+//     action?: any[];
+//     result: R;
+//     metadata: T;
+// }
 
 @Service()
 export class MainAgent {
@@ -67,7 +82,7 @@ export class MainAgent {
             currentState = JSON.parse(currentState);
         }
 
-        let defaultResponse: MainAgentRespone = {
+        let defaultResponse = {
             feedback: classifierResult.feedback,
             action: [],
             result: currentState,
@@ -88,7 +103,7 @@ export class MainAgent {
                     ...defaultResponse,
                     needFeedback: !creationResult.isometric,
                     result: creationResult.isometric || defaultResponse.result,
-                    feedback: creationResult.message || '',
+                    feedback: creationResult.message || defaultResponse.feedback || '',
                 };
             } else {
                 const creationResult = await this.diagramGeneratorAgent.generateIsometricJSONFromBlueprint(uuid);
@@ -96,7 +111,7 @@ export class MainAgent {
                     ...defaultResponse,
                     needFeedback: !creationResult.isometric,
                     result: creationResult.isometric || defaultResponse.result,
-                    feedback: creationResult.message || '',
+                    feedback: creationResult.message || defaultResponse.feedback || '',
                 };
             }
         } else if (classifierResult.isGeneralQuery) {
