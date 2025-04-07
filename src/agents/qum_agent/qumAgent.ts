@@ -17,7 +17,7 @@ export interface PersonaResp {
     outcomes?: OutecomeReps[]
 }
 
-interface OutecomeReps {
+export interface OutecomeReps {
     outcome: string
     scenarios?: ScenarioResp[]
     citations?: CitationResp[]
