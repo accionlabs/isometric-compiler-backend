@@ -4,30 +4,10 @@ import * as fs from "fs";
 import { SemanticModelService } from "../../services/semanticModel.service";
 import { Inject, Service } from "typedi";
 import { LoggerService } from "../../services/logger.service";
+import { OutecomeReps, PersonaResp, ScenarioResp } from "../qum_agent/qumAgent";
 
 const __GHERKIN_PROMPT__ = fs.readFileSync("./src/agents/gherkin_agent/GHERKIN_SCRIPT_AGENT.md", "utf8");
 
-interface Scenario {
-    title: string;
-    steps: string[];
-}
-
-interface Outcome {
-    scenarios: Scenario[];
-}
-
-interface Persona {
-    outcomes: Outcome[];
-}
-
-interface SemanticModel {
-    metadata?: {
-        qum?: Persona[];
-        gherkin?: any;
-    };
-    visualModel?: any;
-    status?: string;
-}
 
 @Service()
 export class GherkinAgent {
@@ -46,13 +26,13 @@ export class GherkinAgent {
         this.gherkinPrompt = __GHERKIN_PROMPT__;
     }
 
-    private extractScenariosNested(personas?: Persona[]): Scenario[] {
-        const scenarios: Scenario[] = [];
+    private extractScenariosNested(personas?: PersonaResp[]): ScenarioResp[] {
+        const scenarios: ScenarioResp[] = [];
         if (!personas) return scenarios;
 
         for (const persona of personas) {
-            for (const outcome of persona.outcomes) {
-                scenarios.push(...outcome.scenarios);
+            for (const outcome of persona?.outcomes ?? []) {
+                scenarios.push(...outcome?.scenarios ?? []);
             }
         }
         return scenarios;
@@ -66,25 +46,69 @@ export class GherkinAgent {
         return await this.llmService.generateJsonWithConversation(this.gherkinPrompt, placeholders, LLM_PLATFORM.OPENAI);
     }
 
+    // public async getGherkinScript(uuid: string, question: string): Promise<any> {
+    //     const semanticModel: SemanticModel | null = await this.semanticModelService.findByUuid(uuid);
+    //     if (!semanticModel) {
+    //         throw new Error(`Semantic model not found for UUID: ${uuid}`);
+    //     }
+
+    //     const extractedScenarios = this.extractScenariosNested(semanticModel.metadata?.qum);
+    //     const gherkinScript = await this.generateGherkinScriptFromScenario(JSON.stringify(extractedScenarios), question);
+
+    //     this.loggerService.info(`[Unified Model] Gherkin Script generated for ${uuid}`);
+
+    //     await this.semanticModelService.saveSemanticModel({
+    //         uuid,
+    //         metadata: { ...semanticModel.metadata, gherkin: gherkinScript },
+    //         visualModel: semanticModel.visualModel,
+    //         // status: semanticModel.status
+    //     });
+
+    //     return gherkinScript;
+    // }
+
     public async getGherkinScript(uuid: string, question: string): Promise<any> {
-        const semanticModel: SemanticModel | null = await this.semanticModelService.findByUuid(uuid);
+        const semanticModel = await this.semanticModelService.findByUuid(uuid);
         if (!semanticModel) {
             throw new Error(`Semantic model not found for UUID: ${uuid}`);
         }
+        let outcomdes: OutecomeReps[] | never[] = []
+        semanticModel.metadata?.qum?.forEach((persona: PersonaResp) => {
+            outcomdes = [...outcomdes, ...persona.outcomes ?? []]
+        })
+        return this.generateGherkinFromOutcomes(outcomdes);
+    }
 
-        const extractedScenarios = this.extractScenariosNested(semanticModel.metadata?.qum);
-        const gherkinScript = await this.generateGherkinScriptFromScenario(JSON.stringify(extractedScenarios), question);
+    private generateGherkinFromOutcomes(inputs: OutecomeReps[]): string {
+        const allLines: string[] = [];
 
-        this.loggerService.info(`[Unified Model] Gherkin Script generated for ${uuid}`);
+        inputs.forEach((input) => {
+            allLines.push(`Feature: ${input.outcome}`);
+            allLines.push('');
 
-        await this.semanticModelService.saveSemanticModel({
-            uuid,
-            metadata: { ...semanticModel.metadata, gherkin: gherkinScript },
-            visualModel: semanticModel.visualModel,
-            // status: semanticModel.status
+            input.scenarios?.forEach((scenarioObj) => {
+                allLines.push(`  # ${scenarioObj.description}`);
+                allLines.push(`  Scenario: ${scenarioObj.scenario}`);
+
+                let isFirstAction = true;
+
+                scenarioObj?.steps?.forEach((step) => {
+                    step?.actions?.forEach((action) => {
+                        const keyword = isFirstAction ? '    When' : '    And';
+                        allLines.push(`${keyword} ${action.action}`);
+                        isFirstAction = false;
+                    });
+                });
+
+                allLines.push('');
+            });
+
+            allLines.push(''); // Extra line between features
         });
 
-        return gherkinScript;
+        return allLines.join('\n');
     }
+
+
 }
 
