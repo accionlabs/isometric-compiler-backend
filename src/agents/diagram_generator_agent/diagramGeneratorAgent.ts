@@ -143,6 +143,7 @@ export class DiagramGeneratorAgent {
         const result = this.parseJSON(response);
         const mappedIsometric = await this.mapQumWithIsometricModel(result.result, uuid);
         return {
+            message: "Isometric diagram generated successfully!",
             description: result.description,
             isometric: this.convertFlatToIsometric(mappedIsometric || result.result),
             result: result.result
