@@ -67,16 +67,22 @@ export class GherkinAgent {
     //     return gherkinScript;
     // }
 
-    public async getGherkinScript(uuid: string, question: string): Promise<any> {
+    public async getGherkinScript(uuid: string, question: string): Promise<{ feedback: string, result: string | null }> {
         const semanticModel = await this.semanticModelService.findByUuid(uuid);
         if (!semanticModel) {
-            throw new Error(`Semantic model not found for UUID: ${uuid}`);
+            return {
+                feedback: 'Semantic model not found, Please upload some project artifacts.',
+                result: null,
+            }
         }
         let outcomdes: OutecomeReps[] | never[] = []
         semanticModel.metadata?.qum?.forEach((persona: PersonaResp) => {
             outcomdes = [...outcomdes, ...persona.outcomes ?? []]
         })
-        return this.generateGherkinFromOutcomes(outcomdes);
+        return {
+            feedback: 'A Gherkin script has beend generated successfully.',
+            result: this.generateGherkinFromOutcomes(outcomdes),
+        }
     }
 
     private generateGherkinFromOutcomes(inputs: OutecomeReps[]): string {

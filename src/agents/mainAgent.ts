@@ -82,6 +82,17 @@ export class MainAgent {
             currentState = JSON.parse(currentState);
         }
 
+        if (!classifierResult) {
+            return {
+                feedback: 'Classifier agent failed to process the request.',
+                action: [],
+                result: currentState,
+                needFeedback: true,
+                isEmailQuery: false,
+                isGherkinScriptQuery: false,
+            };
+        }
+
         let defaultResponse = {
             feedback: classifierResult.feedback,
             action: [],
@@ -93,7 +104,9 @@ export class MainAgent {
         };
 
         if (classifierResult.isGherkinScriptQuery) {
-            defaultResponse.result = await this.gherKinAgent.getGherkinScript(uuid, question);
+            const gherkinResponse = await this.gherKinAgent.getGherkinScript(uuid, question);
+            defaultResponse.result = gherkinResponse.result;
+            defaultResponse.feedback = gherkinResponse.feedback;
         } else if (classifierResult.isDiagramCreationQuery) {
             let image = newDocumentUpload ? this.getImage(newDocumentUpload) : this.getImage(classifierResult.documentReferences);
 
