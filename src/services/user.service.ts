@@ -9,7 +9,7 @@ import ApiError from '../utils/apiError';
 export class UserService extends BaseService<User> {
 
   constructor() {
-    super(AppDataSource.getMongoRepository(User));
+    super(AppDataSource.getRepository(User));
   }
 
   /**

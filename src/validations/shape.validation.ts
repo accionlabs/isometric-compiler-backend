@@ -1,4 +1,4 @@
-import { IsString, IsEnum, IsOptional, IsArray, IsJSON, IsNotEmpty, ValidateNested, IsObject, isArray, IsMongoId } from 'class-validator';
+import { IsString, IsEnum, IsOptional, IsArray, IsJSON, IsNotEmpty, ValidateNested, IsObject, isArray, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ShapeType } from '../entities/shape.entity';
 
@@ -7,16 +7,16 @@ import { ShapeType } from '../entities/shape.entity';
 export class MetadataValidation {
   @IsString()
   @IsOptional()
-  description: string;  
+  description: string;
 
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  applicationTypes?: string[];  
+  applicationTypes?: string[];
 
   @IsOptional()
   @IsObject()
-  customProperties?: Record<string, any>;  
+  customProperties?: Record<string, any>;
 
   @IsOptional()
   @ValidateNested({ each: true })
@@ -34,54 +34,54 @@ export class ValidShape {
 
   @IsString()
   @IsNotEmpty()
-  name: string;  
+  name: string;
 
   @IsEnum(ShapeType, { message: 'type must be one of the following values: 2D, 3D, COMPONENT, LAYERS' })
-  type: ShapeType;  
+  type: ShapeType;
 
   @IsOptional()
   @IsString()
-  attachTo?: string;  
+  attachTo?: string;
 
   @IsOptional()
   @IsString()
-  svgFile?: string;  
+  svgFile?: string;
 
   @IsString()
   @IsOptional()
-  svgContent: string;  
+  svgContent: string;
 
   @IsString()
   @IsOptional()
-  version?: string;  
+  version?: string;
 
   @IsOptional()
   @ValidateNested()
   @Type(() => MetadataValidation)
-  metadata?: MetadataValidation;  
+  metadata?: MetadataValidation;
 
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
-  tags: string[];  
+  tags: string[];
 
   @IsString()
   @IsOptional()
-  author: string;  
+  author: string;
 
   @IsOptional()
   @IsArray()
   @IsObject({ each: true })
-  diagram_components?:  Record<string, any>[]; 
+  diagram_components?: Record<string, any>[];
 
   @IsOptional()
   @IsArray()
   @IsObject({ each: true })
   attachment_points?: Record<string, any>[];
-  
-  @IsMongoId()
-  @IsNotEmpty({ message: 'Category is required and must be a valid MongoDB ObjectId.' })
-  category: string;
+
+  @IsNumber()
+  @IsNotEmpty({ message: 'Category is required' })
+  category: number;
 }
 
 
@@ -92,46 +92,46 @@ export class ShapeUpdateValidation {
 
   @IsString()
   @IsOptional()
-  name: string;  
+  name: string;
 
   @IsEnum(ShapeType)
   @IsOptional()
-  type: ShapeType;  
+  type: ShapeType;
 
   @IsOptional()
   @IsString()
-  attachTo?: string;  
+  attachTo?: string;
 
   @IsOptional()
   @IsString()
-  svgFile?: string;  
+  svgFile?: string;
 
   @IsString()
   @IsOptional()
-  svgContent: string;  
+  svgContent: string;
 
   @IsString()
   @IsOptional()
-  version?: string;  
+  version?: string;
 
   @IsOptional()
   @ValidateNested()
   @Type(() => MetadataValidation)
-  metadata?: MetadataValidation;  
+  metadata?: MetadataValidation;
 
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
-  tags: string[];  
+  tags: string[];
 
   @IsString()
   @IsOptional()
-  author: string;  
+  author: string;
 
   @IsOptional()
   @IsArray()
   @IsObject({ each: true })
-  diagram_components?:  Record<string, any>[]; 
+  diagram_components?: Record<string, any>[];
 
   @IsOptional()
   @IsArray()

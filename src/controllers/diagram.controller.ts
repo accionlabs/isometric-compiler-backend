@@ -37,14 +37,14 @@ export default class DiagramController {
     async updateDiagram(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const diagramId = req.params.id;
-            const diagram = await this.diagramService.findOneById(diagramId);
+            const diagram = await this.diagramService.findOneById(Number(diagramId));
             if (!diagram) {
                 throw new ApiError('diagram not found', 404)
             }
-            if (diagram.author.toString() != req?.user?._id.toString()) {
+            if (diagram.author._id.toString() != req?.user?._id.toString()) {
                 throw new ApiError('not authorized to edit', 403)
             }
-            const updatedDiagram = await this.diagramService.update(diagramId, req.body);
+            const updatedDiagram = await this.diagramService.update(Number(diagramId), req.body);
             res.status(200).json(updatedDiagram);
         } catch (e) {
             next(e)
@@ -53,7 +53,7 @@ export default class DiagramController {
     }
 
     @Get('/', {
-        isAuthenticated: false,
+        isAuthenticated: true,
         authorizedRole: 'all'
     },
         { data: Array<Diagram>, total: Number })
@@ -65,7 +65,7 @@ export default class DiagramController {
 
             const allowedFields: (keyof Diagram)[] = ['name', 'version'];
 
-            const filters = FilterUtils.buildMongoFilters<Diagram>(query, allowedFields);
+            const filters = FilterUtils.buildPostgresFilters<Diagram>(query, allowedFields);
             const { data, total } = await this.diagramService.findWithFilters(filters, parseInt(page as string, 10), parseInt(limit as string, 10), sort);
 
             res.status(200).json({ data, total });
@@ -83,18 +83,36 @@ export default class DiagramController {
         {})
     async deleteDiagramById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const diagram = await this.diagramService.findOneById(req.params.id);
+            const diagram = await this.diagramService.findOneById(Number(req.params.id));
             if (!diagram) {
                 throw new ApiError('Diagram not found', 404)
             }
-            if (diagram.author.toString() != req?.user?._id.toString()) {
+            if (diagram.author._id.toString() != req?.user?._id.toString()) {
                 throw new ApiError('unauthorized to delete', 403)
             }
-            await this.diagramService.delete(req.params.id);
+            await this.diagramService.delete(Number(req.params.id));
             res.status(200).json({ message: 'Diagram deleted successfully' });
         } catch (e) {
             next(e)
         }
 
     }
+
+    @Get('/byUUId/:uuid', {
+        isAuthenticated: true,
+        authorizedRole: 'all'
+    }, Diagram)
+    async getDiagramById(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const diagram = await this.diagramService.getDiagramByUUID(req.params.uuid);
+            if (!diagram) {
+                throw new ApiError('diagram not found', 404)
+            }
+            res.status(200).json(diagram);
+        } catch (e) {
+            next(e)
+        }
+
+    }
+
 }

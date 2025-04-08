@@ -27,7 +27,7 @@ function extractValidationErrors(errors: ValidationError[], parentKey: string = 
 
 
 export function validateRequest(validSchema: any) {
-  return function (req: Request, res: Response, next: NextFunction) {
+  return async function (req: Request, res: Response, next: NextFunction) {
     // Transform the request body into an instance of the validation schema
     const transformedBody = plainToInstance(validSchema, req.body);
 

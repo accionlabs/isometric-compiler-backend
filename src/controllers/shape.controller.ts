@@ -8,6 +8,7 @@ import { ObjectId } from 'mongodb';
 import { Shape } from '../entities/shape.entity';
 import { FilterUtils } from '../utils/filterUtils';
 import ApiError from '../utils/apiError';
+import { In } from 'typeorm';
 
 
 @Service() // Marks this class as injectable
@@ -24,17 +25,17 @@ export default class ShapeController {
     isAuthenticated: true,
     authorizedRole: 'all'
   },
-  {data: Array<Shape>, total: Number})
+    { data: Array<Shape>, total: Number })
   async getAllShapes(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const {page = 1, limit = 1000, sortName = 'createdAt', sortOrder = 'asc', ...query} = req.query
+      const { page = 1, limit = 1000, sortName = 'createdAt', sortOrder = 'asc', ...query } = req.query
       const sort: Record<string, 1 | -1> = { [sortName as string]: sortOrder === 'asc' ? 1 : -1 };
 
 
       const allowedFields: (keyof Shape)[] = ['name', 'type', 'author', 'tags', 'category', 'version'];
-       
-      const filters = FilterUtils.buildMongoFilters<Shape>(query, allowedFields);
-      const { data, total } = await this.shapeService.findWithFiltersAndCategoryDetails(filters, parseInt(page as string, 10), parseInt(limit as string, 10), sort);
+
+      const filters = FilterUtils.buildPostgresFilters<Shape>(query, allowedFields);
+      const { data, total } = await this.shapeService.findWithFilters(filters, parseInt(page as string, 10), parseInt(limit as string, 10), sort, { category: true });
 
       res.status(200).json({ data, total });
     } catch (e) {
@@ -47,11 +48,11 @@ export default class ShapeController {
     isAuthenticated: true,
     authorizedRole: 'all'
   },
-  Shape)
+    Shape)
   async getShapeById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const shape = await this.shapeService.findOneById(req.params.id);
-      if(!shape) {
+      const shape = await this.shapeService.findOneById(Number(req.params.id), { category: true });
+      if (!shape) {
         throw new ApiError('Shape not found', 404)
       }
       res.status(200).json(shape);
@@ -65,14 +66,14 @@ export default class ShapeController {
     isAuthenticated: true,
     authorizedRole: 'all'
   },
-  {})
+    {})
   async deleteShapeById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const shape = await this.shapeService.findOneById(req.params.id);
-      if(!shape) {
+      const shape = await this.shapeService.findOneById(Number(req.params.id));
+      if (!shape) {
         throw new ApiError('Shape not found', 404)
       }
-      await this.shapeService.delete(req.params.id);
+      await this.shapeService.delete(Number(req.params.id));
       res.status(200).json({ message: 'Shape deleted successfully' });
     } catch (e) {
       next(e)
@@ -84,12 +85,12 @@ export default class ShapeController {
     isAuthenticated: true,
     authorizedRole: 'all'
   },
-  Shape)
+    Shape)
   async updateShape(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const shapeId = req.params.id;
       const { category, ...reqBody } = req.body;
-      const updatedShape = await this.shapeService.update(shapeId, { ...reqBody, category: new ObjectId(category) });
+      const updatedShape = await this.shapeService.update(Number(shapeId), { ...reqBody, category });
       res.status(200).json(updatedShape);
     } catch (e) {
       next(e)
@@ -102,11 +103,11 @@ export default class ShapeController {
     authorizedRole: 'all',
     isAuthenticated: true
   },
-  Shape)
+    Shape)
   async createShape(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const {category,...reqBody} = req.body
-      const newShape = await this.shapeService.create({...reqBody,category:new ObjectId(category)});
+      const { category, ...reqBody } = req.body
+      const newShape = await this.shapeService.create({ ...reqBody, category });
       res.status(201).json(newShape);
     } catch (e) {
       next(e)
@@ -117,24 +118,21 @@ export default class ShapeController {
     isAuthenticated: true,
     authorizedRole: 'all'
   },
-  { data: Array<Shape>,
-    total: Number})
+    {
+      data: Array<Shape>,
+      total: Number
+    })
   async getShapesByCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-        const { categoryId } = req.params;
-        if(!ObjectId.isValid(categoryId)){
-          throw new ApiError("incorrect category ID", 404)
-        }
-
-        const childCategories = await this.categoryService.getChildrenCategories(categoryId)
-        const categoriesTobeSearched: ObjectId[] = [new ObjectId(categoryId)]
-        childCategories.forEach(chCategory => categoriesTobeSearched.push(chCategory._id))
-        // @ts-ignore
-        const shapes = await this.shapeService.findWithFiltersAndCategoryDetails({ category: { '$in': categoriesTobeSearched } }
-        );
-        res.json(shapes);
+      const { categoryId } = req.params;
+      const childCategories = await this.categoryService.getChildrenCategories(categoryId)
+      const categoriesTobeSearched: number[] = [Number(categoryId)]
+      childCategories.forEach(chCategory => categoriesTobeSearched.push(chCategory._id))
+      const shapes = await this.shapeService.findWithFilters({ category: In(categoriesTobeSearched) }, 1, 1000, { name: 'ASC' }, { category: true }
+      );
+      res.json(shapes);
     } catch (e) {
-        next(e)
+      next(e)
     }
   }
 
@@ -142,18 +140,20 @@ export default class ShapeController {
     isAuthenticated: true,
     authorizedRole: 'all'
   },
-  { data: Array<Shape>,
-    total: Number})
-  async searchShapes(req: Request, res: Response, next: NextFunction): Promise<void> {  
+    {
+      data: Array<Shape>,
+      total: Number
+    })
+  async searchShapes(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { text } = req.params;
       const { page = 1, limit = 1000 } = req.query;
-      
+
       const allowedFields: (keyof Shape)[] = ['name', 'type', 'author', 'tags', 'category', 'version'];
 
-      const filters = FilterUtils.buildMongoFilters<Shape>(req.query, allowedFields);
+      const filters = FilterUtils.buildPostgresFilters<Shape>(req.query, allowedFields);
 
-      const { data, total } = await this.shapeService.search(text as string, {  filters, limit: parseInt(limit as string, 10), page: parseInt(page as string, 10) });
+      const { data, total } = await this.shapeService.search(text as string, { filters, limit: parseInt(limit as string, 10), page: parseInt(page as string, 10) });
       res.status(200).json({ data, total });
     } catch (e) {
       next(e)

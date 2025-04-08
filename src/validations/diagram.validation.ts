@@ -2,7 +2,6 @@ import {
     IsString,
     IsNotEmpty,
     IsOptional,
-    IsMongoId,
     IsObject,
     IsArray,
     IsEnum,
@@ -25,7 +24,7 @@ export class CreateDiagramValidation {
     @IsOptional()
     @IsArray()
     @IsObject({ each: true })
-    diagramComponents?:  Record<string, any>[]; 
+    diagramComponents?: Record<string, any>[];
 }
 
 export class DiagramUpdateValidation {
@@ -47,7 +46,7 @@ export class DiagramUpdateValidation {
 
     @IsOptional()
     @IsEnum(['active', 'inactive'], {
-    message: 'Status must be either active or inactive',
+        message: 'Status must be either active or inactive',
     })
     status?: 'active' | 'inactive';
 }

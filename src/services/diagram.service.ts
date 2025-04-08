@@ -7,13 +7,17 @@ import { AppDataSource } from "../configs/database";
 export class DiagramService extends BaseService<Diagram> {
 
     constructor() {
-        super(AppDataSource.getMongoRepository(Diagram));
-        setTimeout(() => {
-            this.getRepository().createCollectionIndex({ name: 1, version: 1 }, { unique: true, name: 'diagram_name_version_unique' });
-        }, 10000);
+        super(AppDataSource.getRepository(Diagram));
+        // setTimeout(() => {
+        //     this.getRepository().createCollectionIndex({ name: 1, version: 1 }, { unique: true, name: 'diagram_name_version_unique' });
+        // }, 10000);
 
 
     }
-
+    async getDiagramByUUID(uuid: string) {
+        return this.getRepository().createQueryBuilder('doc')
+            .where("doc.metadata ->> 'uuid' = :uuid", { uuid })
+            .getOne();
+    }
 
 }
