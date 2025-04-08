@@ -14,6 +14,10 @@ export class DiagramService extends BaseService<Diagram> {
 
 
     }
-
+    async getDiagramByUUID(uuid: string) {
+        return this.getRepository().createQueryBuilder('doc')
+            .where("doc.metadata ->> 'uuid' = :uuid", { uuid })
+            .getOne();
+    }
 
 }

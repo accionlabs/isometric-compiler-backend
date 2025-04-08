@@ -97,4 +97,22 @@ export default class DiagramController {
         }
 
     }
+
+    @Get('/byUUId/:uuid', {
+        isAuthenticated: true,
+        authorizedRole: 'all'
+    }, Diagram)
+    async getDiagramById(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const diagram = await this.diagramService.getDiagramByUUID(req.params.uuid);
+            if (!diagram) {
+                throw new ApiError('diagram not found', 404)
+            }
+            res.status(200).json(diagram);
+        } catch (e) {
+            next(e)
+        }
+
+    }
+
 }
