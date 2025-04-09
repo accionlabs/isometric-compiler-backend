@@ -1,5 +1,6 @@
 import { Entity, Column, UpdateDateColumn, CreateDateColumn, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
 import { SemanticModelStatus } from '../enums';
+import { IShape } from '../agents/shapesManager';
 
 @Entity('semantic_models')
 export class SemanticModel {
@@ -20,7 +21,7 @@ export class SemanticModel {
     metadata: Record<string, any>;
 
     @Column({ type: 'jsonb', nullable: true })
-    visualModel: Record<string, any>;
+    visualModel: IShape[];
 
     @Column({
         type: 'varchar',
