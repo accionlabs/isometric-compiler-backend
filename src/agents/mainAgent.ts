@@ -119,7 +119,7 @@ export class MainAgent {
                     feedback: creationResult.message || defaultResponse.feedback || '',
                 };
             } else {
-                const creationResult = await this.diagramGeneratorAgent.generateIsometricJSONFromBlueprint(uuid);
+                const creationResult = await this.diagramGeneratorAgent.getIsometricJSONFromUUId(uuid);
                 defaultResponse = {
                     ...defaultResponse,
                     needFeedback: !creationResult.isometric,

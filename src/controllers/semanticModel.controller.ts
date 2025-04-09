@@ -27,6 +27,7 @@ export default class SematicModelController {
             }
             res.status(200).json({
                 ...sematicModel.metadata,
+                visualModel: sematicModel.visualModel,
                 status: sematicModel.status
             });
         } catch (e) {
