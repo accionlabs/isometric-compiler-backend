@@ -65,9 +65,9 @@ export class DocumentService extends BaseService<Document> {
         });
         await this.pgVectorService.indexDocument(file, fileContent);
         if (agent === Agents.ARCHITECTURE_AGENT) {
-            this.diagramGeneratorAgent.generateIsometricJSONFromBlueprint(uuid)
+            this.diagramGeneratorAgent.generateIsometricJSONFromBlueprint(uuid, file.originalname)
         } else {
-            this.unifiedModelGenerator.regenerateUnifiedModel(uuid, agent, savedDocument._id);
+            this.unifiedModelGenerator.regenerateUnifiedModel(uuid, agent, savedDocument._id, file.originalname);
         }
         return savedDocument
     }

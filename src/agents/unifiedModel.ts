@@ -46,24 +46,21 @@ export class UnifiedModelGenerator {
 
     public async regenerateUnifiedModel(uuid: string, agent: string, documentId: number, filename?: string): Promise<void> {
         console.log("regenerateUnifiedModel checking in cache", uuid, agent, filename);
-        // const cache = await getCache(filename);
-        // if (cache !== null) {
-        //     await this.semanticModelService.saveSemanticModel({
-        //         uuid,
-        //         metadata: cache,
-        //         visualModel: [],
-        //         status: SemanticModelStatus.ACTIVE
-        //     });
-        //     return;
-        // }
+        const cache = await getCache(filename);
+        if (cache !== null) {
+            await this.semanticModelService.saveSemanticModel({
+                uuid,
+                metadata: cache,
+                status: SemanticModelStatus.ACTIVE
+            });
+            return;
+        }
 
         try {
             console.log("regenerateUnifiedModel started", uuid, agent, filename);
             let context = "";
             await this.semanticModelService.saveSemanticModel({
                 uuid,
-                metadata: {},
-                visualModel: [],
                 status: SemanticModelStatus.INITIATED,
                 agentStatus: { [agent]: SemanticModelStatus.INITIATED }
             });
@@ -79,8 +76,6 @@ export class UnifiedModelGenerator {
             context = `${context}\n\n---\n documentName: ${document?.metadata?.filename} documentId: ${document?._id}`;
             await this.semanticModelService.saveSemanticModel({
                 uuid,
-                metadata: {},
-                visualModel: [],
                 status: SemanticModelStatus.GENERATING_BUSINESS_SPEC,
                 agentStatus: { [agent]: SemanticModelStatus.GENERATING_BUSINESS_SPEC }
             });
@@ -92,8 +87,6 @@ export class UnifiedModelGenerator {
 
             await this.semanticModelService.saveSemanticModel({
                 uuid,
-                metadata: {},
-                visualModel: [],
                 status: SemanticModelStatus.GENERATING_QUM_DESIGN_SPEC,
                 agentStatus: { [agent]: SemanticModelStatus.GENERATING_QUM_DESIGN_SPEC }
             });
@@ -105,7 +98,6 @@ export class UnifiedModelGenerator {
             await this.semanticModelService.saveSemanticModel({
                 uuid,
                 metadata: unifiedModel,
-                visualModel: [],
                 status: SemanticModelStatus.ACTIVE,
                 agentStatus: { [agent]: SemanticModelStatus.ACTIVE }
             });

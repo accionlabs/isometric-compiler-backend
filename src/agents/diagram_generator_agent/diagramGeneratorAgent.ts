@@ -18,6 +18,7 @@ import { SemanticModelService } from '../../services/semanticModel.service';
 import { BreezeExtractorAgent } from '../blueprint_agent/blueprintGenerate';
 import { Document } from '../../entities/document.entity';
 import { DiagramManager } from '../diagramManager';
+import { getCache } from '../cache';
 
 const IMAGE_PROMPT = fs.readFileSync("./src/agents/diagram_generator_agent/DIAGRAM_GENERATOR_AGENT.md", 'utf8');
 const IMAGE_EXTRACTOR_PROMPT = fs.readFileSync("./src/agents/diagram_generator_agent/IMAGE_EXTRACTOR_AGENT.md", 'utf8');
@@ -97,7 +98,19 @@ export class DiagramGeneratorAgent {
         }
     }
 
-    async generateIsometricJSONFromBlueprint(uuid: string): Promise<IsometricJsonAgenResp> {
+    async generateIsometricJSONFromBlueprint(uuid: string, filename?: string): Promise<IsometricJsonAgenResp> {
+        const cache = await getCache(filename);
+        if (cache !== null) {
+            await this.semanticModelService.saveSemanticModel({
+                uuid,
+                visualModel: cache,
+                status: SemanticModelStatus.ACTIVE
+            });
+            return {
+                message: "Blueprint is successfully generated!",
+                isometric: cache
+            }
+        }
         const semanticModel = await this.semanticModelService.findByUuid(uuid);
         const documents = await this.pgVectorService.vectorSearch("", { uuid });
 
