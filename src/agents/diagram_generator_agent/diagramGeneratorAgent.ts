@@ -99,12 +99,6 @@ export class DiagramGeneratorAgent {
 
     async generateIsometricJSONFromBlueprint(uuid: string): Promise<IsometricJsonAgenResp> {
         const semanticModel = await this.semanticModelService.findByUuid(uuid);
-        if (semanticModel?.visualModel?.length) {
-            return {
-                message: semanticModel?.status === 'active' ? "Blueprint is successfully generated!" : "Blueprint generated without mapping functional and design requirements as functional unified artifacts are still under process!",
-                isometric: semanticModel?.visualModel
-            };
-        }
         const documents = await this.pgVectorService.vectorSearch("", { uuid });
 
         if (!documents?.length) {
@@ -130,6 +124,17 @@ export class DiagramGeneratorAgent {
             message: semanticModel?.status === 'active' ? "Blueprint is successfully generated!" : "Blueprint generated without mapping functional and design requirements as functional unified artifacts are still under process!",
             isometric: visualModel
         };
+    }
+
+    async getIsometricJSONFromUUId(uuid: string): Promise<IsometricJsonAgenResp> {
+        const semanticModel = await this.semanticModelService.findByUuid(uuid);
+        if (semanticModel?.visualModel?.length) {
+            return {
+                message: semanticModel?.status === 'active' ? "Blueprint is successfully generated!" : "Blueprint generated without mapping functional and design requirements as functional unified artifacts are still under process!",
+                isometric: semanticModel?.visualModel
+            };
+        }
+        return this.generateIsometricJSONFromBlueprint(uuid);
     }
 
     async generateIsometricJSONFromImage(image: string, uuid: string, availableDocuments: Document[]): Promise<IsometricJsonAgenResp> {

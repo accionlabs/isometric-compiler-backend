@@ -26,10 +26,10 @@ export class SemanticModel {
     @Column({
         type: 'varchar',
         length: 50,
-        default: SemanticModelStatus.INITIATED,
+        default: SemanticModelStatus.ACTIVE,
         enum: SemanticModelStatus
     })
-    status: SemanticModelStatus = SemanticModelStatus.INITIATED
+    status: SemanticModelStatus = SemanticModelStatus.ACTIVE
 
     @Column({ type: 'jsonb', nullable: true })
     agentStatus: Record<string, SemanticModelStatus>;

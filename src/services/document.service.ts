@@ -6,6 +6,7 @@ import { PgVectorService } from "./pgVector.service";
 import { DiagramGeneratorAgent } from "../agents/diagram_generator_agent/diagramGeneratorAgent";
 import { Document as VectorDocument } from "@langchain/core/documents"
 import { UnifiedModelGenerator } from "../agents/unifiedModel";
+import { Agents } from "../enums";
 
 @Service()
 export class DocumentService extends BaseService<Document> {
@@ -24,39 +25,31 @@ export class DocumentService extends BaseService<Document> {
 
     async handleImage(file: Express.Multer.File, uuid: string, fileUrl: string, agent: string) {
         const result = await this.diagramGeneratorAgent.extractInfoFromImage(file.mimetype, file.buffer);
-        const savedDocument = await this.create({
-            uuid,
-            content: result?.toString(), // result from above
-            agent,
-            metadata: {
-                filename: file.originalname,
-                fileType: FileType.image,
-                fileUrl,
-                mimetype: file.mimetype
-
-            }
-        });
         const fileContent: VectorDocument = {
             pageContent: result?.toString() || '',
             metadata: {
-                documentId: savedDocument._id,
                 fileName: file.originalname,
                 fileUrl,
                 fileType: 'image',
                 uuid: uuid
             }
         }
-        await this.pgVectorService.indexDocument(file, [fileContent]);
-        this.unifiedModelGenerator.regenerateUnifiedModel(uuid, agent, savedDocument._id);
+        const savedDocument = await this.saveAndIndexDocument(file, [fileContent], uuid, fileUrl, agent, FileType.image)
+
         return { savedDocument };
     }
 
     async handlePdf(file: Express.Multer.File, uuid: string, fileUrl: string, agent: string) {
         let fileContent = await this.pgVectorService.parsePdf(file, uuid);
-        const fileContentText = fileContent.map((content) => content.pageContent).join("\n\n");
+        const savedDocument = await this.saveAndIndexDocument(file, fileContent, uuid, fileUrl, agent, FileType.pdf)
+
+        return { savedDocument };
+    }
+
+    private async saveAndIndexDocument(file: Express.Multer.File, fileContent: VectorDocument[], uuid: string, fileUrl: string, agent: string, fileType: FileType) {
         const savedDocument = await this.create({
             uuid,
-            content: fileContentText,// fileContentText from above
+            content: fileContent.map((content) => content.pageContent).join('\n'), // result from above
             agent,
             metadata: {
                 filename: file.originalname,
@@ -66,13 +59,21 @@ export class DocumentService extends BaseService<Document> {
 
             }
         });
+
         fileContent = fileContent.map((content) => {
-            return { ...content, metadata: { ...content.metadata, fileName: file.originalname, documentId: savedDocument._id, fileUrl, fileType: 'pdf' } };
+            return { ...content, metadata: { ...content.metadata, fileName: file.originalname, documentId: savedDocument._id, fileUrl, fileType: fileType } };
         });
         await this.pgVectorService.indexDocument(file, fileContent);
-        this.unifiedModelGenerator.regenerateUnifiedModel(uuid, agent, savedDocument._id);
-        return { savedDocument };
+        if (agent === Agents.ARCHITECTURE_AGENT) {
+            this.diagramGeneratorAgent.generateIsometricJSONFromBlueprint(uuid)
+        } else {
+            this.unifiedModelGenerator.regenerateUnifiedModel(uuid, agent, savedDocument._id);
+        }
+        return savedDocument
     }
+
+
+
 
     async getDocumentsByUUID(uuid: string) {
         return this.getRepository().find({ where: { uuid } });
