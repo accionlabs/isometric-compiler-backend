@@ -36,18 +36,6 @@ export default class SematicModelController {
 
     }
 
-    @Post('/save', SaveSemanticModelDto, {
-        isAuthenticated: true,
-        authorizedRole: 'all'
-    }, SemanticModel)
-    async saveSemanticModel(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-            const semanticModel = await this.semanticModelService.saveSemanticModel(req.body);
-            res.status(200).json(semanticModel);
-        } catch (e) {
-            next(e);
-        }
-    }
 
     @Get('/get-agent-status/:uuid', {
         isAuthenticated: true,
@@ -71,7 +59,12 @@ export default class SematicModelController {
     async updateSemanticModel(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { metadata, visualModel } = req.body;
-            const updated = await this.semanticModelService.updateSemanticModel(req.params.uuid, { metadata, visualModel });
+
+            const userId = req?.user?._id
+            if (!userId) {
+                throw new ApiError('user not found', 401)
+            }
+            const updated = await this.semanticModelService.updateSemanticModel(req.params.uuid, { metadata, visualModel, userId });
             res.status(200).json(updated);
         } catch (e) {
             next(e);

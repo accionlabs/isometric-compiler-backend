@@ -60,7 +60,7 @@ export class SemanticModelService extends BaseService<SemanticModel> {
         });
     }
 
-    async updateSemanticModel(uuid: string, data: Partial<Pick<SemanticModel, 'metadata' | 'visualModel'>>): Promise<SemanticModel> {
+    async updateSemanticModel(uuid: string, data: Partial<Pick<SemanticModel, 'metadata' | 'visualModel' | 'userId'>>): Promise<SemanticModel> {
         if (!uuid) {
             throw new ApiError("UUID is required", 400);
         }
@@ -75,15 +75,19 @@ export class SemanticModelService extends BaseService<SemanticModel> {
             if (!semanticModel) {
                 throw new ApiError("Semantic model not found", 404);
             }
-            const semanticModelCopy = JSON.parse(JSON.stringify(semanticModel)); // Deep copy to avoid mutation
 
-            if (data.metadata) {
-                semanticModel.metadata = data.metadata;
+            const currentSemanticModel = JSON.stringify(data.metadata)
+            const existingSemanticModel = JSON.stringify(semanticModel.metadata)
+            if (currentSemanticModel === existingSemanticModel) {
+                throw new ApiError("No changes detected", 400);
             }
 
-            if (data.visualModel?.length) {
-                semanticModel.visualModel = data.visualModel;
-            }
+            const semanticModelCopy = { ...semanticModel, metadata: JSON.parse(existingSemanticModel) };
+
+            Object.assign(semanticModel, {
+                ...data,
+                metadata: data.metadata, // keep the merged one
+            });
             await this.semanticModelHistoryService.createSemanticModelHistory(semanticModelCopy.uuid, semanticModelCopy);
             return await repo.save(semanticModel);
         });

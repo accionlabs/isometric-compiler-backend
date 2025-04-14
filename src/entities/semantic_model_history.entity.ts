@@ -3,7 +3,7 @@ import { SemanticModelStatus } from '../enums';
 import { IShape } from '../agents/shapesManager';
 
 @Entity('semantic_model_histories')
-export class SemanticModelHistroy {
+export class SemanticModelHistory {
     @PrimaryGeneratedColumn()
     _id: number;
 
@@ -33,4 +33,7 @@ export class SemanticModelHistroy {
 
     @Column({ type: 'jsonb', nullable: true })
     agentStatus: Record<string, SemanticModelStatus>;
+
+    @Column({ type: 'integer', nullable: true })
+    userId: number; // ID of the user who created the semantic model history
 }
