@@ -1,10 +1,11 @@
-import { Service } from "typedi";
+import { Inject, Service } from "typedi";
 import { AppDataSource } from "../configs/database";
 import { SemanticModel } from "../entities/semantic_models.entity";
 import { BaseService } from "./base.service";
 import { Agents, SemanticModelStatus } from "../enums";
 import { PersonaResp } from "../agents/qum_agent/qumAgent";
 import ApiError from "../utils/apiError";
+import { SemanticModelHistoryService } from "./semanticModelHistory.service";
 
 type Qum = {
     qum: PersonaResp[];
@@ -12,6 +13,10 @@ type Qum = {
 
 @Service()
 export class SemanticModelService extends BaseService<SemanticModel> {
+
+    @Inject(() => SemanticModelHistoryService)
+    private readonly semanticModelHistoryService: SemanticModelHistoryService
+
     constructor() {
         super(AppDataSource.getRepository(SemanticModel));
     }
@@ -33,6 +38,10 @@ export class SemanticModelService extends BaseService<SemanticModel> {
             });
 
             if (semanticModel) {
+                const semanticModelCopy = JSON.parse(JSON.stringify(semanticModel)); // Deep copy to avoid mutation
+                if (semanticModelCopy.metadata || semanticModelCopy.visualModel?.length) {
+                    await this.semanticModelHistoryService.createSemanticModelHistory(semanticModelCopy.uuid, semanticModelCopy);
+                }
                 if (data.metadata && semanticModel.metadata) {
                     semanticModel.metadata = this.mergeJsons(semanticModel.metadata as Qum | undefined, data.metadata as Qum);
                 } else if (data.metadata) {
@@ -66,15 +75,16 @@ export class SemanticModelService extends BaseService<SemanticModel> {
             if (!semanticModel) {
                 throw new ApiError("Semantic model not found", 404);
             }
+            const semanticModelCopy = JSON.parse(JSON.stringify(semanticModel)); // Deep copy to avoid mutation
 
-            if (data.metadata !== undefined) {
+            if (data.metadata) {
                 semanticModel.metadata = data.metadata;
             }
 
-            if (data.visualModel !== undefined) {
+            if (data.visualModel?.length) {
                 semanticModel.visualModel = data.visualModel;
             }
-
+            await this.semanticModelHistoryService.createSemanticModelHistory(semanticModelCopy.uuid, semanticModelCopy);
             return await repo.save(semanticModel);
         });
     }
