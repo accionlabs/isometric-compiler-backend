@@ -4,6 +4,7 @@ import { SemanticModel } from "../entities/semantic_models.entity";
 import { BaseService } from "./base.service";
 import { Agents, SemanticModelStatus } from "../enums";
 import { PersonaResp } from "../agents/qum_agent/qumAgent";
+import ApiError from "../utils/apiError";
 
 type Qum = {
     qum: PersonaResp[];
@@ -49,6 +50,35 @@ export class SemanticModelService extends BaseService<SemanticModel> {
             return await repo.save(semanticModel);
         });
     }
+
+    async updateSemanticModel(uuid: string, data: Partial<Pick<SemanticModel, 'metadata' | 'visualModel'>>): Promise<SemanticModel> {
+        if (!uuid) {
+            throw new ApiError("UUID is required", 400);
+        }
+
+        return this.getRepository().manager.transaction(async (manager) => {
+            const repo = manager.getRepository(SemanticModel);
+            const semanticModel = await repo.findOne({
+                where: { uuid },
+                lock: { mode: "pessimistic_write" },
+            });
+
+            if (!semanticModel) {
+                throw new ApiError("Semantic model not found", 404);
+            }
+
+            if (data.metadata !== undefined) {
+                semanticModel.metadata = data.metadata;
+            }
+
+            if (data.visualModel !== undefined) {
+                semanticModel.visualModel = data.visualModel;
+            }
+
+            return await repo.save(semanticModel);
+        });
+    }
+
 
 
 

@@ -4,7 +4,7 @@ import { SemanticModel } from "../entities/semantic_models.entity";
 import { NextFunction, Request, Response } from 'express';
 import { SemanticModelService } from "../services/semanticModel.service";
 import ApiError from "../utils/apiError";
-import { SaveSemanticModelDto } from "../validations/semanticModel.validation";
+import { SaveSemanticModelDto, UpdateSemanticModelDto } from "../validations/semanticModel.validation";
 
 @Service()
 @Controller('/semantic-model')
@@ -61,4 +61,21 @@ export default class SematicModelController {
             next(e);
         }
     }
+
+
+
+    @Post('/update', UpdateSemanticModelDto, {
+        isAuthenticated: true,
+        authorizedRole: 'all'
+    }, SemanticModel)
+    async updateSemanticModel(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { uuid, metadata, visualModel } = req.body;
+            const updated = await this.semanticModelService.updateSemanticModel(uuid, { metadata, visualModel });
+            res.status(200).json(updated);
+        } catch (e) {
+            next(e);
+        }
+    }
+
 }
