@@ -83,7 +83,7 @@ class OutcomeRepsDto {
 }
 
 class MetadataDto {
-    @IsObject()
+    @IsArray()
     @ValidateNested({ each: true })
     @Type(() => PersonaRespDto)
     qum: PersonaRespDto[];
@@ -121,8 +121,6 @@ export class SaveSemanticModelDto {
 
 
 export class UpdateSemanticModelDto {
-    @IsString()
-    uuid: string;
 
     @IsOptional()
     @ValidateNested()
@@ -130,7 +128,7 @@ export class UpdateSemanticModelDto {
     metadata?: MetadataDto;
 
     @IsOptional()
-    @IsObject()
+    @IsArray()
     visualModel?: Record<string, any>;
 }
 

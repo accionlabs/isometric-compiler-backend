@@ -1,5 +1,5 @@
 import { Inject, Service } from "typedi";
-import { Controller, Get, Post } from "../core";
+import { Controller, Get, Post, Put } from "../core";
 import { SemanticModel } from "../entities/semantic_models.entity";
 import { NextFunction, Request, Response } from 'express';
 import { SemanticModelService } from "../services/semanticModel.service";
@@ -64,14 +64,14 @@ export default class SematicModelController {
 
 
 
-    @Post('/update', UpdateSemanticModelDto, {
+    @Put('/:uuid', UpdateSemanticModelDto, {
         isAuthenticated: true,
         authorizedRole: 'all'
     }, SemanticModel)
     async updateSemanticModel(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { uuid, metadata, visualModel } = req.body;
-            const updated = await this.semanticModelService.updateSemanticModel(uuid, { metadata, visualModel });
+            const { metadata, visualModel } = req.body;
+            const updated = await this.semanticModelService.updateSemanticModel(req.params.uuid, { metadata, visualModel });
             res.status(200).json(updated);
         } catch (e) {
             next(e);
