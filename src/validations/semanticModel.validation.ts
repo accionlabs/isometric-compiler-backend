@@ -1,4 +1,4 @@
-import { IsArray, IsEnum, IsNotEmpty, IsObject, IsOptional, IsString, ValidateNested } from "class-validator";
+import { IsArray, IsEnum, IsNotEmpty, IsObject, IsOptional, IsString, IsUUID, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 import { SemanticModelStatus } from "../enums";
 
@@ -131,4 +131,14 @@ export class UpdateSemanticModelDto {
     @IsArray()
     visualModel?: Record<string, any>;
 }
+
+
+export class SemanticModelDto {
+    @IsUUID()
+    uuid: string;
+
+    @IsString()
+    historyId: string;
+}
+
 

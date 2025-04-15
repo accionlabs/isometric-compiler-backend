@@ -13,13 +13,32 @@ export class SemanticModelHistoryService extends BaseService<SemanticModelHistor
         return this.getRepository().find({ where: { uuid } });
     }
 
+    async getHistoryByUuid(uuid: string): Promise<SemanticModelHistory[]> {
+        if (!uuid) {
+            throw new Error("UUID is required");
+        }
+
+        return this.getRepository().find({
+            where: { uuid },
+            order: { createdAt: 'DESC' }
+        });
+    }
+
     async createSemanticModelHistory(uuid: string, data: Partial<SemanticModelHistory>): Promise<SemanticModelHistory> {
         if (!uuid) {
             throw new Error("uuid is required");
         }
 
         const semanticModelHistory = this.getRepository().create({ uuid, ...data });
-        return await this.getRepository().save(semanticModelHistory);
+        const result = await this.getRepository().save(semanticModelHistory);
+        return result
     }
+
+    async findByIdAndUuid(historyId: number, uuid: string): Promise<SemanticModelHistory | null> {
+        return this.getRepository().findOne({
+            where: { _id: historyId, uuid },
+        });
+    }
+
 
 }

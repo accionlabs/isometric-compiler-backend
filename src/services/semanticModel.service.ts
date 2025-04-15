@@ -60,7 +60,10 @@ export class SemanticModelService extends BaseService<SemanticModel> {
         });
     }
 
-    async updateSemanticModel(uuid: string, data: Partial<Pick<SemanticModel, 'metadata' | 'visualModel' | 'userId'>>): Promise<SemanticModel> {
+    async updateSemanticModel(
+        uuid: string,
+        data: Partial<Pick<SemanticModel, 'metadata' | 'visualModel' | 'userId'>>
+    ): Promise<SemanticModel> {
         if (!uuid) {
             throw new ApiError("UUID is required", 400);
         }
@@ -76,24 +79,48 @@ export class SemanticModelService extends BaseService<SemanticModel> {
                 throw new ApiError("Semantic model not found", 404);
             }
 
-            const currentSemanticModel = JSON.stringify(data.metadata)
-            const existingSemanticModel = JSON.stringify(semanticModel.metadata)
-            if (currentSemanticModel === existingSemanticModel) {
+            const isMetadataChanged =
+                data.metadata && JSON.stringify(data.metadata) !== JSON.stringify(semanticModel.metadata);
+
+            const isVisualModelChanged =
+                data.visualModel && JSON.stringify(data.visualModel) !== JSON.stringify(semanticModel.visualModel);
+
+            if (!isMetadataChanged && !isVisualModelChanged) {
                 throw new ApiError("No changes detected", 400);
             }
 
-            const semanticModelCopy = { ...semanticModel, metadata: JSON.parse(existingSemanticModel) };
+            const semanticModelCopy = {
+                uuid: semanticModel.uuid,
+                metadata: semanticModel.metadata,
+                visualModel: semanticModel.visualModel,
+                userId: semanticModel.userId
+            };
 
-            Object.assign(semanticModel, {
-                ...data,
-                metadata: data.metadata, // keep the merged one
-            });
-            await this.semanticModelHistoryService.createSemanticModelHistory(semanticModelCopy.uuid, semanticModelCopy);
+            // Save previous state to history
+            await this.semanticModelHistoryService.createSemanticModelHistory(uuid, semanticModelCopy);
+
+            // Apply updates
+            Object.assign(semanticModel, data);
             return await repo.save(semanticModel);
         });
     }
 
 
+    async revertToHistory(uuid: string, historyId: number, userId: number): Promise<SemanticModel> {
+        const history = await this.semanticModelHistoryService.findByIdAndUuid(historyId, uuid);
+        if (!history) {
+            throw new ApiError("Semantic model history not found for given UUID", 404);
+        }
+
+        // This will internally:
+        // - save current version to history
+        // - update the model
+        return this.updateSemanticModel(uuid, {
+            metadata: history.metadata,
+            visualModel: history.visualModel,
+            userId,
+        });
+    }
 
 
     async getAgentStatus(uuid: string) {
