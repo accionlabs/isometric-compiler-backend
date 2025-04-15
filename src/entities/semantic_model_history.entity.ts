@@ -1,5 +1,5 @@
 import { Entity, Column, UpdateDateColumn, CreateDateColumn, PrimaryGeneratedColumn, Index } from 'typeorm';
-import { SemanticModelStatus } from '../enums';
+import { Agents, SemanticModelStatus } from '../enums';
 import { IShape } from '../agents/shapesManager';
 
 @Entity('semantic_model_histories')
@@ -36,4 +36,7 @@ export class SemanticModelHistory {
 
     @Column({ type: 'integer', nullable: true })
     userId: number; // ID of the user who created the semantic model history
+
+    @Column({ type: 'enum', enum: Agents, nullable: true })
+    agent: Agents
 }

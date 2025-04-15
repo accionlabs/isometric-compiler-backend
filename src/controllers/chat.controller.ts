@@ -57,6 +57,10 @@ export default class CategoriesController {
 
             const { uuid, query, currentState, agent = Agents.REQUIREMENT_AGENT } = req.body
             const { file } = req
+            const userId = req.user?._id
+            if (!userId) {
+                throw new ApiError('user not found', 401)
+            }
             let messageType: MessageTypes = MessageTypes.TEXT;
             let handledDoc = null;
             let fileType;
@@ -67,12 +71,12 @@ export default class CategoriesController {
                     case 'image/png':
                         const uploadedImage = await this.awsService.uploadFile(config.ISOMETRIC_IMAGE_FOLDER, file);
                         fileType = 'image'
-                        handledDoc = await this.documentService.handleImage(file, uuid, uploadedImage.s3Url, agent);
+                        handledDoc = await this.documentService.handleImage(file, uuid, uploadedImage.s3Url, agent, userId);
                         break;
                     case 'application/pdf':
                         const uploadedDoc = await this.awsService.uploadFile(config.ISOMETRIC_DOC_FOLDER, file);
                         fileType = 'pdf'
-                        handledDoc = await this.documentService.handlePdf(file, uuid, uploadedDoc.s3Url, agent);
+                        handledDoc = await this.documentService.handlePdf(file, uuid, uploadedDoc.s3Url, agent, userId);
                         break;
                     default:
                         return res.status(400).json({ message: 'File format not allowed!' });
