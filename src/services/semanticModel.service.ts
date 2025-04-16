@@ -62,7 +62,7 @@ export class SemanticModelService extends BaseService<SemanticModel> {
 
     async updateSemanticModel(
         uuid: string,
-        data: Partial<Pick<SemanticModel, 'metadata' | 'visualModel' | 'userId'>>
+        data: Partial<Pick<SemanticModel, 'metadata' | 'userId'>>
     ): Promise<SemanticModel> {
         if (!uuid) {
             throw new ApiError("UUID is required", 400);
@@ -82,17 +82,13 @@ export class SemanticModelService extends BaseService<SemanticModel> {
             const isMetadataChanged =
                 data.metadata && JSON.stringify(data.metadata) !== JSON.stringify(semanticModel.metadata);
 
-            const isVisualModelChanged =
-                data.visualModel && JSON.stringify(data.visualModel) !== JSON.stringify(semanticModel.visualModel);
-
-            if (!isMetadataChanged && !isVisualModelChanged) {
+            if (!isMetadataChanged) {
                 throw new ApiError("No changes detected", 400);
             }
 
             const semanticModelCopy = {
                 uuid: semanticModel.uuid,
                 metadata: semanticModel.metadata,
-                visualModel: semanticModel.visualModel,
                 userId: semanticModel.userId
             };
 
@@ -112,12 +108,9 @@ export class SemanticModelService extends BaseService<SemanticModel> {
             throw new ApiError("Semantic model history not found for given UUID", 404);
         }
 
-        // This will internally:
         // - save current version to history
-        // - update the model
         return this.updateSemanticModel(uuid, {
             metadata: history.metadata,
-            visualModel: history.visualModel,
             userId,
         });
     }

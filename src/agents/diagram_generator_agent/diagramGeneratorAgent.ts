@@ -99,18 +99,7 @@ export class DiagramGeneratorAgent {
     }
 
     async generateIsometricJSONFromBlueprint(uuid: string, filename?: string): Promise<IsometricJsonAgenResp> {
-        const cache = await getCache(filename);
-        if (cache !== null) {
-            await this.semanticModelService.saveSemanticModel({
-                uuid,
-                visualModel: cache,
-                status: SemanticModelStatus.ACTIVE
-            });
-            return {
-                message: "Blueprint is successfully generated!",
-                isometric: cache
-            }
-        }
+
         const semanticModel = await this.semanticModelService.findByUuid(uuid);
         const documents = await this.pgVectorService.vectorSearch("", { uuid });
 

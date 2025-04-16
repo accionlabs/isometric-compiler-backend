@@ -5,7 +5,6 @@ import { NextFunction, Request, Response } from 'express';
 import { SemanticModelService } from "../services/semanticModel.service";
 import ApiError from "../utils/apiError";
 import { SemanticModelDto, UpdateSemanticModelDto } from "../validations/semanticModel.validation";
-import { SemanticModelHistory } from "../entities/semantic_model_history.entity";
 import { SemanticModelHistoryService } from "../services/semanticModelHistory.service";
 
 @Service()
@@ -63,13 +62,13 @@ export default class SematicModelController {
     }, SemanticModel)
     async updateSemanticModel(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { metadata, visualModel } = req.body;
+            const { metadata } = req.body;
 
             const userId = req?.user?._id
             if (!userId) {
                 throw new ApiError('user not found', 401)
             }
-            const updated = await this.semanticModelService.updateSemanticModel(req.params.uuid, { metadata, visualModel, userId });
+            const updated = await this.semanticModelService.updateSemanticModel(req.params.uuid, { metadata, userId });
             res.status(200).json(updated);
         } catch (e) {
             next(e);
@@ -100,28 +99,6 @@ export default class SematicModelController {
         }
     }
 
-    @Get('/history/:uuid', {
-        isAuthenticated: true,
-        authorizedRole: 'all'
-    }, SemanticModelHistory)
-    async getSemanticModelHistory(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-            const { uuid } = req.params;
-
-            if (!uuid) {
-                throw new ApiError("UUID is required", 400);
-            }
-
-            const history = await this.semanticModelHistoryService.getHistoryByUuid(uuid);
-
-            res.status(200).json({
-                count: history.length,
-                history
-            });
-        } catch (e) {
-            next(e);
-        }
-    }
 
 
 }
