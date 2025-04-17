@@ -46,7 +46,7 @@ export class Document {
     @Column({ type: 'jsonb', nullable: true })
     metadata?: Metadata;
 
-    @Column({ type: 'enum', default: UnifiedModelGenerationStatus.ACTIVE, enum: UnifiedModelGenerationStatus })
+    @Column({ type: 'enum', default: UnifiedModelGenerationStatus.PROCESSING, enum: UnifiedModelGenerationStatus })
     status: UnifiedModelGenerationStatus
 
 }
