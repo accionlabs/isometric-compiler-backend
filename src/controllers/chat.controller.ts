@@ -10,6 +10,7 @@ import { MainAgent } from "../agents/mainAgent";
 import { Chat } from "../entities/chat.entity";
 import { Agents, MessageRoles, MessageTypes } from "../enums";
 import ApiError from "../utils/apiError";
+import { FunctionalAgentWorkflowService } from "../agents/workflows/functionalAgentWorkflow";
 
 class ChatResp {
     uuid: string;
@@ -43,6 +44,9 @@ export default class CategoriesController {
     @Inject(() => MainAgent)
     private readonly mainAgent: MainAgent
 
+    @Inject(() => FunctionalAgentWorkflowService)
+    private readonly functionalAgentWorkflowService: FunctionalAgentWorkflowService
+
 
 
 
@@ -61,26 +65,32 @@ export default class CategoriesController {
             if (!userId) {
                 throw new ApiError('user not found', 401)
             }
-            let messageType: MessageTypes = MessageTypes.TEXT;
-            let handledDoc = null;
-            let fileType;
-            if (file) {
-                messageType = MessageTypes.FILE;
-                switch (file?.mimetype) {
-                    case 'image/jpeg':
-                    case 'image/png':
-                        const uploadedImage = await this.awsService.uploadFile(config.ISOMETRIC_IMAGE_FOLDER, file);
-                        fileType = 'image'
-                        handledDoc = await this.documentService.handleImage(file, uuid, uploadedImage.s3Url, agent, userId);
-                        break;
-                    case 'application/pdf':
-                        const uploadedDoc = await this.awsService.uploadFile(config.ISOMETRIC_DOC_FOLDER, file);
-                        fileType = 'pdf'
-                        handledDoc = await this.documentService.handlePdf(file, uuid, uploadedDoc.s3Url, agent, userId);
-                        break;
-                    default:
-                        return res.status(400).json({ message: 'File format not allowed!' });
-                }
+            let messageType: MessageTypes = !!file ? MessageTypes.FILE : MessageTypes.TEXT;
+
+            // let handledDoc = null;
+            // let fileType;
+            // if (file) {
+            //     messageType = MessageTypes.FILE;
+            //     switch (file?.mimetype) {
+            //         case 'image/jpeg':
+            //         case 'image/png':
+            //             const uploadedImage = await this.awsService.uploadFile(config.ISOMETRIC_IMAGE_FOLDER, file);
+            //             fileType = 'image'
+            //             handledDoc = await this.documentService.handleImage(file, uuid, uploadedImage.s3Url, agent, userId);
+            //             break;
+            //         case 'application/pdf':
+            //             const uploadedDoc = await this.awsService.uploadFile(config.ISOMETRIC_DOC_FOLDER, file);
+            //             fileType = 'pdf'
+            //             handledDoc = await this.documentService.handlePdf(file, uuid, uploadedDoc.s3Url, agent, userId);
+            //             break;
+            //         default:
+            //             return res.status(400).json({ message: 'File format not allowed!' });
+            //     }
+            // }
+            let fileIdexingResp
+            if (!!file) {
+                console.log("file uploaded")
+                fileIdexingResp = await this.functionalAgentWorkflowService.fileIndexingWorkflow(uuid as string, file)
             }
             const question: Partial<Chat> =
             {
@@ -89,8 +99,7 @@ export default class CategoriesController {
                 messageType: messageType,
                 agent,
                 metadata: {
-                    ...(!!handledDoc?.savedDocument._id && { documentId: handledDoc.savedDocument._id }), ...(!!handledDoc?.savedDocument?.metadata?.fileUrl && { fileUrl: handledDoc?.savedDocument.metadata.fileUrl }),
-                    ...(fileType && { fileType: fileType })
+                    ...fileIdexingResp
                 },
                 role: MessageRoles.USER
             }
@@ -110,8 +119,16 @@ export default class CategoriesController {
             return res.status(200).json({
                 uuid,
                 message: result.feedback,
-                messageType: !!result.result?.length ? 'json' : 'text', // json or text check
-                metadata: { content: result.result, action: result.action, needFeedback: result.needFeedback, isEmailQuery: result.isEmailQuery, emailId: result.email, isPdfUploaded: fileType === 'pdf', isGherkinScriptQuery: result.isGherkinScriptQuery },
+                messageType: !!result.result?.length ? MessageTypes.JSON : MessageTypes.TEXT, // json or text check
+                metadata: {
+                    content: result.result,
+                    action: result.action,
+                    needFeedback: result.needFeedback,
+                    isEmailQuery: result.isEmailQuery,
+                    emailId: result.email,
+                    isPdfUploaded: fileIdexingResp?.metadata.fileType === 'pdf' ? true : false,
+                    isGherkinScriptQuery: result.isGherkinScriptQuery
+                },
                 role: 'system'
             });
         } catch (e) {

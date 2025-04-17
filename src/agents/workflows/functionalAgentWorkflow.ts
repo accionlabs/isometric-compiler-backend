@@ -2,6 +2,7 @@ import { Service } from "typedi";
 import axios from 'axios';
 import config from "../../configs";
 import { FileType } from "../../entities/document.entity";
+import FormData from 'form-data';
 
 export interface FileIndexingWorkflowResp {
     metadata:
@@ -27,10 +28,15 @@ export class FunctionalAgentWorkflowService {
 
     async fileIndexingWorkflow(uuid: string, document: Express.Multer.File): Promise<FileIndexingWorkflowResp> {
         const workflowUrl = `${config.N8N_WEBHOOK_URL}/index/document?uuid=${uuid}`;
+        console.log('workflowUrl', workflowUrl)
         const formData = new FormData();
-        formData.append('document', document.buffer, document.originalname);
+        formData.append('document', document.buffer, {
+            filename: document.originalname,
+            contentType: document.mimetype
+        });
         formData.append('uuid', uuid);
         const response = await axios.post(workflowUrl, formData)
+        console.log("response", response.data)
         return response.data;
     }
 
