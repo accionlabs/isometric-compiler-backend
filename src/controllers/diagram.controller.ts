@@ -6,6 +6,7 @@ import { Diagram } from "../entities/diagram.entity";
 import { NextFunction, Request, Response } from 'express';
 import { FilterUtils } from "../utils/filterUtils";
 import ApiError from "../utils/apiError";
+import { ProjectService } from "../services/project.service";
 
 @Service()
 @Controller('/diagram')
@@ -14,6 +15,9 @@ export default class DiagramController {
     @Inject(() => DiagramService)
     private readonly diagramService: DiagramService
 
+    @Inject(() => ProjectService)
+    private readonly projectService: ProjectService
+
     @Post('/', CreateDiagramValidation, {
         authorizedRole: 'all',
         isAuthenticated: true
@@ -21,9 +25,16 @@ export default class DiagramController {
         Diagram)
     async createDiagram(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            // check project uuid coming or not, if not then insert for default project uuid
+            let { uuid } = req.body;
+            const userId = req.user?._id;
+            if (!userId) throw new ApiError('Unauthorized', 401);
 
-            const newDiagram = await this.diagramService.create({ ...req.body, author: req?.user?._id });
+            // If uuid not present, fetch default project UUID for admin user
+            if (!uuid) {
+                uuid = await this.projectService.getDefaultProjectUUID();
+            }
+
+            const newDiagram = await this.diagramService.create({ ...req.body, uuid, author: req?.user?._id, userId });
             res.status(201).json(newDiagram);
         } catch (e) {
             next(e)

@@ -18,7 +18,7 @@ export const AppDataSource = new DataSource({
   logging: false, // Set to true if you want to log SQL queries for debugging
   entities: [__dirname + '/../entities/*.entity{.ts,.js}'], // Path to your entities
   migrations: [__dirname + '/../migrations/*{.ts,.js}'], // Path to your migrations (if you are using migrations) 
-  migrationsRun: true
+  migrationsRun: false
 });
 AppDataSource.initialize()
   .then(() => {

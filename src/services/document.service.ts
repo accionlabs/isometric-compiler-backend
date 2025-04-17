@@ -21,8 +21,8 @@ export class DocumentService extends BaseService<Document> {
     @Inject(() => DiagramGeneratorAgent)
     private readonly diagramGeneratorAgent: DiagramGeneratorAgent
 
-    // @Inject(() => UnifiedModelGenerator)
-    // private readonly unifiedModelGenerator: UnifiedModelGenerator
+    @Inject(() => UnifiedModelGenerator)
+    private readonly unifiedModelGenerator: UnifiedModelGenerator
 
     @Inject(() => UnifiedModelWorkflow)
     private readonly unifiedModelWorkflow: UnifiedModelWorkflow
@@ -71,8 +71,9 @@ export class DocumentService extends BaseService<Document> {
         if (agent === Agents.ARCHITECTURE_AGENT) {
             this.diagramGeneratorAgent.generateIsometricJSONFromBlueprint(uuid, file.originalname)
         } else {
-            const worklowResp = await this.unifiedModelWorkflow.startUnifiedModelWorkflow(uuid, savedDocument._id)
-            console.log("UnifiedModelWorkflow started", worklowResp);
+            // const worklowResp = await this.unifiedModelWorkflow.startUnifiedModelWorkflow(uuid, savedDocument._id)
+            // console.log("UnifiedModelWorkflow started", worklowResp);
+            this.unifiedModelGenerator.regenerateUnifiedModel(uuid, agent, savedDocument._id, userId, file.originalname)
         }
         return savedDocument
     }

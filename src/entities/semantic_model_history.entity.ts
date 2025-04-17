@@ -20,6 +20,12 @@ export class SemanticModelHistory {
     @Column({ type: 'jsonb', nullable: true })
     metadata: Record<string, any>;
 
+    @Column({ type: 'jsonb', nullable: true })
+    architectural_specs: Record<string, any>;
+
+    @Column({ type: 'jsonb', nullable: true })
+    qum_specs: Record<string, any>;
+
     @Column({
         type: 'varchar',
         length: 50,

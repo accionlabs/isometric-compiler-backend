@@ -16,7 +16,7 @@ export class Diagram extends BaseEntity {
   @JoinColumn({ name: 'userId' })
   author: User;
 
-  @Column({ type: 'integer' })
+  @Column({ type: 'integer', nullable: true })
   userId: number; // ID of the user who created the semantic model history
 
   @Column({ type: 'varchar', length: 255 })
@@ -28,7 +28,7 @@ export class Diagram extends BaseEntity {
   @Column({ type: 'jsonb', nullable: true })
   metadata: any;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', nullable: true })
   uuid: string
 
   @Column({ type: 'jsonb', nullable: true })
