@@ -1,4 +1,4 @@
-import { Repository, DeepPartial, ObjectLiteral, FindManyOptions, FindOneOptions, FindOptionsOrder, FindOptionsWhere, FindOptionsRelations } from 'typeorm';
+import { Repository, DeepPartial, ObjectLiteral, FindManyOptions, FindOneOptions, FindOptionsOrder, FindOptionsWhere, FindOptionsRelations, FindOptionsSelect, FindOptionsSelectByString } from 'typeorm';
 import ApiError from '../utils/apiError';
 
 export abstract class BaseService<T extends ObjectLiteral> {
@@ -9,11 +9,13 @@ export abstract class BaseService<T extends ObjectLiteral> {
     page: number = 1,
     limit: number = 1000,
     sort: FindOptionsOrder<T>,
-    relations?: FindOptionsRelations<T>
+    relations?: FindOptionsRelations<T>,
+    select?: FindOptionsSelect<T>,
   ): Promise<{ data: T[]; total: number }> {
     const skip = (page - 1) * limit;
     const [data, total] = await Promise.all([
       this.repository.find({
+        select: select,
         where: filters,
         skip,
         take: limit,

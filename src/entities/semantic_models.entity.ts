@@ -1,5 +1,5 @@
 import { Entity, Column, UpdateDateColumn, CreateDateColumn, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
-import { SemanticModelStatus } from '../enums';
+import { Agents, SemanticModelStatus } from '../enums';
 import { IShape } from '../agents/shapesManager';
 
 @Entity('semantic_models')
@@ -33,4 +33,10 @@ export class SemanticModel {
 
     @Column({ type: 'jsonb', nullable: true })
     agentStatus: Record<string, SemanticModelStatus>;
+
+    @Column({ type: 'integer' })
+    userId: number;
+
+    @Column({ type: 'enum', enum: Agents, nullable: true })
+    agent: Agents
 }

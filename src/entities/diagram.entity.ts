@@ -2,7 +2,8 @@ import {
   Entity,
   Column,
   ManyToOne,
-  Index
+  Index,
+  JoinColumn
 } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { User } from './user.entity';
@@ -11,8 +12,12 @@ import { User } from './user.entity';
 @Index('diagram_name_version_unique', ['name', 'version'], { unique: true })
 export class Diagram extends BaseEntity {
 
-  @ManyToOne(() => User, (user) => user.diagrams, { onDelete: "CASCADE" })
+  @ManyToOne(() => User, { eager: false })
+  @JoinColumn({ name: 'userId' })
   author: User;
+
+  @Column({ type: 'integer' })
+  userId: number; // ID of the user who created the semantic model history
 
   @Column({ type: 'varchar', length: 255 })
   name: string;
@@ -22,6 +27,9 @@ export class Diagram extends BaseEntity {
 
   @Column({ type: 'jsonb', nullable: true })
   metadata: any;
+
+  @Column({ type: 'uuid' })
+  uuid: string
 
   @Column({ type: 'jsonb', nullable: true })
   diagramComponents: Record<string, any>[];

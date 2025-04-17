@@ -1,13 +1,102 @@
-import { IsEnum, IsNotEmpty, IsObject, IsOptional, IsString, ValidateNested } from "class-validator";
+import { IsArray, IsEnum, IsNotEmpty, IsObject, IsOptional, IsString, IsUUID, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 import { SemanticModelStatus } from "../enums";
 
+
+export class CitationRespDto {
+    @IsString()
+    documentName: string;
+
+    @IsString()
+    documentId: string;
+
+}
+
+export class ScenarioRespDto {
+    @IsString()
+    scenario: string;
+
+    @IsOptional()
+    @IsString()
+    description?: string;
+
+    @IsOptional()
+    @IsString()
+    metadataShapeName?: string;
+
+    @IsOptional()
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => StepRespDto)
+    steps?: StepRespDto[];
+}
+
+export class StepRespDto {
+    @IsString()
+    step: string;
+
+    @IsOptional()
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => ActionRespDto)
+    actions?: ActionRespDto[];
+
+    @IsOptional()
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => CitationRespDto)
+    citations?: CitationRespDto[];
+}
+
+export class ActionRespDto {
+    @IsString()
+    action: string;
+
+}
+
+class PersonaRespDto {
+    @IsString()
+    persona: string;
+
+    @IsOptional()
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => OutcomeRepsDto)
+    outcomes?: OutcomeRepsDto[];
+}
+
+class OutcomeRepsDto {
+    @IsString()
+    outcome: string;
+
+    @IsOptional()
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => ScenarioRespDto)
+    scenarios?: ScenarioRespDto[];
+
+    @IsOptional()
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => CitationRespDto)
+    citations?: CitationRespDto[];
+}
+
 class MetadataDto {
-    [key: string]: any;
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => PersonaRespDto)
+    qum: PersonaRespDto[];
 }
 
 class VisualModelDto {
     [key: string]: any;
+}
+class SaveMetadataDto {
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => PersonaRespDto)
+    qum: PersonaRespDto[];
 }
 
 export class SaveSemanticModelDto {
@@ -17,7 +106,7 @@ export class SaveSemanticModelDto {
 
     @IsOptional()
     @ValidateNested()
-    @Type(() => MetadataDto)
+    @Type(() => SaveMetadataDto)
     metadata?: Record<string, any>;
 
     @IsOptional()
@@ -32,15 +121,24 @@ export class SaveSemanticModelDto {
 
 
 export class UpdateSemanticModelDto {
-    @IsString()
-    uuid: string;
 
     @IsOptional()
-    @IsObject()
-    metadata?: Record<string, any>;
+    @ValidateNested()
+    @Type(() => MetadataDto)
+    metadata?: MetadataDto;
 
     @IsOptional()
-    @IsObject()
+    @IsArray()
     visualModel?: Record<string, any>;
 }
+
+
+export class SemanticModelDto {
+    @IsUUID()
+    uuid: string;
+
+    @IsString()
+    historyId: string;
+}
+
 

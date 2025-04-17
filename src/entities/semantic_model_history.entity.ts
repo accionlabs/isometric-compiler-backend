@@ -1,9 +1,9 @@
-import { Entity, Column, UpdateDateColumn, CreateDateColumn, PrimaryGeneratedColumn, Index } from 'typeorm';
-import { SemanticModelStatus } from '../enums';
-import { IShape } from '../agents/shapesManager';
+import { Entity, Column, UpdateDateColumn, CreateDateColumn, PrimaryGeneratedColumn, Index, JoinColumn, ManyToOne } from 'typeorm';
+import { Agents, SemanticModelStatus } from '../enums';
+import { User } from './user.entity';
 
 @Entity('semantic_model_histories')
-export class SemanticModelHistroy {
+export class SemanticModelHistory {
     @PrimaryGeneratedColumn()
     _id: number;
 
@@ -20,9 +20,6 @@ export class SemanticModelHistroy {
     @Column({ type: 'jsonb', nullable: true })
     metadata: Record<string, any>;
 
-    @Column({ type: 'jsonb', nullable: true })
-    visualModel: IShape[];
-
     @Column({
         type: 'varchar',
         length: 50,
@@ -31,6 +28,13 @@ export class SemanticModelHistroy {
     })
     status: SemanticModelStatus = SemanticModelStatus.ACTIVE
 
-    @Column({ type: 'jsonb', nullable: true })
-    agentStatus: Record<string, SemanticModelStatus>;
+    @ManyToOne(() => User, { eager: false })
+    @JoinColumn({ name: 'userId' })
+    user: User;
+
+    @Column({ type: 'integer' })
+    userId: number; // ID of the user who created the semantic model history
+
+    @Column({ type: 'enum', enum: Agents, nullable: true })
+    agent: Agents
 }
