@@ -7,6 +7,7 @@ import { DiagramGeneratorAgent } from "../agents/diagram_generator_agent/diagram
 import { Document as VectorDocument } from "@langchain/core/documents"
 import { UnifiedModelGenerator } from "../agents/unifiedModel";
 import { Agents } from "../enums";
+import { UnifiedModelWorkflow } from "../agents/workflows/unifiedModel";
 
 @Service()
 export class DocumentService extends BaseService<Document> {
@@ -20,8 +21,11 @@ export class DocumentService extends BaseService<Document> {
     @Inject(() => DiagramGeneratorAgent)
     private readonly diagramGeneratorAgent: DiagramGeneratorAgent
 
-    @Inject(() => UnifiedModelGenerator)
-    private readonly unifiedModelGenerator: UnifiedModelGenerator
+    // @Inject(() => UnifiedModelGenerator)
+    // private readonly unifiedModelGenerator: UnifiedModelGenerator
+
+    @Inject(() => UnifiedModelWorkflow)
+    private readonly unifiedModelWorkflow: UnifiedModelWorkflow
 
     async handleImage(file: Express.Multer.File, uuid: string, fileUrl: string, agent: string, userId: number) {
         const result = await this.diagramGeneratorAgent.extractInfoFromImage(file.mimetype, file.buffer);
@@ -67,7 +71,8 @@ export class DocumentService extends BaseService<Document> {
         if (agent === Agents.ARCHITECTURE_AGENT) {
             this.diagramGeneratorAgent.generateIsometricJSONFromBlueprint(uuid, file.originalname)
         } else {
-            this.unifiedModelGenerator.regenerateUnifiedModel(uuid, agent, savedDocument._id, userId, file.originalname);
+            const worklowResp = await this.unifiedModelWorkflow.startUnifiedModelWorkflow(uuid, savedDocument._id)
+            console.log("UnifiedModelWorkflow started", worklowResp);
         }
         return savedDocument
     }
