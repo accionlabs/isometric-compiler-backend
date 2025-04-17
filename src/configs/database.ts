@@ -14,11 +14,11 @@ export const dataSourceOption: DataSourceOptions = {
   // ssl: true, // If you're using SSL connections
 }
 export const AppDataSource = new DataSource({
-  ...dataSourceOption, synchronize: true, // Automatically create database schema (disable in production)
+  ...dataSourceOption, synchronize: false, // Automatically create database schema (disable in production)
   logging: false, // Set to true if you want to log SQL queries for debugging
   entities: [__dirname + '/../entities/*.entity{.ts,.js}'], // Path to your entities
   migrations: [__dirname + '/../migrations/*{.ts,.js}'], // Path to your migrations (if you are using migrations) 
-
+  migrationsRun: true
 });
 AppDataSource.initialize()
   .then(() => {
