@@ -79,6 +79,7 @@ export class SemanticModelService extends BaseService<SemanticModel> {
                 throw new ApiError("Semantic model not found", 404);
             }
 
+            // change this logic as metadata is not being used instead of this we are using architectual_specs and qum_specs
             const isMetadataChanged =
                 data.metadata && JSON.stringify(data.metadata) !== JSON.stringify(semanticModel.metadata);
 
@@ -86,11 +87,8 @@ export class SemanticModelService extends BaseService<SemanticModel> {
                 throw new ApiError("No changes detected", 400);
             }
 
-            const semanticModelCopy = {
-                uuid: semanticModel.uuid,
-                metadata: semanticModel.metadata,
-                userId: semanticModel.userId
-            };
+            const semanticModelCopy = JSON.parse(JSON.stringify(semanticModel));
+            if (!semanticModelCopy.userId) semanticModelCopy.userId = data.userId
 
             // Save previous state to history
             await this.semanticModelHistoryService.createSemanticModelHistory(uuid, semanticModelCopy);
