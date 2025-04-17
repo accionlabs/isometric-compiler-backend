@@ -39,3 +39,11 @@ export enum Agents {
   ATDD_AGENT = 'atdd_agent',
   CODE_GENERATION_AGENT = 'code_generation_agent',
 }
+
+export enum UnifiedModelGenerationStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  PROCESSING = 'processing',
+  ERROR = 'error',
+
+}
