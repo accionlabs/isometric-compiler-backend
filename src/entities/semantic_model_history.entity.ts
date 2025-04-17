@@ -32,7 +32,7 @@ export class SemanticModelHistory {
     @JoinColumn({ name: 'userId' })
     user: User;
 
-    @Column({ type: 'integer', nullable: true })
+    @Column({ type: 'integer' })
     userId: number; // ID of the user who created the semantic model history
 
     @Column({ type: 'enum', enum: Agents, nullable: true })

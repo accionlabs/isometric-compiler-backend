@@ -13,6 +13,7 @@ import { fileUpload } from './middlewares/fileUpload'
 import { DocumentController } from './controllers/document.controller'
 import SematicModelController from './controllers/semanticModel.controller'
 import SematicModelHistoryController from './controllers/sematicModelHistory.controller'
+import ProjectController from './controllers/project.controller'
 
 var router = express.Router();
 
@@ -24,7 +25,8 @@ export const controllers = [
   ChatController,
   DocumentController,
   SematicModelController,
-  SematicModelHistoryController
+  SematicModelHistoryController,
+  ProjectController
 ]
 
 controllers.forEach(controller => {

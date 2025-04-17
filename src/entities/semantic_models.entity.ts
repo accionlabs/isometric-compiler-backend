@@ -34,7 +34,7 @@ export class SemanticModel {
     @Column({ type: 'jsonb', nullable: true })
     agentStatus: Record<string, SemanticModelStatus>;
 
-    @Column({ type: 'integer', nullable: true })
+    @Column({ type: 'integer' })
     userId: number;
 
     @Column({ type: 'enum', enum: Agents, nullable: true })
