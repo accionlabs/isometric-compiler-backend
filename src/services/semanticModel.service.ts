@@ -110,7 +110,7 @@ export class SemanticModelService extends BaseService<SemanticModel> {
 
         // - save current version to history
         return this.updateSemanticModel(uuid, {
-            metadata: history.metadata,
+            ...history,
             userId,
         });
     }

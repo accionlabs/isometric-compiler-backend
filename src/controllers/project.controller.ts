@@ -8,7 +8,7 @@ import { ProjectService } from "../services/project.service";
 import { CreateProjectValidation } from "../validations/project.validation";
 
 @Service()
-@Controller('/project')
+@Controller('/projects')
 export default class ProjectController {
     @Inject(() => ProjectService)
     private readonly projectService: ProjectService

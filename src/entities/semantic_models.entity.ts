@@ -21,6 +21,12 @@ export class SemanticModel {
     metadata: Record<string, any>;
 
     @Column({ type: 'jsonb', nullable: true })
+    architectural_specs: Record<string, any>;
+
+    @Column({ type: 'jsonb', nullable: true })
+    qum_specs: Record<string, any>;
+
+    @Column({ type: 'jsonb', nullable: true })
     visualModel: IShape[];
 
     @Column({
@@ -34,7 +40,7 @@ export class SemanticModel {
     @Column({ type: 'jsonb', nullable: true })
     agentStatus: Record<string, SemanticModelStatus>;
 
-    @Column({ type: 'integer' })
+    @Column({ type: 'integer', nullable: true })
     userId: number;
 
     @Column({ type: 'enum', enum: Agents, nullable: true })
