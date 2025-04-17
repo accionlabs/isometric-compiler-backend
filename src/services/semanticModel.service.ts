@@ -1,9 +1,11 @@
-import { Service } from "typedi";
+import { Inject, Service } from "typedi";
 import { AppDataSource } from "../configs/database";
 import { SemanticModel } from "../entities/semantic_models.entity";
 import { BaseService } from "./base.service";
 import { Agents, SemanticModelStatus } from "../enums";
 import { PersonaResp } from "../agents/qum_agent/qumAgent";
+import ApiError from "../utils/apiError";
+import { SemanticModelHistoryService } from "./semanticModelHistory.service";
 
 type Qum = {
     qum: PersonaResp[];
@@ -11,6 +13,10 @@ type Qum = {
 
 @Service()
 export class SemanticModelService extends BaseService<SemanticModel> {
+
+    @Inject(() => SemanticModelHistoryService)
+    private readonly semanticModelHistoryService: SemanticModelHistoryService
+
     constructor() {
         super(AppDataSource.getRepository(SemanticModel));
     }
@@ -32,6 +38,10 @@ export class SemanticModelService extends BaseService<SemanticModel> {
             });
 
             if (semanticModel) {
+                const semanticModelCopy = JSON.parse(JSON.stringify(semanticModel)); // Deep copy to avoid mutation
+                if (semanticModelCopy.metadata || semanticModelCopy.visualModel?.length) {
+                    await this.semanticModelHistoryService.createSemanticModelHistory(semanticModelCopy.uuid, semanticModelCopy);
+                }
                 if (data.metadata && semanticModel.metadata) {
                     semanticModel.metadata = this.mergeJsons(semanticModel.metadata as Qum | undefined, data.metadata as Qum);
                 } else if (data.metadata) {
@@ -50,6 +60,60 @@ export class SemanticModelService extends BaseService<SemanticModel> {
         });
     }
 
+    async updateSemanticModel(
+        uuid: string,
+        data: Partial<Pick<SemanticModel, 'metadata' | 'userId'>>
+    ): Promise<SemanticModel> {
+        if (!uuid) {
+            throw new ApiError("UUID is required", 400);
+        }
+
+        return this.getRepository().manager.transaction(async (manager) => {
+            const repo = manager.getRepository(SemanticModel);
+            const semanticModel = await repo.findOne({
+                where: { uuid },
+                lock: { mode: "pessimistic_write" },
+            });
+
+            if (!semanticModel) {
+                throw new ApiError("Semantic model not found", 404);
+            }
+
+            const isMetadataChanged =
+                data.metadata && JSON.stringify(data.metadata) !== JSON.stringify(semanticModel.metadata);
+
+            if (!isMetadataChanged) {
+                throw new ApiError("No changes detected", 400);
+            }
+
+            const semanticModelCopy = {
+                uuid: semanticModel.uuid,
+                metadata: semanticModel.metadata,
+                userId: semanticModel.userId
+            };
+
+            // Save previous state to history
+            await this.semanticModelHistoryService.createSemanticModelHistory(uuid, semanticModelCopy);
+
+            // Apply updates
+            Object.assign(semanticModel, data);
+            return await repo.save(semanticModel);
+        });
+    }
+
+
+    async revertToHistory(uuid: string, historyId: number, userId: number): Promise<SemanticModel> {
+        const history = await this.semanticModelHistoryService.findByIdAndUuid(historyId, uuid);
+        if (!history) {
+            throw new ApiError("Semantic model history not found for given UUID", 404);
+        }
+
+        // - save current version to history
+        return this.updateSemanticModel(uuid, {
+            metadata: history.metadata,
+            userId,
+        });
+    }
 
 
     async getAgentStatus(uuid: string) {

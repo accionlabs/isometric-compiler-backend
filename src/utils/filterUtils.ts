@@ -53,7 +53,6 @@ export class FilterUtils {
     query: Record<string, any>,
     allowedFields: (keyof T)[] = []
   ): FindOptionsWhere<T> {
-    console.log("query", query)
     const filters: FindOptionsWhere<T> = {};
     const parsedFilters = this.parseFilters(query);
 

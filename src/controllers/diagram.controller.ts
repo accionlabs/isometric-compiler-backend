@@ -21,6 +21,7 @@ export default class DiagramController {
         Diagram)
     async createDiagram(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+            // check project uuid coming or not, if not then insert for default project uuid
 
             const newDiagram = await this.diagramService.create({ ...req.body, author: req?.user?._id });
             res.status(201).json(newDiagram);
@@ -63,7 +64,7 @@ export default class DiagramController {
             const sort: Record<string, 1 | -1> = { [sortName as string]: sortOrder === 'asc' ? 1 : -1 };
 
 
-            const allowedFields: (keyof Diagram)[] = ['name', 'version'];
+            const allowedFields: (keyof Diagram)[] = ['name', 'version', "uuid", "createdAt", "updatedAt", "status"];
 
             const filters = FilterUtils.buildPostgresFilters<Diagram>(query, allowedFields);
             const { data, total } = await this.diagramService.findWithFilters(filters, parseInt(page as string, 10), parseInt(limit as string, 10), sort);

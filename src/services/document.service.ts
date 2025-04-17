@@ -23,7 +23,7 @@ export class DocumentService extends BaseService<Document> {
     @Inject(() => UnifiedModelGenerator)
     private readonly unifiedModelGenerator: UnifiedModelGenerator
 
-    async handleImage(file: Express.Multer.File, uuid: string, fileUrl: string, agent: string) {
+    async handleImage(file: Express.Multer.File, uuid: string, fileUrl: string, agent: string, userId: number) {
         const result = await this.diagramGeneratorAgent.extractInfoFromImage(file.mimetype, file.buffer);
         const fileContent: VectorDocument = {
             pageContent: result?.toString() || '',
@@ -34,19 +34,19 @@ export class DocumentService extends BaseService<Document> {
                 uuid: uuid
             }
         }
-        const savedDocument = await this.saveAndIndexDocument(file, [fileContent], uuid, fileUrl, agent, FileType.image)
+        const savedDocument = await this.saveAndIndexDocument(file, [fileContent], uuid, fileUrl, agent, FileType.image, userId)
 
         return { savedDocument };
     }
 
-    async handlePdf(file: Express.Multer.File, uuid: string, fileUrl: string, agent: string) {
+    async handlePdf(file: Express.Multer.File, uuid: string, fileUrl: string, agent: string, userId: number) {
         let fileContent = await this.pgVectorService.parsePdf(file, uuid);
-        const savedDocument = await this.saveAndIndexDocument(file, fileContent, uuid, fileUrl, agent, FileType.pdf)
+        const savedDocument = await this.saveAndIndexDocument(file, fileContent, uuid, fileUrl, agent, FileType.pdf, userId)
 
         return { savedDocument };
     }
 
-    private async saveAndIndexDocument(file: Express.Multer.File, fileContent: VectorDocument[], uuid: string, fileUrl: string, agent: string, fileType: FileType) {
+    private async saveAndIndexDocument(file: Express.Multer.File, fileContent: VectorDocument[], uuid: string, fileUrl: string, agent: string, fileType: FileType, userId: number) {
         const savedDocument = await this.create({
             uuid,
             content: fileContent.map((content) => content.pageContent).join('\n'), // result from above
@@ -67,7 +67,7 @@ export class DocumentService extends BaseService<Document> {
         if (agent === Agents.ARCHITECTURE_AGENT) {
             this.diagramGeneratorAgent.generateIsometricJSONFromBlueprint(uuid, file.originalname)
         } else {
-            this.unifiedModelGenerator.regenerateUnifiedModel(uuid, agent, savedDocument._id, file.originalname);
+            this.unifiedModelGenerator.regenerateUnifiedModel(uuid, agent, savedDocument._id, userId, file.originalname);
         }
         return savedDocument
     }
