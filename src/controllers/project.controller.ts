@@ -63,6 +63,36 @@ export default class ProjectController {
         }
     }
 
+
+    @Put('/:id', CreateProjectValidation, {
+        isAuthenticated: true,
+        authorizedRole: 'all'
+    }, Project)
+    async updateProject(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const projectId = parseInt(req.params.id, 10);
+            if (isNaN(projectId)) {
+                throw new ApiError('Invalid project ID', 400);
+            }
+
+            const existingProject = await this.projectService.findOneById(projectId);
+            if (!existingProject) {
+                throw new ApiError('Project not found', 404);
+            }
+
+            // Optional: Check if user owns the project, if ownership enforcement is needed
+            if (existingProject.userId !== req.user?._id) {
+                throw new ApiError('Unauthorized to update this project', 403);
+            }
+
+            const updatedProject = await this.projectService.update(projectId, req.body);
+            res.status(200).json(updatedProject);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+
     @Delete('/:id', {
         isAuthenticated: true,
         authorizedRole: 'all'
