@@ -7,6 +7,7 @@ import { SendEmailDto } from "../validations/document.validation";
 import { DocumentService } from "../services/document.service";
 import { Document } from "../entities/document.entity";
 import ApiError from "../utils/apiError";
+import { FilterUtils } from "../utils/filterUtils";
 
 @Service()
 @Controller('/documents')
@@ -35,6 +36,26 @@ export class DocumentController {
             }
 
             return res.json(document);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    @Get('/', {
+        isAuthenticated: true,
+        authorizedRole: 'all'
+    }, Array<Document>)
+    async getDocuments(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            const { page = 1, limit = 1000, sortName = 'createdAt', sortOrder = 'asc', ...query } = req.query
+            const sort: Record<string, 1 | -1> = { [sortName as string]: sortOrder === 'asc' ? 1 : -1 };
+
+
+            const allowedFields: (keyof Document)[] = ["uuid", 'agent', "createdAt", "updatedAt", "status"];
+
+            const filters = FilterUtils.buildPostgresFilters<Document>(query, allowedFields);
+            const { data, total } = await this.documentService.findWithFilters(filters, parseInt(page as string, 10), parseInt(limit as string, 10), sort);
+            return res.json({ data, total });
         } catch (e) {
             next(e);
         }

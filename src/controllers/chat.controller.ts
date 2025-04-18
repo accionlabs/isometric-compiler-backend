@@ -1,7 +1,7 @@
 import { Inject, Service } from "typedi"
 import { Controller, Delete, Get, Post, Put } from "../core"
 import { NextFunction, Request, Response } from 'express';
-import { ChatValidation } from "../validations/chat.validation";
+import { ChatValidation, ChatGenerateValidation } from "../validations/chat.validation";
 import { ChatService } from "../services/chat.service";
 import { AWSService } from "../services/aws.service";
 import config from "../configs";
@@ -10,6 +10,8 @@ import { MainAgent } from "../agents/mainAgent";
 import { Chat } from "../entities/chat.entity";
 import { Agents, MessageRoles, MessageTypes } from "../enums";
 import ApiError from "../utils/apiError";
+import { DiagramGeneratorAgent } from "../agents/diagram_generator_agent/diagramGeneratorAgent";
+import axios from "axios";
 
 class ChatResp {
     uuid: string;
@@ -42,6 +44,9 @@ export default class CategoriesController {
 
     @Inject(() => MainAgent)
     private readonly mainAgent: MainAgent
+
+    @Inject(() => DiagramGeneratorAgent)
+    private readonly diagramGeneratorAgent: DiagramGeneratorAgent
 
 
 
@@ -95,7 +100,7 @@ export default class CategoriesController {
                 role: MessageRoles.USER
             }
 
-            const result = await this.mainAgent.processRequest(query, uuid, currentState, file)
+            const result = await this.mainAgent.processRequest(query, uuid, currentState, userId, file)
             const chats: Partial<Chat> = {
                 uuid,
                 message: result.feedback,
@@ -151,5 +156,59 @@ export default class CategoriesController {
         }
     }
 
+    @Post('/generate', ChatGenerateValidation, {
+        authorizedRole: 'all',
+        isAuthenticated: true,
+        fileUpload: true
+    }, ChatResp
+    )
+    async generateDiagram(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { uuid, documentId, key } = req.body
+            const userId = req.user?._id
+            if (!userId) {
+                throw new ApiError('unauthorized', 403)
+            }
+            if (key === 'blueprint') {
+                const diagramResp = await this.diagramGeneratorAgent.getIsometricJSONFromUUId(uuid, userId)
+                if (diagramResp) {
+                    return res.status(200).json({
+                        uuid,
+                        message: diagramResp.message,
+                        messageType: 'json',
+                        metadata: { content: diagramResp.isometric },
+                        role: 'system'
+                    });
+                } else {
+                    throw new ApiError('diagram not found', 404)
+                }
+            } else if (key === 'diagram') {
+                if (!documentId) {
+                    throw new ApiError('documentId not found', 400)
+                }
+                const document = await this.documentService.findOneById(documentId)
+                if (!document?.metadata?.fileUrl) {
+                    throw new ApiError("Document not found", 404)
+                }
+                const awsResp = await this.awsService.getPresignedUrlFromUrl(document.metadata?.fileUrl);
+                if (!awsResp) {
+                    throw new ApiError("AWS response not correct", 400)
+                }
+                const doc = await axios.get(awsResp) // need to call workflow to generate diagrma from document
 
+                return res.status(200).json({
+                    uuid,
+                    message: "Message from workflow",
+                    messageType: 'json',
+                    metadata: {}, // coontent from workflow
+                    role: 'system'
+                });
+            } else {
+                throw new ApiError('key not found', 400)
+            }
+
+        } catch (e) {
+            next(e)
+        }
+    }
 }
