@@ -28,7 +28,6 @@ export class FunctionalAgentWorkflowService {
 
     async fileIndexingWorkflow(uuid: string, document: Express.Multer.File): Promise<FileIndexingWorkflowResp> {
         const workflowUrl = `${config.N8N_WEBHOOK_URL}/functional-agent/document/index`;
-        console.log('workflowUrl', workflowUrl)
         const formData = new FormData();
         formData.append('document', document.buffer, {
             filename: document.originalname,
