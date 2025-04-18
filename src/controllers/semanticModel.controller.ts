@@ -1,11 +1,11 @@
+import { NextFunction, Request, Response } from 'express';
 import { Inject, Service } from "typedi";
 import { Controller, Get, Post, Put } from "../core";
 import { SemanticModel } from "../entities/semantic_models.entity";
-import { NextFunction, Request, Response } from 'express';
 import { SemanticModelService } from "../services/semanticModel.service";
+import { SemanticModelHistoryService } from "../services/semanticModelHistory.service";
 import ApiError from "../utils/apiError";
 import { SemanticModelDto, UpdateSemanticModelDto } from "../validations/semanticModel.validation";
-import { SemanticModelHistoryService } from "../services/semanticModelHistory.service";
 
 @Service()
 @Controller('/semantic-model')
@@ -30,9 +30,9 @@ export default class SematicModelController {
                 throw new ApiError('Shape not found', 404)
             }
             res.status(200).json({
-                ...sematicModel.qum_specs,
+                qum: sematicModel.qum_specs?.unified_model,
                 visualModel: sematicModel.visualModel,
-                architectural_specs: sematicModel.architectural_specs,
+                architectural: sematicModel.architectural_specs,
                 status: sematicModel.status
             });
         } catch (e) {
