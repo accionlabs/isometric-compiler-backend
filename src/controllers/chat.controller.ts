@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import { Inject, Service } from "typedi";
 import { DiagramGeneratorAgent } from "../agents/diagram_generator_agent/diagramGeneratorAgent";
 import { MainAgent } from "../agents/mainAgent";
+import { ArchitectualAgentWorkflowService } from "../agents/workflows/architecturalAgentWorkflow";
 import { FunctionalAgentWorkflowService } from "../agents/workflows/functionalAgentWorkflow";
 import { Controller, Get, Post } from "../core";
 import { Chat } from "../entities/chat.entity";
@@ -51,6 +52,8 @@ export default class CategoriesController {
     @Inject(() => DiagramGeneratorAgent)
     private readonly diagramGeneratorAgent: DiagramGeneratorAgent
 
+    @Inject(() => FunctionalAgentWorkflowService)
+    private readonly architectualAgentWorkflowService: ArchitectualAgentWorkflowService
 
 
 
@@ -77,32 +80,16 @@ export default class CategoriesController {
                     console.log("file uploaded")
                     fileIdexingResp = await this.functionalAgentWorkflowService.fileIndexingWorkflow(uuid as string, file)
                     console.log("fileIdexingResp", fileIdexingResp)
-                }else{
+                } else {
                     result = await this.functionalAgentWorkflowService.functionAgentWorkflow(uuid as string, query as string)
                 }
-            } else {
+            }
+            else if (agent === Agents.ARCHITECTURE_AGENT && file) {
+                fileIdexingResp = await this.architectualAgentWorkflowService.fileIndexingWorkflow(uuid as string, file)
+            }
+            else {
                 result = await this.mainAgent.processRequest(query, uuid, currentState, userId, file)
             }
-            // let handledDoc = null;
-            // let fileType;
-            // if (file) {
-            //     messageType = MessageTypes.FILE;
-            //     switch (file?.mimetype) {
-            //         case 'image/jpeg':
-            //         case 'image/png':
-            //             const uploadedImage = await this.awsService.uploadFile(config.ISOMETRIC_IMAGE_FOLDER, file);
-            //             fileType = 'image'
-            //             handledDoc = await this.documentService.handleImage(file, uuid, uploadedImage.s3Url, agent, userId);
-            //             break;
-            //         case 'application/pdf':
-            //             const uploadedDoc = await this.awsService.uploadFile(config.ISOMETRIC_DOC_FOLDER, file);
-            //             fileType = 'pdf'
-            //             handledDoc = await this.documentService.handlePdf(file, uuid, uploadedDoc.s3Url, agent, userId);
-            //             break;
-            //         default:
-            //             return res.status(400).json({ message: 'File format not allowed!' });
-            //     }
-            // }
 
 
             const question: Partial<Chat> =
