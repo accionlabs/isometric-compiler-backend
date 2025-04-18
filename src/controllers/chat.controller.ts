@@ -77,8 +77,9 @@ export default class CategoriesController {
                     console.log("file uploaded")
                     fileIdexingResp = await this.functionalAgentWorkflowService.fileIndexingWorkflow(uuid as string, file)
                     console.log("fileIdexingResp", fileIdexingResp)
+                }else{
+                    result = await this.functionalAgentWorkflowService.functionAgentWorkflow(uuid as string, query as string)
                 }
-                result = await this.functionalAgentWorkflowService.functionAgentWorkflow(uuid as string, query as string)
             } else {
                 result = await this.mainAgent.processRequest(query, uuid, currentState, userId, file)
             }
@@ -111,17 +112,17 @@ export default class CategoriesController {
                 messageType: messageType,
                 agent,
                 metadata: {
-                    ...fileIdexingResp
+                    ...fileIdexingResp?.metadata
                 },
                 role: MessageRoles.USER
             }
 
             const chats: Partial<Chat> = {
                 uuid,
-                message: result.feedback,
+                message: result?.feedback || "Document is indexed successfully",
                 agent,
-                messageType: !!result.result?.length ? MessageTypes.JSON : MessageTypes.TEXT, // json or text check
-                metadata: { content: result.result, action: result.action, needFeedback: result.needFeedback, isGherkinScriptQuery: result.isGherkinScriptQuery },
+                messageType: !!result?.result?.length ? MessageTypes.JSON : MessageTypes.TEXT, // json or text check
+                metadata: { content: result?.result, action: result?.action, needFeedback: result?.needFeedback, isGherkinScriptQuery: result?.isGherkinScriptQuery },
                 role: MessageRoles.SYSTEM
             }
 
@@ -129,16 +130,16 @@ export default class CategoriesController {
             await this.chatService.create(chats)
             return res.status(200).json({
                 uuid,
-                message: result.feedback,
-                messageType: !!result.result?.length ? MessageTypes.JSON : MessageTypes.TEXT, // json or text check
+                message: result?.feedback || "Document is indexed successfully",
+                messageType: !!result?.result?.length ? MessageTypes.JSON : MessageTypes.TEXT, // json or text check
                 metadata: {
-                    content: result.result,
-                    action: result.action,
-                    needFeedback: result.needFeedback,
-                    isEmailQuery: result.isEmailQuery,
-                    emailId: result.email,
+                    content: result?.result,
+                    action: result?.action,
+                    needFeedback: result?.needFeedback,
+                    isEmailQuery: result?.isEmailQuery,
+                    emailId: result?.email,
                     isPdfUploaded: fileIdexingResp?.metadata.fileType === 'pdf' ? true : false,
-                    isGherkinScriptQuery: result.isGherkinScriptQuery
+                    isGherkinScriptQuery: result?.isGherkinScriptQuery
                 },
                 role: 'system'
             });
