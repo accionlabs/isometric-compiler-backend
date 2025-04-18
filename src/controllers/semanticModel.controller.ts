@@ -30,7 +30,7 @@ export default class SematicModelController {
                 throw new ApiError('Shape not found', 404)
             }
             res.status(200).json({
-                ...sematicModel.metadata,
+                ...sematicModel.qum_specs,
                 visualModel: sematicModel.visualModel,
                 status: sematicModel.status
             });
