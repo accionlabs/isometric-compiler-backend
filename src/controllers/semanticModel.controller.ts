@@ -32,6 +32,7 @@ export default class SematicModelController {
             res.status(200).json({
                 ...sematicModel.qum_specs,
                 visualModel: sematicModel.visualModel,
+                architectural_specs: sematicModel.architectural_specs,
                 status: sematicModel.status
             });
         } catch (e) {
