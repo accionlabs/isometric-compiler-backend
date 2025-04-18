@@ -30,11 +30,17 @@ export default class DiagramController {
             if (!userId) throw new ApiError('Unauthorized', 401);
 
             // If uuid not present, fetch default project UUID for admin user
-            if (!uuid) {
-                uuid = await this.projectService.getDefaultProjectUUID();
+            // if (!uuid) {
+            //     uuid = await this.projectService.getDefaultProjectUUID();
+            // }
+
+            const project = await this.projectService.findByUUID(uuid);
+
+            if (!project) {
+                throw new ApiError('Project not found', 404);
             }
 
-            const newDiagram = await this.diagramService.create({ ...req.body, uuid, author: req?.user?._id, userId });
+            const newDiagram = await this.diagramService.create({ ...req.body, uuid, userId });
             res.status(201).json(newDiagram);
         } catch (e) {
             next(e)
@@ -53,9 +59,9 @@ export default class DiagramController {
             if (!diagram) {
                 throw new ApiError('diagram not found', 404)
             }
-            if (diagram.author._id.toString() != req?.user?._id.toString()) {
-                throw new ApiError('not authorized to edit', 403)
-            }
+            // if (diagram.userId.toString() != req?.user?._id.toString()) {
+            //     throw new ApiError('not authorized to edit', 403)
+            // }
             const updatedDiagram = await this.diagramService.update(Number(diagramId), req.body);
             res.status(200).json(updatedDiagram);
         } catch (e) {

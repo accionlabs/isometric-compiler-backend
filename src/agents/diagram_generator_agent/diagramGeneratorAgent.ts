@@ -98,7 +98,7 @@ export class DiagramGeneratorAgent {
         }
     }
 
-    async generateIsometricJSONFromBlueprint(uuid: string, filename?: string): Promise<IsometricJsonAgenResp> {
+    async generateIsometricJSONFromBlueprint(uuid: string, userId: number, filename?: string): Promise<IsometricJsonAgenResp> {
 
         const semanticModel = await this.semanticModelService.findByUuid(uuid);
         const documents = await this.pgVectorService.vectorSearch("", { uuid });
@@ -119,7 +119,7 @@ export class DiagramGeneratorAgent {
         const visualModel = diagrmaManger.convertBlueprintToIsometric(blueprint, semanticModel?.metadata?.qum)
 
 
-        this.semanticModelService.saveSemanticModel({ uuid, metadata: { qum: semanticModel?.metadata?.qum, blueprint }, visualModel: visualModel });
+        this.semanticModelService.saveSemanticModel({ userId, uuid, metadata: { qum: semanticModel?.metadata?.qum, blueprint }, visualModel: visualModel });
 
 
         return {
@@ -128,7 +128,7 @@ export class DiagramGeneratorAgent {
         };
     }
 
-    async getIsometricJSONFromUUId(uuid: string): Promise<IsometricJsonAgenResp> {
+    async getIsometricJSONFromUUId(uuid: string, userId: number): Promise<IsometricJsonAgenResp> {
         const semanticModel = await this.semanticModelService.findByUuid(uuid);
         if (semanticModel?.visualModel?.length) {
             return {
@@ -136,7 +136,7 @@ export class DiagramGeneratorAgent {
                 isometric: semanticModel?.visualModel
             };
         }
-        return this.generateIsometricJSONFromBlueprint(uuid);
+        return this.generateIsometricJSONFromBlueprint(uuid, userId);
     }
 
     async generateIsometricJSONFromImage(image: string, uuid: string, availableDocuments: Document[]): Promise<IsometricJsonAgenResp> {

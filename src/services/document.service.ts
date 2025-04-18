@@ -69,7 +69,7 @@ export class DocumentService extends BaseService<Document> {
         });
         await this.pgVectorService.indexDocument(file, fileContent);
         if (agent === Agents.ARCHITECTURE_AGENT) {
-            this.diagramGeneratorAgent.generateIsometricJSONFromBlueprint(uuid, file.originalname)
+            this.diagramGeneratorAgent.generateIsometricJSONFromBlueprint(uuid, userId, file.originalname)
         } else {
             // const worklowResp = await this.unifiedModelWorkflow.startUnifiedModelWorkflow(uuid, savedDocument._id)
             // console.log("UnifiedModelWorkflow started", worklowResp);
