@@ -1,17 +1,17 @@
-import { Inject, Service } from "typedi"
-import { Controller, Delete, Get, Post, Put } from "../core"
+import axios from "axios";
 import { NextFunction, Request, Response } from 'express';
-import { ChatValidation, ChatGenerateValidation } from "../validations/chat.validation";
-import { ChatService } from "../services/chat.service";
-import { AWSService } from "../services/aws.service";
-import config from "../configs";
-import { DocumentService } from "../services/document.service";
+import { Inject, Service } from "typedi";
+import { DiagramGeneratorAgent } from "../agents/diagram_generator_agent/diagramGeneratorAgent";
 import { MainAgent } from "../agents/mainAgent";
+import { FunctionalAgentWorkflowService } from "../agents/workflows/functionalAgentWorkflow";
+import { Controller, Get, Post } from "../core";
 import { Chat } from "../entities/chat.entity";
 import { Agents, MessageRoles, MessageTypes } from "../enums";
+import { AWSService } from "../services/aws.service";
+import { ChatService } from "../services/chat.service";
+import { DocumentService } from "../services/document.service";
 import ApiError from "../utils/apiError";
-import { DiagramGeneratorAgent } from "../agents/diagram_generator_agent/diagramGeneratorAgent";
-import axios from "axios";
+import { ChatGenerateValidation, ChatValidation } from "../validations/chat.validation";
 
 class ChatResp {
     uuid: string;
@@ -45,6 +45,9 @@ export default class CategoriesController {
     @Inject(() => MainAgent)
     private readonly mainAgent: MainAgent
 
+    @Inject(() => FunctionalAgentWorkflowService)
+    private readonly functionalAgentWorkflowService: FunctionalAgentWorkflowService
+
     @Inject(() => DiagramGeneratorAgent)
     private readonly diagramGeneratorAgent: DiagramGeneratorAgent
 
@@ -66,27 +69,42 @@ export default class CategoriesController {
             if (!userId) {
                 throw new ApiError('user not found', 401)
             }
-            let messageType: MessageTypes = MessageTypes.TEXT;
-            let handledDoc = null;
-            let fileType;
-            if (file) {
-                messageType = MessageTypes.FILE;
-                switch (file?.mimetype) {
-                    case 'image/jpeg':
-                    case 'image/png':
-                        const uploadedImage = await this.awsService.uploadFile(config.ISOMETRIC_IMAGE_FOLDER, file);
-                        fileType = 'image'
-                        handledDoc = await this.documentService.handleImage(file, uuid, uploadedImage.s3Url, agent, userId);
-                        break;
-                    case 'application/pdf':
-                        const uploadedDoc = await this.awsService.uploadFile(config.ISOMETRIC_DOC_FOLDER, file);
-                        fileType = 'pdf'
-                        handledDoc = await this.documentService.handlePdf(file, uuid, uploadedDoc.s3Url, agent, userId);
-                        break;
-                    default:
-                        return res.status(400).json({ message: 'File format not allowed!' });
+            let messageType: MessageTypes = !!file ? MessageTypes.FILE : MessageTypes.TEXT;
+            let fileIdexingResp
+            let result
+            if (agent === Agents.REQUIREMENT_AGENT || agent === Agents.DESIGN_AGENT) {
+                if (!!file) {
+                    console.log("file uploaded")
+                    fileIdexingResp = await this.functionalAgentWorkflowService.fileIndexingWorkflow(uuid as string, file)
+                    console.log("fileIdexingResp", fileIdexingResp)
+                }else{
+                    result = await this.functionalAgentWorkflowService.functionAgentWorkflow(uuid as string, query as string)
                 }
+            } else {
+                result = await this.mainAgent.processRequest(query, uuid, currentState, userId, file)
             }
+            // let handledDoc = null;
+            // let fileType;
+            // if (file) {
+            //     messageType = MessageTypes.FILE;
+            //     switch (file?.mimetype) {
+            //         case 'image/jpeg':
+            //         case 'image/png':
+            //             const uploadedImage = await this.awsService.uploadFile(config.ISOMETRIC_IMAGE_FOLDER, file);
+            //             fileType = 'image'
+            //             handledDoc = await this.documentService.handleImage(file, uuid, uploadedImage.s3Url, agent, userId);
+            //             break;
+            //         case 'application/pdf':
+            //             const uploadedDoc = await this.awsService.uploadFile(config.ISOMETRIC_DOC_FOLDER, file);
+            //             fileType = 'pdf'
+            //             handledDoc = await this.documentService.handlePdf(file, uuid, uploadedDoc.s3Url, agent, userId);
+            //             break;
+            //         default:
+            //             return res.status(400).json({ message: 'File format not allowed!' });
+            //     }
+            // }
+
+
             const question: Partial<Chat> =
             {
                 uuid: uuid as string,
@@ -94,19 +112,17 @@ export default class CategoriesController {
                 messageType: messageType,
                 agent,
                 metadata: {
-                    ...(!!handledDoc?.savedDocument._id && { documentId: handledDoc.savedDocument._id }), ...(!!handledDoc?.savedDocument?.metadata?.fileUrl && { fileUrl: handledDoc?.savedDocument.metadata.fileUrl }),
-                    ...(fileType && { fileType: fileType })
+                    ...fileIdexingResp?.metadata
                 },
                 role: MessageRoles.USER
             }
 
-            const result = await this.mainAgent.processRequest(query, uuid, currentState, userId, file)
             const chats: Partial<Chat> = {
                 uuid,
-                message: result.feedback,
+                message: result?.feedback || "Document is indexed successfully",
                 agent,
-                messageType: !!result.result?.length ? MessageTypes.JSON : MessageTypes.TEXT, // json or text check
-                metadata: { content: result.result, action: result.action, needFeedback: result.needFeedback, isGherkinScriptQuery: result.isGherkinScriptQuery },
+                messageType: !!result?.result?.length ? MessageTypes.JSON : MessageTypes.TEXT, // json or text check
+                metadata: { content: result?.result, action: result?.action, needFeedback: result?.needFeedback, isGherkinScriptQuery: result?.isGherkinScriptQuery },
                 role: MessageRoles.SYSTEM
             }
 
@@ -114,9 +130,17 @@ export default class CategoriesController {
             await this.chatService.create(chats)
             return res.status(200).json({
                 uuid,
-                message: result.feedback,
-                messageType: !!result.result?.length ? 'json' : 'text', // json or text check
-                metadata: { content: result.result, action: result.action, needFeedback: result.needFeedback, isEmailQuery: result.isEmailQuery, emailId: result.email, isPdfUploaded: fileType === 'pdf', isGherkinScriptQuery: result.isGherkinScriptQuery },
+                message: result?.feedback || "Document is indexed successfully",
+                messageType: !!result?.result?.length ? MessageTypes.JSON : MessageTypes.TEXT, // json or text check
+                metadata: {
+                    content: result?.result,
+                    action: result?.action,
+                    needFeedback: result?.needFeedback,
+                    isEmailQuery: result?.isEmailQuery,
+                    emailId: result?.email,
+                    isPdfUploaded: fileIdexingResp?.metadata.fileType === 'pdf' ? true : false,
+                    isGherkinScriptQuery: result?.isGherkinScriptQuery
+                },
                 role: 'system'
             });
         } catch (e) {
