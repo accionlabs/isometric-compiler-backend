@@ -1,16 +1,15 @@
-import { Inject, Service } from "typedi"
-import { Controller, Delete, Get, Post, Put } from "../core"
 import { NextFunction, Request, Response } from 'express';
-import { ChatValidation } from "../validations/chat.validation";
-import { ChatService } from "../services/chat.service";
-import { AWSService } from "../services/aws.service";
-import config from "../configs";
-import { DocumentService } from "../services/document.service";
+import { Inject, Service } from "typedi";
 import { MainAgent } from "../agents/mainAgent";
+import { FunctionalAgentWorkflowService } from "../agents/workflows/functionalAgentWorkflow";
+import { Controller, Get, Post } from "../core";
 import { Chat } from "../entities/chat.entity";
 import { Agents, MessageRoles, MessageTypes } from "../enums";
+import { AWSService } from "../services/aws.service";
+import { ChatService } from "../services/chat.service";
+import { DocumentService } from "../services/document.service";
 import ApiError from "../utils/apiError";
-import { FunctionalAgentWorkflowService } from "../agents/workflows/functionalAgentWorkflow";
+import { ChatValidation } from "../validations/chat.validation";
 
 class ChatResp {
     uuid: string;
@@ -66,7 +65,19 @@ export default class CategoriesController {
                 throw new ApiError('user not found', 401)
             }
             let messageType: MessageTypes = !!file ? MessageTypes.FILE : MessageTypes.TEXT;
+            let fileIdexingResp
+            let result
+            if (agent === Agents.REQUIREMENT_AGENT || agent === Agents.DESIGN_AGENT) {
+                if (!!file) {
+                    console.log("file uploaded")
+                    fileIdexingResp = await this.functionalAgentWorkflowService.fileIndexingWorkflow(uuid as string, file)
+                    console.log("fileIdexingResp", fileIdexingResp)
+                }
+                result = await this.functionalAgentWorkflowService.functionAgentWorkflow(uuid as string, query as string)
+            } else {
+                result = await this.mainAgent.processRequest(query, uuid, currentState, file)
 
+            }
             // let handledDoc = null;
             // let fileType;
             // if (file) {
@@ -87,11 +98,8 @@ export default class CategoriesController {
             //             return res.status(400).json({ message: 'File format not allowed!' });
             //     }
             // }
-            let fileIdexingResp
-            if (!!file) {
-                console.log("file uploaded")
-                fileIdexingResp = await this.functionalAgentWorkflowService.fileIndexingWorkflow(uuid as string, file)
-            }
+
+
             const question: Partial<Chat> =
             {
                 uuid: uuid as string,
@@ -104,7 +112,6 @@ export default class CategoriesController {
                 role: MessageRoles.USER
             }
 
-            const result = await this.mainAgent.processRequest(query, uuid, currentState, file)
             const chats: Partial<Chat> = {
                 uuid,
                 message: result.feedback,
