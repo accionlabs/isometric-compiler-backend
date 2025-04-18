@@ -70,7 +70,7 @@ export class MainAgent {
         return null;
     }
 
-    public async processRequest(question: string, uuid: string, currentState: any = [], file?: Express.Multer.File): Promise<MainAgentRespone> {
+    public async processRequest(question: string, uuid: string, currentState: any = [], userId: number, file?: Express.Multer.File): Promise<MainAgentRespone> {
         const documentDetails = await this.documentService.getDocumentsByUUID(uuid);
         const availableDocuments = documentDetails?.map((doc) => doc.metadata?.filename || '') || [];
         this.loggerService.info(`Processing documents documents ${availableDocuments.join(",")}`)
@@ -119,7 +119,7 @@ export class MainAgent {
                     feedback: creationResult.message || defaultResponse.feedback || '',
                 };
             } else {
-                const creationResult = await this.diagramGeneratorAgent.getIsometricJSONFromUUId(uuid);
+                const creationResult = await this.diagramGeneratorAgent.getIsometricJSONFromUUId(uuid, userId);
                 defaultResponse = {
                     ...defaultResponse,
                     needFeedback: !creationResult.isometric,

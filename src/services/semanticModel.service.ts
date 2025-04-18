@@ -40,6 +40,7 @@ export class SemanticModelService extends BaseService<SemanticModel> {
             if (semanticModel) {
                 const semanticModelCopy = JSON.parse(JSON.stringify(semanticModel)); // Deep copy to avoid mutation
                 if (semanticModelCopy.metadata || semanticModelCopy.visualModel?.length) {
+                    if (!semanticModelCopy.userId) semanticModelCopy.userId = data.userId
                     await this.semanticModelHistoryService.createSemanticModelHistory(semanticModelCopy.uuid, semanticModelCopy);
                 }
                 if (data.metadata && semanticModel.metadata) {
