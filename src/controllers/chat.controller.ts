@@ -77,9 +77,7 @@ export default class CategoriesController {
             let result
             if (agent === Agents.REQUIREMENT_AGENT || agent === Agents.DESIGN_AGENT) {
                 if (!!file) {
-                    console.log("file uploaded")
                     fileIdexingResp = await this.functionalAgentWorkflowService.fileIndexingWorkflow(uuid as string, file)
-                    console.log("fileIdexingResp", fileIdexingResp)
                 } else {
                     result = await this.functionalAgentWorkflowService.functionAgentWorkflow(uuid as string, query as string)
                 }
@@ -175,7 +173,7 @@ export default class CategoriesController {
     )
     async generateDiagram(req: Request, res: Response, next: NextFunction) {
         try {
-            const { uuid, documentId, key } = req.body
+            const { uuid, documentId, key, fileUrl } = req.body
             const userId = req.user?._id
             if (!userId) {
                 throw new ApiError('unauthorized', 403)
@@ -190,14 +188,17 @@ export default class CategoriesController {
                     role: 'system'
                 });
             } else if (key === 'diagram') {
-                if (!documentId) {
+                if (!documentId && !fileUrl) {
                     throw new ApiError('documentId not found', 400)
                 }
-                const document = await this.documentService.findOneById(documentId)
-                if (!document?.metadata?.fileUrl) {
+                let fileUrlN = fileUrl || ''
+                let document
+                if (documentId) document = await this.documentService.findOneById(documentId)
+                fileUrlN = document?.metadata?.fileUrl || fileUrlN
+                if (!fileUrlN) {
                     throw new ApiError("Document not found", 404)
                 }
-                const awsResp = await this.awsService.getPresignedUrlFromUrl(document.metadata?.fileUrl);
+                const awsResp = await this.awsService.getPresignedUrlFromUrl(fileUrlN);
                 if (!awsResp) {
                     throw new ApiError("AWS response not correct", 400)
                 }
@@ -206,7 +207,7 @@ export default class CategoriesController {
                     throw new ApiError("Document not found", 404)
                 }
 
-                const resp = await this.architectualAgentWorkflowService.generateIsometricFromDocment(uuid, document.metadata?.filename, document.metadata?.mimetype, doc.data)
+                const resp = await this.architectualAgentWorkflowService.generateIsometricFromDocment(uuid, doc.data, document?.metadata?.mimetype || 'image/png', document?.metadata?.filename || 'image.png')
                 return res.status(200).json({
                     uuid,
                     message: "Diagram generated successfully",

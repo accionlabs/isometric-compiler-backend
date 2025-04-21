@@ -38,7 +38,6 @@ export class ArchitectualAgentWorkflowService {
             contentType: document.mimetype
         });
         const response = await axios.post(workflowUrl, formData)
-        console.log("respin", response, workflowUrl)
         return response.data;
     }
 
@@ -49,23 +48,28 @@ export class ArchitectualAgentWorkflowService {
         //     filename: document.originalname,
         //     contentType: document.mimetype
         // });
-        console.log("calling apissssssss")
+
         const response = await axios.get(workflowUrl)
-        console.log("respin from generate blueprint", response, workflowUrl)
         return this.mapIsometricToBluprint(response.data?.result, uuid)
     }
 
-    async generateIsometricFromDocment(uuid: string, filename: string, mimetype: string, document: Buffer) {
-        console.log("document", uuid, filename, mimetype)
+    async generateIsometricFromDocment(uuid: string, document: Buffer, mimeType: string, filename: string): Promise<IShape[]> {
         const workflowUrl = `${config.N8N_WEBHOOK_URL}/architecture-agent/generate/image2isometric?uuid=${uuid}`;
         const formData = new FormData();
-        formData.append('document', Buffer.from(document), {
-            filename: filename,
-            contentType: mimetype
+        const imageBuffer = Buffer.from(document);
+        formData.append('document', imageBuffer, {
+            filename: filename, // or get original filename if available
+            contentType: mimeType,
+            knownLength: imageBuffer.length
         });
         formData.append('uuid', uuid)
-        const response = await axios.post(workflowUrl, formData)
-        console.log("respin from doc", response.data, workflowUrl)
+        const axiosConfig = {
+            headers: {
+                ...formData.getHeaders(),
+                'Content-Length': formData.getLengthSync()
+            }
+        };
+        const response = await axios.post(workflowUrl, formData, axiosConfig)
         const mappedData = await this.mapIsometricToQum(response.data?.output?.result, uuid)
         return this.convertFlatToIsometric(mappedData)
     }
@@ -82,7 +86,7 @@ export class ArchitectualAgentWorkflowService {
             return result
         }
         const qum = semanticModel.qum_specs.unified_model;
-        result.map((res: any) => {
+        return result.map((res: any) => {
             const comp = res.components.map((r: any) => {
                 return {
                     ...r,
