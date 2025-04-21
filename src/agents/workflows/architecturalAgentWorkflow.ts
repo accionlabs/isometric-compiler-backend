@@ -70,7 +70,7 @@ export class ArchitectualAgentWorkflowService {
             }
         };
         const response = await axios.post(workflowUrl, formData, axiosConfig)
-        const mappedData = await this.mapIsometricToQum(response.data?.output?.result, uuid)
+        const mappedData = await this.mapIsometricToQum(response.data?.result, uuid)
         return this.convertFlatToIsometric(mappedData)
     }
 
