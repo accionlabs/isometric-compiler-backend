@@ -63,13 +63,13 @@ export default class SematicModelController {
     }, SemanticModel)
     async updateSemanticModel(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { metadata } = req.body;
+            const { qum_specs } = req.body;
 
             const userId = req?.user?._id
             if (!userId) {
                 throw new ApiError('user not found', 401)
             }
-            const updated = await this.semanticModelService.updateSemanticModel(req.params.uuid, { metadata, userId });
+            const updated = await this.semanticModelService.updateSemanticModel(req.params.uuid, { qum_specs, userId });
             res.status(200).json(updated);
         } catch (e) {
             next(e);
