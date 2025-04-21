@@ -52,7 +52,7 @@ export default class CategoriesController {
     @Inject(() => DiagramGeneratorAgent)
     private readonly diagramGeneratorAgent: DiagramGeneratorAgent
 
-    @Inject(() => FunctionalAgentWorkflowService)
+    @Inject(() => ArchitectualAgentWorkflowService)
     private readonly architectualAgentWorkflowService: ArchitectualAgentWorkflowService
 
 
@@ -181,18 +181,14 @@ export default class CategoriesController {
                 throw new ApiError('unauthorized', 403)
             }
             if (key === 'blueprint') {
-                const diagramResp = await this.diagramGeneratorAgent.getIsometricJSONFromUUId(uuid, userId)
-                if (diagramResp) {
-                    return res.status(200).json({
-                        uuid,
-                        message: diagramResp.message,
-                        messageType: 'json',
-                        metadata: { content: diagramResp.isometric },
-                        role: 'system'
-                    });
-                } else {
-                    throw new ApiError('diagram not found', 404)
-                }
+                const diagramResp = await this.architectualAgentWorkflowService.generateBlueprint(uuid)
+                return res.status(200).json({
+                    uuid,
+                    message: "Blueprint generated successfully",
+                    messageType: 'json',
+                    metadata: { result: diagramResp }, // coontent from workflow
+                    role: 'system'
+                });
             } else if (key === 'diagram') {
                 if (!documentId) {
                     throw new ApiError('documentId not found', 400)
@@ -205,13 +201,17 @@ export default class CategoriesController {
                 if (!awsResp) {
                     throw new ApiError("AWS response not correct", 400)
                 }
-                const doc = await axios.get(awsResp) // need to call workflow to generate diagrma from document
+                const doc = await axios.get(awsResp, { responseType: 'arraybuffer' }) // need to call workflow to generate diagrma from document
+                if (!doc.data) {
+                    throw new ApiError("Document not found", 404)
+                }
 
+                const resp = await this.architectualAgentWorkflowService.generateIsometricFromDocment(uuid, document.metadata?.filename, document.metadata?.mimetype, doc.data)
                 return res.status(200).json({
                     uuid,
-                    message: "Message from workflow",
+                    message: "Diagram generated successfully",
                     messageType: 'json',
-                    metadata: {}, // coontent from workflow
+                    metadata: { result: resp }, // coontent from workflow
                     role: 'system'
                 });
             } else {
