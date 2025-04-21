@@ -40,4 +40,8 @@ export class ChatGenerateValidation {
 
     @IsEnum(Key)
     key: string
+
+    @IsString()
+    @IsOptional()
+    fileUrl?: string
 }
