@@ -76,11 +76,11 @@ export class GherkinAgent {
             }
         }
         let outcomdes: OutecomeReps[] | never[] = []
-        semanticModel.metadata?.qum?.forEach((persona: PersonaResp) => {
+        semanticModel.qum_specs?.unified_model?.forEach((persona: PersonaResp) => {
             outcomdes = [...outcomdes, ...persona.outcomes ?? []]
         })
         return {
-            feedback: 'A Gherkin script has beend generated successfully.',
+            feedback: 'A Gherkin script has been generated successfully.',
             result: this.generateGherkinFromOutcomes(outcomdes),
         }
     }
