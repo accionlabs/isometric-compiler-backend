@@ -26,7 +26,7 @@ export default class SematicModelHistoryController {
             if (!uuid) {
                 throw new ApiError("UUID is required", 400);
             }
-            const allowedFields: (keyof SemanticModelHistory)[] = ['createdAt', 'userId', "updatedAt", "status"];
+            const allowedFields: (keyof SemanticModelHistory)[] = ['createdAt', 'userId', "updatedAt", "status", "uuid"];
 
             const selectedFields = { _id: true, uuid: true, createdAt: true, updatedAt: true, status: true, agent: true }
             const filters = FilterUtils.buildPostgresFilters<SemanticModelHistory>(restQuery, allowedFields);
