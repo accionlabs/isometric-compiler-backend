@@ -47,7 +47,7 @@ export default class ProjectController {
                 [sortName as string]: sortOrder === 'asc' ? 1 : -1
             };
 
-            const allowedFields: (keyof Project)[] = ['name', 'createdAt', "updatedAt", "status"];
+            const allowedFields: (keyof Project)[] = ['name', 'createdAt', "updatedAt", "status", "uuid"];
             const filters = FilterUtils.buildPostgresFilters<Project>(query, allowedFields);
 
             const { data, total } = await this.projectService.findWithFilters(
