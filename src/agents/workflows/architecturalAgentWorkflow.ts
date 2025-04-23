@@ -2,12 +2,13 @@ import axios from 'axios';
 import FormData from 'form-data';
 import { Inject, Service } from "typedi";
 import config from "../../configs";
-import { FileType } from "../../entities/document.entity";
-import ShapeManager, { IShape } from '../shapesManager';
-import { filterQumByScenarios, getLayerByLength, nextPositionOnLayer } from '../helpers';
 import shapes from '../../configs/shapesv3.json';
+import { FileType } from "../../entities/document.entity";
+import { Agents } from '../../enums';
 import { SemanticModelService } from '../../services/semanticModel.service';
 import { DiagramManager } from '../diagramManager';
+import { filterQumByScenarios, getLayerByLength, nextPositionOnLayer } from '../helpers';
+import ShapeManager, { IShape } from '../shapesManager';
 
 const COMPONENTS = Object.keys(shapes['components']);
 const SHAPES_3D = Object.keys(shapes['3dshapes']);
@@ -37,6 +38,7 @@ export class ArchitectualAgentWorkflowService {
             filename: document.originalname,
             contentType: document.mimetype
         });
+        formData.append('agent', Agents.ARCHITECTURE_AGENT);
         const response = await axios.post(workflowUrl, formData)
         return response.data;
     }

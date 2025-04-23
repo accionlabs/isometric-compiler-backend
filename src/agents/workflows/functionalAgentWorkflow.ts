@@ -1,3 +1,4 @@
+import { Agents } from './../../enums/index';
 import axios from 'axios';
 import FormData from 'form-data';
 import { Service } from "typedi";
@@ -31,9 +32,10 @@ export class FunctionalAgentWorkflowService {
         const formData = new FormData();
         formData.append('document', document.buffer, {
             filename: document.originalname,
-            contentType: document.mimetype
+            contentType: document.mimetype,
         });
         formData.append('uuid', uuid);
+        formData.append('agent', Agents.REQUIREMENT_AGENT);
         const response = await axios.post(workflowUrl, formData)
         return response.data;
     }
@@ -42,7 +44,7 @@ export class FunctionalAgentWorkflowService {
         const workflowUrl = `${config.N8N_WEBHOOK_URL}/functional-agent/chat`;
         const requestBody = {
             uuid: uuid,
-            query: query,
+            query: query
         };
         const response = await axios.post(workflowUrl, requestBody, {
             headers: {
