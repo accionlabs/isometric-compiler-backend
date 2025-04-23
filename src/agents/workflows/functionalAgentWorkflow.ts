@@ -1,9 +1,9 @@
-import { Agents } from './../../enums/index';
 import axios from 'axios';
 import FormData from 'form-data';
 import { Service } from "typedi";
 import config from "../../configs";
 import { FileType } from "../../entities/document.entity";
+import { Agents } from './../../enums/index';
 
 export interface FileIndexingWorkflowResp {
     metadata:
@@ -32,7 +32,7 @@ export class FunctionalAgentWorkflowService {
         const formData = new FormData();
         formData.append('document', document.buffer, {
             filename: document.originalname,
-            contentType: document.mimetype,
+            contentType: document.mimetype
         });
         formData.append('uuid', uuid);
         formData.append('agent', Agents.REQUIREMENT_AGENT);
