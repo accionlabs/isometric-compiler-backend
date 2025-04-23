@@ -26,7 +26,7 @@ export interface FunctionalAgentWorkflowResp {
 @Service()
 export class FunctionalAgentWorkflowService {
 
-    async fileIndexingWorkflow(uuid: string, document: Express.Multer.File): Promise<FileIndexingWorkflowResp> {
+    async fileIndexingWorkflow(uuid: string, agent: string, document: Express.Multer.File): Promise<FileIndexingWorkflowResp> {
         const workflowUrl = `${config.N8N_WEBHOOK_URL}/functional-agent/document/index`;
         const formData = new FormData();
         formData.append('document', document.buffer, {
@@ -34,6 +34,7 @@ export class FunctionalAgentWorkflowService {
             contentType: document.mimetype
         });
         formData.append('uuid', uuid);
+        formData.append('agent', agent);
         const response = await axios.post(workflowUrl, formData)
         return response.data;
     }
@@ -42,7 +43,7 @@ export class FunctionalAgentWorkflowService {
         const workflowUrl = `${config.N8N_WEBHOOK_URL}/functional-agent/chat`;
         const requestBody = {
             uuid: uuid,
-            query: query,
+            query: query
         };
         const response = await axios.post(workflowUrl, requestBody, {
             headers: {
