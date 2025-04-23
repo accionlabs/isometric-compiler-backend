@@ -10,6 +10,7 @@ interface PersonalizedUxResp {
     type: "Web App" | "Mobile App" | "Chat Agent"
     description: string
     technology: "React" | "Angular" | "Vue" | "Flutter" | "React Native"
+    name: string
 }
 
 interface EntityMicroservicesResp {
