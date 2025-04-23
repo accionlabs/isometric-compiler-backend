@@ -77,7 +77,7 @@ export default class CategoriesController {
             let result
             if (agent === Agents.REQUIREMENT_AGENT || agent === Agents.DESIGN_AGENT) {
                 if (!!file) {
-                    fileIdexingResp = await this.functionalAgentWorkflowService.fileIndexingWorkflow(uuid as string, file)
+                    fileIdexingResp = await this.functionalAgentWorkflowService.fileIndexingWorkflow(uuid as string, agent as string, file)
                 } else {
                     result = await this.functionalAgentWorkflowService.functionAgentWorkflow(uuid as string, query as string)
                 }
