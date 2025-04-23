@@ -4,7 +4,6 @@ import { Inject, Service } from "typedi";
 import config from "../../configs";
 import shapes from '../../configs/shapesv3.json';
 import { FileType } from "../../entities/document.entity";
-import { Agents } from '../../enums';
 import { SemanticModelService } from '../../services/semanticModel.service';
 import { DiagramManager } from '../diagramManager';
 import { filterQumByScenarios, getLayerByLength, nextPositionOnLayer } from '../helpers';
@@ -38,7 +37,6 @@ export class ArchitectualAgentWorkflowService {
             filename: document.originalname,
             contentType: document.mimetype
         });
-        formData.append('agent', Agents.ARCHITECTURE_AGENT);
         const response = await axios.post(workflowUrl, formData)
         return response.data;
     }
