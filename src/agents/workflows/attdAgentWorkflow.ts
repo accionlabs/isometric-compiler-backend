@@ -15,8 +15,8 @@ export interface FileIndexingWorkflowResp {
     }
 }
 
-export interface FunctionalAgentWorkflowResp {
-    feedback: string,
+export interface AttdAgentWorkflowResp {
+    feedback: string
     result?: any,
     action?: any[],
     needFeedback?: boolean,
@@ -25,7 +25,7 @@ export interface FunctionalAgentWorkflowResp {
     isGherkinScriptQuery?: boolean,
 }
 @Service()
-export class FunctionalAgentWorkflowService {
+export class AttdAgentWorkflowService {
 
     async fileIndexingWorkflow(uuid: string, agent: string, document: Express.Multer.File): Promise<FileIndexingWorkflowResp> {
         const workflowUrl = `${config.N8N_WEBHOOK_URL}/functional-agent/document/index`;
@@ -37,11 +37,12 @@ export class FunctionalAgentWorkflowService {
         formData.append('uuid', uuid);
         formData.append('agent', agent);
         const response = await axios.post(workflowUrl, formData)
+        console.log("response", response.data)
         return response.data;
     }
 
-    async functionAgentWorkflow(uuid: string, query: string): Promise<FunctionalAgentWorkflowResp> {
-        const workflowUrl = `${config.N8N_WEBHOOK_URL}/functional-agent/chat`;
+    async attdAgentWorkflow(uuid: string, query: string): Promise<AttdAgentWorkflowResp> {
+        const workflowUrl = `${config.N8N_WEBHOOK_URL}/atdd-agent/chat`;
         const requestBody = {
             uuid: uuid,
             query: query
