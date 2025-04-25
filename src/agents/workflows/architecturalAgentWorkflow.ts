@@ -15,6 +15,7 @@ const SHAPES_2D = Object.keys(shapes['2dshapes']);
 const ALL_SHAPES = [...SHAPES_2D, ...COMPONENTS];
 
 export interface FileIndexingWorkflowResp {
+    feedback: string;
     metadata:
     {
         documentId: number

@@ -13,6 +13,7 @@ import { ChatService } from "../services/chat.service";
 import { DocumentService } from "../services/document.service";
 import ApiError from "../utils/apiError";
 import { ChatGenerateValidation, ChatValidation } from "../validations/chat.validation";
+import { AttdAgentWorkflowService } from "../agents/workflows/attdAgentWorkflow";
 
 class ChatResp {
     uuid: string;
@@ -55,6 +56,9 @@ export default class CategoriesController {
     @Inject(() => ArchitectualAgentWorkflowService)
     private readonly architectualAgentWorkflowService: ArchitectualAgentWorkflowService
 
+    @Inject(() => AttdAgentWorkflowService)
+    private readonly attdAgentworkFlow: AttdAgentWorkflowService
+
 
 
     @Post('/', ChatValidation, {
@@ -78,12 +82,20 @@ export default class CategoriesController {
             if (agent === Agents.REQUIREMENT_AGENT || agent === Agents.DESIGN_AGENT) {
                 if (!!file) {
                     fileIdexingResp = await this.functionalAgentWorkflowService.fileIndexingWorkflow(uuid as string, agent as string, file)
+                    fileIdexingResp.feedback = "Document Index Successfully!"
                 } else {
                     result = await this.functionalAgentWorkflowService.functionAgentWorkflow(uuid as string, query as string)
                 }
             }
             else if (agent === Agents.ARCHITECTURE_AGENT && file) {
                 fileIdexingResp = await this.architectualAgentWorkflowService.fileIndexingWorkflow(uuid as string, file)
+                fileIdexingResp.feedback = "Document Index Successfully!"
+            } else if (agent === Agents.ATDD_AGENT) {
+                if (!!file) {
+                    fileIdexingResp = await this.attdAgentworkFlow.fileIndexingWorkflow(uuid, agent, file)
+                    fileIdexingResp.feedback = "Document Index Successfully!"
+                }
+                else result = await this.attdAgentworkFlow.attdAgentWorkflow(uuid, query)
             }
             else {
                 result = await this.mainAgent.processRequest(query, uuid, currentState, userId, file)
@@ -104,7 +116,7 @@ export default class CategoriesController {
 
             const chats: Partial<Chat> = {
                 uuid,
-                message: result?.feedback || "Document is indexed successfully",
+                message: result?.feedback || fileIdexingResp?.feedback || "Something Went Wrong!",
                 agent,
                 messageType: !!result?.result?.length ? MessageTypes.JSON : MessageTypes.TEXT, // json or text check
                 metadata: { content: result?.result, action: result?.action, needFeedback: result?.needFeedback, isGherkinScriptQuery: result?.isGherkinScriptQuery },
@@ -115,7 +127,7 @@ export default class CategoriesController {
             await this.chatService.create(chats)
             return res.status(200).json({
                 uuid,
-                message: result?.feedback || "Document is indexed successfully",
+                message: result?.feedback || fileIdexingResp?.feedback || "Something Went Wrong!",
                 messageType: !!result?.result?.length ? MessageTypes.JSON : MessageTypes.TEXT, // json or text check
                 metadata: {
                     content: result?.result,
