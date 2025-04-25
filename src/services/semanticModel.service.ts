@@ -1,16 +1,22 @@
-import { Service } from "typedi";
+import { Inject, Service } from "typedi";
 import { AppDataSource } from "../configs/database";
 import { SemanticModel } from "../entities/semantic_models.entity";
 import { BaseService } from "./base.service";
 import { Agents, SemanticModelStatus } from "../enums";
 import { PersonaResp } from "../agents/qum_agent/qumAgent";
+import ApiError from "../utils/apiError";
+import { SemanticModelHistoryService } from "./semanticModelHistory.service";
 
 type Qum = {
-    qum: PersonaResp[];
+    unified_model: PersonaResp[];
 };
 
 @Service()
 export class SemanticModelService extends BaseService<SemanticModel> {
+
+    @Inject(() => SemanticModelHistoryService)
+    private readonly semanticModelHistoryService: SemanticModelHistoryService
+
     constructor() {
         super(AppDataSource.getRepository(SemanticModel));
     }
@@ -32,15 +38,20 @@ export class SemanticModelService extends BaseService<SemanticModel> {
             });
 
             if (semanticModel) {
-                if (data.metadata && semanticModel.metadata) {
-                    semanticModel.metadata = this.mergeJsons(semanticModel.metadata as Qum | undefined, data.metadata as Qum);
-                } else if (data.metadata) {
-                    semanticModel.metadata = data.metadata;
+                const semanticModelCopy = JSON.parse(JSON.stringify(semanticModel)); // Deep copy to avoid mutation
+                if (semanticModelCopy.qum_specs || semanticModelCopy.architectural_specs?.length) {
+                    if (!semanticModelCopy.userId) semanticModelCopy.userId = data.userId
+                    await this.semanticModelHistoryService.createSemanticModelHistory(semanticModelCopy.uuid, semanticModelCopy);
+                }
+                if (data.qum_specs && semanticModel.qum_specs) {
+                    semanticModel.qum_specs = this.mergeJsons(semanticModel.qum_specs as Qum | undefined, data.qum_specs as Qum);
+                } else if (data.qum_specs) {
+                    semanticModel.qum_specs = data.qum_specs;
                 }
 
                 Object.assign(semanticModel, {
                     ...data,
-                    metadata: semanticModel.metadata, // keep the merged one
+                    qum_specs: semanticModel.qum_specs, // keep the merged one
                 });
             } else {
                 semanticModel = repo.create(data);
@@ -50,6 +61,58 @@ export class SemanticModelService extends BaseService<SemanticModel> {
         });
     }
 
+    async updateSemanticModel(
+        uuid: string,
+        data: Partial<Pick<SemanticModel, 'qum_specs' | 'userId'>>
+    ): Promise<SemanticModel> {
+        if (!uuid) {
+            throw new ApiError("UUID is required", 400);
+        }
+
+        return this.getRepository().manager.transaction(async (manager) => {
+            const repo = manager.getRepository(SemanticModel);
+            const semanticModel = await repo.findOne({
+                where: { uuid },
+                lock: { mode: "pessimistic_write" },
+            });
+
+            if (!semanticModel) {
+                throw new ApiError("Semantic model not found", 404);
+            }
+
+            // change this logic as metadata is not being used instead of this we are using architectual_specs and qum_specs
+            const isMetadataChanged =
+                data.qum_specs && JSON.stringify(data.qum_specs) !== JSON.stringify(semanticModel.qum_specs);
+
+            if (!isMetadataChanged) {
+                throw new ApiError("No changes detected", 400);
+            }
+
+            const semanticModelCopy = JSON.parse(JSON.stringify(semanticModel));
+            if (!semanticModelCopy.userId) semanticModelCopy.userId = data.userId
+
+            // Save previous state to history
+            await this.semanticModelHistoryService.createSemanticModelHistory(uuid, semanticModelCopy);
+
+            // Apply updates
+            Object.assign(semanticModel, data);
+            return await repo.save(semanticModel);
+        });
+    }
+
+
+    async revertToHistory(uuid: string, historyId: number, userId: number): Promise<SemanticModel> {
+        const history = await this.semanticModelHistoryService.findByIdAndUuid(historyId, uuid);
+        if (!history) {
+            throw new ApiError("Semantic model history not found for given UUID", 404);
+        }
+
+        // - save current version to history
+        return this.updateSemanticModel(uuid, {
+            ...history,
+            userId,
+        });
+    }
 
 
     async getAgentStatus(uuid: string) {
@@ -79,15 +142,15 @@ export class SemanticModelService extends BaseService<SemanticModel> {
         if (!json1 || Object.keys(json1).length === 0) return json2 || {};
         if (!json2 || Object.keys(json2).length === 0) return json1 || {};
         // Start with a deep clone of json1 to avoid mutating it
-        const merged: Qum = { qum: JSON.parse(JSON.stringify(json1.qum ?? [])) };
+        const merged: Qum = { unified_model: JSON.parse(JSON.stringify(json1.unified_model ?? [])) };
 
         // Iterate through each persona in json2.
-        for (const persona2 of json2.qum) {
+        for (const persona2 of json2.unified_model) {
             // Check if this persona already exists in merged data.
-            let existingPersona = merged.qum.find(p => p.persona === persona2.persona);
+            let existingPersona = merged.unified_model.find(p => p.persona === persona2.persona);
             if (!existingPersona) {
                 // Persona does not exist, so add it entirely.
-                merged.qum.push(persona2);
+                merged.unified_model.push(persona2);
             } else {
                 // Persona exists: merge outcomes.
                 for (const outcome2 of (persona2?.outcomes || [])) {
@@ -144,7 +207,7 @@ export class SemanticModelService extends BaseService<SemanticModel> {
                 }
             }
         }
-        if (!merged.qum.length) {
+        if (!merged.unified_model.length) {
             return {};
         }
         return merged;

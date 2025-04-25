@@ -2,7 +2,7 @@ import { extractScenarios } from "./helpers";
 import { getCache } from "./cache";
 import { Inject, Service } from "typedi";
 import { SemanticModelService } from "../services/semanticModel.service";
-import { SemanticModelStatus } from "../enums";
+import { Agents, SemanticModelStatus } from "../enums";
 import { QUMAgent, QumBusinessSpecAgenResp, QumDesignSpecAgentResp, ScenarioResp } from "./qum_agent/qumAgent";
 import { LoggerService } from "../services/logger.service";
 import { DocumentService } from "../services/document.service";
@@ -44,14 +44,16 @@ export class UnifiedModelGenerator {
         return personas;
     }
 
-    public async regenerateUnifiedModel(uuid: string, agent: string, documentId: number, filename?: string): Promise<void> {
+    public async regenerateUnifiedModel(uuid: string, agent: string, documentId: number, userId: number, filename?: string): Promise<void> {
         console.log("regenerateUnifiedModel checking in cache", uuid, agent, filename);
         const cache = await getCache(filename);
         if (cache !== null) {
             await this.semanticModelService.saveSemanticModel({
                 uuid,
                 metadata: cache,
-                status: SemanticModelStatus.ACTIVE
+                status: SemanticModelStatus.ACTIVE,
+                userId,
+                agent: agent as Agents
             });
             return;
         }
@@ -99,6 +101,8 @@ export class UnifiedModelGenerator {
                 uuid,
                 metadata: unifiedModel,
                 status: SemanticModelStatus.ACTIVE,
+                userId,
+                agent: agent as Agents,
                 agentStatus: { [agent]: SemanticModelStatus.ACTIVE }
             });
         } catch (error: any) {

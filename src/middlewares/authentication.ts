@@ -20,7 +20,7 @@ declare global {
 
 export function authenticate(isAuthenticated: boolean) {
   return async function (req: Request, res: Response, next: NextFunction) {
-    /* try {
+    try {
       if (!isAuthenticated) {
         return next()
       }
@@ -54,8 +54,7 @@ export function authenticate(isAuthenticated: boolean) {
       }
     } catch (e) {
       next(e)
-    } */
-    return next()
+    }
   }
 }
 

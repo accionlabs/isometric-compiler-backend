@@ -25,6 +25,9 @@ export class CreateDiagramValidation {
     @IsArray()
     @IsObject({ each: true })
     diagramComponents?: Record<string, any>[];
+
+    @IsString()
+    uuid: string; // Project UUID
 }
 
 export class DiagramUpdateValidation {

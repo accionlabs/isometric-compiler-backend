@@ -128,7 +128,7 @@ export class DiagramManager {
             const isSingle = blueprint.personalized_ux.length === 1;
             for (let i = 0; i < blueprint.personalized_ux.length; i++) {
                 let default_shape = 'Personalized Ux';
-                this.manager.addShape(currentLayer.id, default_shape, "COMPONENT", blueprint.personalized_ux[i].type, isSingle ? 'top-c1' : 'top', null, blueprintDescription['ux_engine'], isSingle);
+                this.manager.addShape(currentLayer.id, default_shape, "COMPONENT", blueprint.personalized_ux[i].name, isSingle ? 'top-c1' : 'top', null, blueprintDescription['ux_engine'], isSingle);
             }
         }
         return this.manager.getAll();

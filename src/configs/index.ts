@@ -21,6 +21,7 @@ const config = {
     DATABASE_CLIENT: process.env.DATABASE_CLIENT,
 
     SOURCE_EMAIL_ID: process.env.SOURCE_EMAIL_ID,
+    N8N_WEBHOOK_URL: process.env.N8N_WEBHOOK_URL,
 
 
 }
