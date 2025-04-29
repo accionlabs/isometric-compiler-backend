@@ -138,7 +138,6 @@ export default class CategoriesController {
                     isPdfUploaded: fileIdexingResp?.metadata.fileType === 'pdf' ? true : false,
                     isGherkinScriptQuery: result?.isGherkinScriptQuery
                 },
-                isGherkinScriptQuery: result?.isGherkinScriptQuery,
                 role: 'system'
             });
         } catch (e) {
