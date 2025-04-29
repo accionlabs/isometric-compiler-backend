@@ -27,31 +27,47 @@ export interface FunctionalAgentWorkflowResp {
 @Service()
 export class FunctionalAgentWorkflowService {
 
-    async fileIndexingWorkflow(uuid: string, agent: string, document: Express.Multer.File): Promise<FileIndexingWorkflowResp> {
-        const workflowUrl = `${config.N8N_WEBHOOK_URL}/functional-agent/document/index`;
-        const formData = new FormData();
-        formData.append('document', document.buffer, {
-            filename: document.originalname,
-            contentType: document.mimetype
-        });
-        formData.append('uuid', uuid);
-        formData.append('agent', agent);
-        const response = await axios.post(workflowUrl, formData)
-        return response.data;
+    async fileIndexingWorkflow(uuid: string, agent: string, document: Express.Multer.File, userId: number = 1): Promise<FileIndexingWorkflowResp> {
+        try {
+            const workflowUrl = `${config.N8N_WEBHOOK_URL}/functional-agent/document/index`;
+            const formData = new FormData();
+            formData.append('document', document.buffer, {
+                filename: document.originalname,
+                contentType: document.mimetype
+            });
+            formData.append('uuid', uuid);
+            formData.append('agent', agent);
+            formData.append('userId', userId)
+            const response = await axios.post(workflowUrl, formData)
+            return response.data;
+        } catch (error) {
+            console.log(error)
+            throw error
+        }
+
     }
 
-    async functionAgentWorkflow(uuid: string, query: string): Promise<FunctionalAgentWorkflowResp> {
-        const workflowUrl = `${config.N8N_WEBHOOK_URL}/functional-agent/chat`;
-        const requestBody = {
-            uuid: uuid,
-            query: query
-        };
-        const response = await axios.post(workflowUrl, requestBody, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        return response.data;
+    async functionAgentWorkflow(uuid: string, query: string, agent: string, userId: number = 1): Promise<FunctionalAgentWorkflowResp> {
+        try {
+            const workflowUrl = `${config.N8N_WEBHOOK_URL}/functional-agent/chat`;
+            const requestBody = {
+                uuid: uuid,
+                query: query,
+                agent: agent,
+                userId: userId
+            };
+
+            const response = await axios.post(workflowUrl, requestBody, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            return response.data;
+        } catch (error) {
+            console.log(error)
+            throw error;
+        }
+
     }
 
 }
