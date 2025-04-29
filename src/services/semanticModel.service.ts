@@ -82,12 +82,9 @@ export class SemanticModelService extends BaseService<SemanticModel> {
 
             // change this logic as metadata is not being used instead of this we are using architectual_specs and qum_specs
             const isMetadataChanged =
-                data.qum_specs && JSON.stringify(data.qum_specs) !== JSON.stringify(semanticModel.qum_specs);
+                (data.qum_specs || data.architectural_specs) && JSON.stringify({ qum_specs: data.qum_specs, architectural_specs: data.architectural_specs }) !== JSON.stringify({ qum_specs: semanticModel.qum_specs, architectural_specs: semanticModel.architectural_specs });
 
-            const isArchitecturalSpecsChanged =
-                data.architectural_specs && JSON.stringify(data.architectural_specs) !== JSON.stringify(semanticModel.architectural_specs);
-
-            if (!isMetadataChanged && !isArchitecturalSpecsChanged) {
+            if (!isMetadataChanged) {
                 throw new ApiError("No changes detected", 400);
             }
 
