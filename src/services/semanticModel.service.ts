@@ -63,7 +63,7 @@ export class SemanticModelService extends BaseService<SemanticModel> {
 
     async updateSemanticModel(
         uuid: string,
-        data: Partial<Pick<SemanticModel, 'qum_specs' | 'userId'>>
+        data: Partial<Pick<SemanticModel, 'architectural_specs' | 'qum_specs' | 'userId'>>
     ): Promise<SemanticModel> {
         if (!uuid) {
             throw new ApiError("UUID is required", 400);
@@ -82,7 +82,7 @@ export class SemanticModelService extends BaseService<SemanticModel> {
 
             // change this logic as metadata is not being used instead of this we are using architectual_specs and qum_specs
             const isMetadataChanged =
-                data.qum_specs && JSON.stringify(data.qum_specs) !== JSON.stringify(semanticModel.qum_specs);
+                (data.qum_specs || data.architectural_specs) && JSON.stringify({ qum_specs: data.qum_specs, architectural_specs: data.architectural_specs }) !== JSON.stringify({ qum_specs: semanticModel.qum_specs, architectural_specs: semanticModel.architectural_specs });
 
             if (!isMetadataChanged) {
                 throw new ApiError("No changes detected", 400);
