@@ -47,12 +47,14 @@ export class FunctionalAgentWorkflowService {
 
     }
 
-    async functionAgentWorkflow(uuid: string, query: string): Promise<FunctionalAgentWorkflowResp> {
+    async functionAgentWorkflow(uuid: string, query: string, agent: string, userId: number = 1): Promise<FunctionalAgentWorkflowResp> {
         try {
             const workflowUrl = `${config.N8N_WEBHOOK_URL}/functional-agent/chat`;
             const requestBody = {
                 uuid: uuid,
-                query: query
+                query: query,
+                agent: agent,
+                userId: userId
             };
 
             const response = await axios.post(workflowUrl, requestBody, {
