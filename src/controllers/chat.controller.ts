@@ -1,10 +1,7 @@
 import axios from "axios";
 import { NextFunction, Request, Response } from 'express';
 import { Inject, Service } from "typedi";
-import { DiagramGeneratorAgent } from "../agents/diagram_generator_agent/diagramGeneratorAgent";
-import { MainAgent } from "../agents/mainAgent";
 import { ArchitectualAgentWorkflowService } from "../agents/workflows/architecturalAgentWorkflow";
-import { FunctionalAgentWorkflowService } from "../agents/workflows/functionalAgentWorkflow";
 import { Controller, Get, Post } from "../core";
 import { Chat } from "../entities/chat.entity";
 import { Agents, MessageRoles, MessageTypes } from "../enums";
@@ -13,7 +10,7 @@ import { ChatService } from "../services/chat.service";
 import { DocumentService } from "../services/document.service";
 import ApiError from "../utils/apiError";
 import { ChatGenerateValidation, ChatValidation } from "../validations/chat.validation";
-import { AttdAgentWorkflowService } from "../agents/workflows/attdAgentWorkflow";
+import { MainWorkflow } from "../agents/workflows";
 
 class ChatResp {
     uuid: string;
@@ -44,20 +41,12 @@ export default class CategoriesController {
     @Inject(() => DocumentService)
     private readonly documentService: DocumentService
 
-    @Inject(() => MainAgent)
-    private readonly mainAgent: MainAgent
+    @Inject(() => MainWorkflow)
+    private readonly mainWorkFlow: MainWorkflow
 
-    @Inject(() => FunctionalAgentWorkflowService)
-    private readonly functionalAgentWorkflowService: FunctionalAgentWorkflowService
-
-    @Inject(() => DiagramGeneratorAgent)
-    private readonly diagramGeneratorAgent: DiagramGeneratorAgent
 
     @Inject(() => ArchitectualAgentWorkflowService)
     private readonly architectualAgentWorkflowService: ArchitectualAgentWorkflowService
-
-    @Inject(() => AttdAgentWorkflowService)
-    private readonly attdAgentworkFlow: AttdAgentWorkflowService
 
 
 
@@ -69,77 +58,16 @@ export default class CategoriesController {
     )
     async processChat(req: Request, res: Response, next: NextFunction) {
         try {
-
-            const { uuid, query, currentState, agent = Agents.REQUIREMENT_AGENT } = req.body
             const { file } = req
             const userId = req.user?._id
             if (!userId) {
                 throw new ApiError('user not found', 401)
             }
-            let messageType: MessageTypes = !!file ? MessageTypes.FILE : MessageTypes.TEXT;
-            let fileIdexingResp
-            let result
-            if (agent === Agents.REQUIREMENT_AGENT || agent === Agents.DESIGN_AGENT) {
-                if (!!file) {
-                    fileIdexingResp = await this.functionalAgentWorkflowService.fileIndexingWorkflow(uuid as string, agent as string, file)
-                    fileIdexingResp.feedback = "Document Index Successfully!"
-                } else {
-                    result = await this.functionalAgentWorkflowService.functionAgentWorkflow(uuid as string, query as string)
-                }
-            }
-            else if (agent === Agents.ARCHITECTURE_AGENT && file) {
-                fileIdexingResp = await this.architectualAgentWorkflowService.fileIndexingWorkflow(uuid as string, file)
-                fileIdexingResp.feedback = "Document Index Successfully!"
-            } else if (agent === Agents.ATDD_AGENT) {
-                if (!!file) {
-                    fileIdexingResp = await this.attdAgentworkFlow.fileIndexingWorkflow(uuid, agent, file)
-                    fileIdexingResp.feedback = "Document Index Successfully!"
-                }
-                else result = await this.attdAgentworkFlow.attdAgentWorkflow(uuid, query)
-            }
-            else {
-                result = await this.mainAgent.processRequest(query, uuid, currentState, userId, file)
-            }
+            const [userChat, systemChat] = await this.mainWorkFlow.processChat({ ...req.body, file, userId })
 
-
-            const question: Partial<Chat> =
-            {
-                uuid: uuid as string,
-                message: query as string,
-                messageType: messageType,
-                agent,
-                metadata: {
-                    ...fileIdexingResp?.metadata
-                },
-                role: MessageRoles.USER
-            }
-
-            const chats: Partial<Chat> = {
-                uuid,
-                message: result?.feedback || fileIdexingResp?.feedback || "Something Went Wrong!",
-                agent,
-                messageType: !!result?.result?.length ? MessageTypes.JSON : MessageTypes.TEXT, // json or text check
-                metadata: { content: result?.result, action: result?.action, needFeedback: result?.needFeedback, isGherkinScriptQuery: result?.isGherkinScriptQuery },
-                role: MessageRoles.SYSTEM
-            }
-
-            await this.chatService.create(question)
-            await this.chatService.create(chats)
-            return res.status(200).json({
-                uuid,
-                message: result?.feedback || fileIdexingResp?.feedback || "Something Went Wrong!",
-                messageType: !!result?.result?.length ? MessageTypes.JSON : MessageTypes.TEXT, // json or text check
-                metadata: {
-                    content: result?.result,
-                    action: result?.action,
-                    needFeedback: result?.needFeedback,
-                    isEmailQuery: result?.isEmailQuery,
-                    emailId: result?.email,
-                    isPdfUploaded: fileIdexingResp?.metadata.fileType === 'pdf' ? true : false,
-                    isGherkinScriptQuery: result?.isGherkinScriptQuery
-                },
-                role: 'system'
-            });
+            await this.chatService.create(userChat)
+            await this.chatService.create(systemChat)
+            return res.status(200).json(systemChat);
         } catch (e) {
             next(e)
         }
