@@ -81,7 +81,7 @@ export default class CategoriesController {
             let result
             if (agent === Agents.REQUIREMENT_AGENT || agent === Agents.DESIGN_AGENT) {
                 if (!!file) {
-                    fileIdexingResp = await this.functionalAgentWorkflowService.fileIndexingWorkflow(uuid as string, agent as string, file)
+                    fileIdexingResp = await this.functionalAgentWorkflowService.fileIndexingWorkflow(uuid as string, agent as string, file, req.user?._id)
                     fileIdexingResp.feedback = "Document Index Successfully!"
                 } else {
                     result = await this.functionalAgentWorkflowService.functionAgentWorkflow(uuid as string, query as string)
@@ -138,6 +138,7 @@ export default class CategoriesController {
                     isPdfUploaded: fileIdexingResp?.metadata.fileType === 'pdf' ? true : false,
                     isGherkinScriptQuery: result?.isGherkinScriptQuery
                 },
+                isGherkinScriptQuery: result?.isGherkinScriptQuery,
                 role: 'system'
             });
         } catch (e) {
