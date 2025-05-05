@@ -6,7 +6,7 @@ import shapes from '../../configs/shapesv3.json';
 import { FileType } from "../../entities/document.entity";
 import { SemanticModelService } from '../../services/semanticModel.service';
 import { DiagramManager } from '../diagramManager';
-import { filterQumByScenarios, getLayerByLength, nextPositionOnLayer } from '../helpers';
+import { filterQumByScenarios, getLayerByLength, getShapeDetailsFromMaster, nextPositionOnLayer } from '../helpers';
 import ShapeManager, { IShape } from '../shapesManager';
 
 const COMPONENTS = Object.keys(shapes['components']);
@@ -51,7 +51,46 @@ export class ArchitectualAgentWorkflowService {
         // });
 
         const response = await axios.get(workflowUrl)
+        console.log('response********* blue print', response.data)
         return this.mapIsometricToBluprint(response.data?.result, uuid)
+    }
+
+    async architecturalAgentWorkflow(uuid: string, query: string, currentState: any): Promise<any> {
+        const workflowUrl = `${config.N8N_WEBHOOK_URL}/architecture-agent/chat`;
+        const requestBody = {
+            uuid: uuid,
+            query: query,
+            currentState: this.cleanIsometricMetadata(currentState)
+        };
+        console.log('requestBody*********', requestBody)
+        const response = await axios.post(workflowUrl, requestBody, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log('response*********', response.data)
+        let result
+        let errorFeedback: string | false = false;
+        if (response.data.queryType === 'diagramModification') {
+            try {
+                result = this.processDiagramModifierResult(response.data.result, currentState)
+            }
+            catch (e) {
+                errorFeedback = (e as Error).message
+            }
+        } else if (response.data.queryType === 'diagramCreation') {
+            if (!!response.data?.result && response.data?.result?.length !== 0) {
+                result = await this.mapIsometricToBluprint(response.data?.result, uuid)
+            }
+
+        }
+        return {
+            ...response.data,
+            result: result || JSON.parse(currentState),
+            feedback: errorFeedback || response.data.feedback || 'Processed!',
+            action: response.data.result,
+            needFeedback: Boolean(errorFeedback)
+        }
     }
 
     async generateIsometricFromDocment(uuid: string, document: Buffer, mimeType: string, filename: string): Promise<IShape[]> {
@@ -74,6 +113,19 @@ export class ArchitectualAgentWorkflowService {
         const mappedData = await this.mapIsometricToQum(response.data?.result, uuid)
         return this.convertFlatToIsometric(mappedData)
     }
+
+
+    private cleanIsometricMetadata(metadata: any[]) {
+        const clean_metadata = JSON.parse(JSON.stringify(metadata))
+        for (let i = 0; i < clean_metadata?.length; i++) {
+            delete clean_metadata[i].attachmentPoints;
+            delete clean_metadata[i].absolutePosition;
+            delete clean_metadata[i].parentAttachmentPoints;
+            delete clean_metadata[i].cut;
+        }
+        console.log("clean_metadata", clean_metadata)
+        return clean_metadata;
+    };
 
     private async mapIsometricToBluprint(result: any, uuid: string) {
         const semanticModel = await this.semanticModelService.findByUuid(uuid);
@@ -145,6 +197,110 @@ export class ArchitectualAgentWorkflowService {
         }
         // global.logger.info(`No shape detected for ${shape}`);
         return 'Generic Server-L';
+    }
+
+    private processDiagramModifierResult(agent2_actions: any[], current_metadata: any) {
+        let updated_metadata = null;
+        for (const agent2_result of agent2_actions) {
+            if (agent2_result.action && ["undo", "redo"].indexOf(agent2_result.action) === -1) {
+                updated_metadata = this.modifiyDiagam(agent2_result, updated_metadata || current_metadata);
+            } else {
+                throw new Error("Undo/Redo operations not supported yet. Please use the Undo/Redo action on Canvas instead");
+            }
+        }
+        return updated_metadata;
+    }
+
+    private modifiyDiagam(agent2_result: any, metadata: any) {
+        const manager = new ShapeManager(metadata);
+        let { action, id, shapeName, position, relativeTo: relativeTo3dShapeId, name, decorator } = agent2_result;
+        let shapeType = null;
+        if (action === "addLayer") {
+            shapeType = 'LAYER';
+            action = 'add';
+        }
+        if (action === "addComponent") {
+            shapeType = 'COMPONENT';
+            action = 'add';
+        }
+        if (action === "add3D") {
+            shapeType = '3D';
+            action = 'add';
+        }
+        if (action === "addDecorator") {
+            shapeType = '2D';
+            action = 'add';
+        }
+        if (action === "moveDecorator") {
+            shapeType = '2D';
+            action = 'move';
+        }
+        if (action === "move" || action === "remove") {
+            shapeType = '3D';
+        }
+        if (action === "removeDecorator") {
+            shapeType = '2D';
+            action = 'remove';
+        }
+        if (shapeName) {
+            //pass decorator
+            const valid = getShapeDetailsFromMaster(decorator ? decorator : shapeName);
+            shapeName = valid.name;
+            shapeType = valid.type;
+            if (valid.decorator && !decorator) {
+                decorator = valid.decorator;
+            }
+        }
+        switch (action) {
+            case "add":
+                switch (shapeType) {
+                    case "3D":
+                    case "COMPONENT":
+                    case "LAYER":
+                        manager.addShape(relativeTo3dShapeId, shapeName, shapeType, name, position, decorator);
+                        break;
+                    case "2D":
+                        manager.add2DShape(relativeTo3dShapeId, decorator);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case "remove":
+                switch (shapeType) {
+                    case "3D":
+                    case "COMPONENT":
+                    case "LAYER":
+                        manager.remove3DShape(id)
+                        break;
+                    case "2D":
+                        manager.remove2DShape(relativeTo3dShapeId, decorator)
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case "move":
+                switch (shapeType) {
+                    case "3D":
+                    case "COMPONENT":
+                    case "LAYER":
+                        manager.move3DShape(id, relativeTo3dShapeId, position)
+                        break;
+                    case "2D":
+                        manager.move2DShape(id, decorator, relativeTo3dShapeId)
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case "rename":
+                manager.rename(id, name);
+                break;
+            default:
+                break;
+        }
+        return manager.getAll();
     }
 
 }
