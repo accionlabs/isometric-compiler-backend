@@ -60,11 +60,16 @@ export class MainWorkflow {
                 case Agents.ATDD_AGENT:
                     result = await this.attdAgentworkFlow.attdAgentWorkflow(uuid, query)
                     break;
+                case Agents.ARCHITECTURE_AGENT:
+                    result = await this.architectualAgentWorkflowService.architecturalAgentWorkflow(uuid, query, currentState)
+                    break;
                 default:
                     result = await this.mainAgent.processRequest(query, uuid, currentState, userId, file)
             }
 
         }
+
+        console.log(JSON.stringify(result, undefined, 2), "result")
 
         const question: Partial<Chat> =
         {
