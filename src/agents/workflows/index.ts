@@ -55,7 +55,7 @@ export class MainWorkflow {
             switch (agent) {
                 case Agents.REQUIREMENT_AGENT:
                 case Agents.DESIGN_AGENT:
-                    result = await this.functionalAgentWorkflowService.functionAgentWorkflow(uuid, query)
+                    result = await this.functionalAgentWorkflowService.functionAgentWorkflow(uuid, query, agent)
                     break;
                 case Agents.ATDD_AGENT:
                     result = await this.attdAgentworkFlow.attdAgentWorkflow(uuid, query)
