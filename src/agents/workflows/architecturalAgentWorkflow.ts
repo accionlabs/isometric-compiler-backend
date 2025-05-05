@@ -51,7 +51,6 @@ export class ArchitectualAgentWorkflowService {
         // });
 
         const response = await axios.get(workflowUrl)
-        console.log('response********* blue print', response.data)
         return this.mapIsometricToBluprint(response.data?.result, uuid)
     }
 
@@ -62,13 +61,11 @@ export class ArchitectualAgentWorkflowService {
             query: query,
             currentState: this.cleanIsometricMetadata(currentState)
         };
-        console.log('requestBody*********', requestBody)
         const response = await axios.post(workflowUrl, requestBody, {
             headers: {
                 'Content-Type': 'application/json'
             }
         });
-        console.log('response*********', response.data)
         let result
         let errorFeedback: string | false = false;
         if (response.data.queryType === 'diagramModification') {
@@ -123,7 +120,6 @@ export class ArchitectualAgentWorkflowService {
             delete clean_metadata[i].parentAttachmentPoints;
             delete clean_metadata[i].cut;
         }
-        console.log("clean_metadata", clean_metadata)
         return clean_metadata;
     };
 
