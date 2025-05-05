@@ -1,4 +1,5 @@
-import { IsString, IsOptional, MinLength, IsObject, MaxLength, ValidateNested, IsArray, ValidateIf, IsBoolean } from 'class-validator';
+import { IsString, IsOptional, MinLength, MaxLength, IsEnum, IsNumber, IsBoolean } from 'class-validator';
+import { Agents } from '../enums';
 // Metadata class to define the structure and validation of metadat
 // Category validation class
 export class ChatValidation {
@@ -12,6 +13,10 @@ export class ChatValidation {
     @MinLength(10)
     @MaxLength(50)
     uuid: string
+
+    @IsOptional()
+    @IsEnum(Agents)
+    agents?: Agents
 
     @IsOptional()
     currentState?: any[]
@@ -29,4 +34,28 @@ export class GitRepoValidation {
     @IsOptional()
     @IsBoolean()
     isCloudStore: boolean
+}
+
+enum Key {
+    diagram = 'diagram',
+    blueprint = 'blueprint',
+
+}
+
+export class ChatGenerateValidation {
+    @IsString()
+    @MinLength(10)
+    @MaxLength(50)
+    uuid: string
+
+    @IsNumber()
+    @IsOptional()
+    documentId?: number
+
+    @IsEnum(Key)
+    key: string
+
+    @IsString()
+    @IsOptional()
+    fileUrl?: string
 }

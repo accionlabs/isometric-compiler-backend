@@ -41,7 +41,7 @@ export class ClassifierAgent {
         return conversations && conversations.length > 0 ? JSON.parse(conversations) : [];
     }
 
-    public async processClassifierAgent(question: string, availableDocuments: string[], newDocument: string, uuid?: string): Promise<ClassifierAgentResp> {
+    public async processClassifierAgent(question: string, availableDocuments: string[], newDocument: string, uuid?: string): Promise<ClassifierAgentResp | null> {
         const conversations = await this.fetchOldConversationContext(uuid);
         const placeholders = {
             conversations: conversations,

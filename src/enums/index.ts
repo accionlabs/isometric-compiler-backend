@@ -30,3 +30,20 @@ export enum MessageRoles {
   SYSTEM = 'system',
   USER = 'user'
 }
+
+export enum Agents {
+  REQUIREMENT_AGENT = 'requirement_agent',
+  DESIGN_AGENT = 'design_agent',
+  ARCHITECTURE_AGENT = 'architecture_agent',
+  BREEZE_AGENT = 'breeze_agent',
+  ATDD_AGENT = 'atdd_agent',
+  CODE_GENERATION_AGENT = 'code_generation_agent',
+}
+
+export enum UnifiedModelGenerationStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  PROCESSING = 'processing',
+  ERROR = 'error',
+
+}

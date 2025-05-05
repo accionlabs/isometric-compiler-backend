@@ -1,0 +1,1265 @@
+{
+  "qum": [
+    {
+      "persona": "Applicant",
+      "outcomes": [
+        {
+          "outcome": "Register as a qualified driver",
+          "citations": [
+            {
+              "documentId": "21",
+              "documentName": "Transport Inc. Business Requirement Document.pdf"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Initiate registration process",
+                  "actions": [
+                    {
+                      "action": "Enter mobile number"
+                    },
+                    {
+                      "action": "Click on 'Verify' button"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Applicant starts registration with mobile number verification",
+              "description": "The applicant initiates the registration process by verifying their mobile number and proceeds to enter personal and professional details.",
+              "metadataShapeName": "ServerA"
+            },
+            {
+              "steps": [
+                {
+                  "step": "Fill out registration form",
+                  "actions": [
+                    {
+                      "action": "Enter personal information"
+                    },
+                    {
+                      "action": "Upload required documents"
+                    },
+                    {
+                      "action": "Click on 'Submit' button"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Applicant completes registration by submitting all required documents",
+              "description": "The applicant submits personal, educational, employment, and medical details to complete the registration process.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        },
+        {
+          "outcome": "Submit registration form",
+          "citations": [
+            {
+              "documentId": "21",
+              "documentName": "Transport Inc. Business Requirement Document.pdf"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Review and submit registration form",
+                  "actions": [
+                    {
+                      "action": "Review entered details"
+                    },
+                    {
+                      "action": "Click on 'Submit' button"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Applicant submits the registration form after filling all details",
+              "description": "The applicant fills in all required fields and submits the registration form for verification.",
+              "metadataShapeName": "ServerA"
+            },
+            {
+              "steps": [
+                {
+                  "step": "Edit registration form",
+                  "actions": [
+                    {
+                      "action": "Modify details in the form"
+                    },
+                    {
+                      "action": "Click on 'Save Changes' button"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Applicant makes changes to the registration form as required",
+              "description": "The applicant updates the registration form based on feedback from previous employers or verification checks.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        },
+        {
+          "outcome": "Schedule drug and alcohol test",
+          "citations": [
+            {
+              "documentId": "21",
+              "documentName": "Transport Inc. Business Requirement Document.pdf"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Choose test center",
+                  "actions": [
+                    {
+                      "action": "Select preferred test center from the list"
+                    },
+                    {
+                      "action": "Click on 'Schedule Test' button"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Applicant selects a test center and schedules a drug and alcohol test",
+              "description": "The applicant chooses a test center from a list and schedules a test, receiving a routing slip for the appointment.",
+              "metadataShapeName": "ServerA"
+            },
+            {
+              "steps": [
+                {
+                  "step": "Attend scheduled test",
+                  "actions": [
+                    {
+                      "action": "Present routing slip at test center"
+                    },
+                    {
+                      "action": "Complete the test"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Applicant completes the drug and alcohol test at the selected center",
+              "description": "The applicant visits the selected test center and completes the drug and alcohol test as part of the registration process.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        },
+        {
+          "outcome": "View application status",
+          "citations": [
+            {
+              "documentId": "21",
+              "documentName": "Transport Inc. Business Requirement Document.pdf"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "View application status",
+                  "actions": [
+                    {
+                      "action": "Log in to the application portal"
+                    },
+                    {
+                      "action": "Click on 'Check Status' button"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Applicant checks the status of their application online",
+              "description": "The applicant logs into the portal to view the current status of their application, including any flags or required actions.",
+              "metadataShapeName": "ServerA"
+            },
+            {
+              "steps": [
+                {
+                  "step": "Receive application updates",
+                  "actions": [
+                    {
+                      "action": "Check notifications in the application"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Applicant receives notifications about application status changes",
+              "description": "The applicant receives email or SMS notifications regarding changes in the status of their application.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        },
+        {
+          "outcome": "Re-apply after rejection",
+          "citations": [
+            {
+              "documentId": "21",
+              "documentName": "Transport Inc. Business Requirement Document.pdf"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Re-initiate application process",
+                  "actions": [
+                    {
+                      "action": "Log in to the application portal"
+                    },
+                    {
+                      "action": "Click on 'Re-apply' button"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Applicant re-applies after a 30-day waiting period following rejection",
+              "description": "The applicant waits for 30 days after rejection and then re-applies by updating their application with new or corrected information.",
+              "metadataShapeName": "ServerA"
+            },
+            {
+              "steps": [
+                {
+                  "step": "Edit application details",
+                  "actions": [
+                    {
+                      "action": "Modify necessary details in the application"
+                    },
+                    {
+                      "action": "Click on 'Save Changes' button"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Applicant updates application details before re-applying",
+              "description": "The applicant reviews and updates their application details to address reasons for previous rejection before re-applying.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "persona": "Supervisor",
+      "outcomes": [
+        {
+          "outcome": "Verify applicant details",
+          "citations": [
+            {
+              "documentId": "21",
+              "documentName": "Transport Inc. Business Requirement Document.pdf"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Conduct employment verification",
+                  "actions": [
+                    {
+                      "action": "Send verification request to previous employers"
+                    },
+                    {
+                      "action": "Review responses received"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Supervisor verifies applicant's previous employment details",
+              "description": "The supervisor checks the applicant's previous employment details by contacting former employers for confirmation.",
+              "metadataShapeName": "ServerA"
+            },
+            {
+              "steps": [
+                {
+                  "step": "Verify medical and MVR records",
+                  "actions": [
+                    {
+                      "action": "Check medical certificate against registry"
+                    },
+                    {
+                      "action": "Fetch MVR details"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Supervisor verifies medical and MVR details",
+              "description": "The supervisor cross-checks the applicant's medical certificates and MVR details for accuracy and compliance.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        },
+        {
+          "outcome": "Manage application statuses",
+          "citations": [
+            {
+              "documentId": "21",
+              "documentName": "Transport Inc. Business Requirement Document.pdf"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Update application status",
+                  "actions": [
+                    {
+                      "action": "Change status to 'Qualified' or 'Rejected'"
+                    },
+                    {
+                      "action": "Notify applicant of the status change"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Supervisor updates application status after verification",
+              "description": "The supervisor updates the status of the application based on the verification results, marking it as qualified or rejected.",
+              "metadataShapeName": "ServerA"
+            },
+            {
+              "steps": [
+                {
+                  "step": "Flag discrepancies in applications",
+                  "actions": [
+                    {
+                      "action": "Review application details"
+                    },
+                    {
+                      "action": "Mark application as flagged"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Supervisor flags applications with discrepancies",
+              "description": "The supervisor flags applications that have discrepancies or require further investigation.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        },
+        {
+          "outcome": "Qualify or reject applications",
+          "citations": [
+            {
+              "documentId": "21",
+              "documentName": "Transport Inc. Business Requirement Document.pdf"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Qualify applicant",
+                  "actions": [
+                    {
+                      "action": "Confirm qualification status"
+                    },
+                    {
+                      "action": "Allow access to driver profile"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Supervisor qualifies an applicant after successful verification",
+              "description": "The supervisor marks the applicant as qualified after all verification checks are successfully completed.",
+              "metadataShapeName": "ServerA"
+            },
+            {
+              "steps": [
+                {
+                  "step": "Reject application",
+                  "actions": [
+                    {
+                      "action": "Change status to 'Rejected'"
+                    },
+                    {
+                      "action": "Notify applicant of rejection"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Supervisor rejects an applicant due to failed verification",
+              "description": "The supervisor rejects the applicant if verification checks reveal discrepancies or non-compliance.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        },
+        {
+          "outcome": "Intervene in flagged applications",
+          "citations": [
+            {
+              "documentId": "21",
+              "documentName": "Transport Inc. Business Requirement Document.pdf"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Review flagged applications",
+                  "actions": [
+                    {
+                      "action": "Investigate discrepancies"
+                    },
+                    {
+                      "action": "Make necessary updates"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Supervisor intervenes in applications flagged for discrepancies",
+              "description": "The supervisor reviews and resolves issues in applications that have been flagged for discrepancies during verification.",
+              "metadataShapeName": "ServerA"
+            },
+            {
+              "steps": [
+                {
+                  "step": "Request additional information",
+                  "actions": [
+                    {
+                      "action": "Send email or notification to applicant"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Supervisor contacts applicants for additional information",
+              "description": "The supervisor reaches out to applicants to request additional information or clarification on flagged application details.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "persona": "Transport Admin",
+      "outcomes": [
+        {
+          "outcome": "Manage applications and statuses",
+          "citations": [
+            {
+              "documentId": "21",
+              "documentName": "Transport Inc. Business Requirement Document.pdf"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Manage application statuses",
+                  "actions": [
+                    {
+                      "action": "Review all applications"
+                    },
+                    {
+                      "action": "Update statuses as necessary"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Admin oversees the application process and updates statuses",
+              "description": "The admin monitors the application process, ensuring that statuses are updated accurately and timely.",
+              "metadataShapeName": "ServerA"
+            },
+            {
+              "steps": [
+                {
+                  "step": "Address processing issues",
+                  "actions": [
+                    {
+                      "action": "Identify issues in application flow"
+                    },
+                    {
+                      "action": "Implement solutions"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Admin resolves issues with application processing",
+              "description": "The admin addresses and resolves any issues that arise during the application processing to ensure smooth operations.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        },
+        {
+          "outcome": "Verify and upload documents",
+          "citations": [
+            {
+              "documentId": "21",
+              "documentName": "Transport Inc. Business Requirement Document.pdf"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Document verification",
+                  "actions": [
+                    {
+                      "action": "Review submitted documents"
+                    },
+                    {
+                      "action": "Confirm authenticity"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Admin verifies documents submitted by applicants",
+              "description": "The admin checks the authenticity and completeness of documents submitted by applicants during the registration process.",
+              "metadataShapeName": "ServerA"
+            },
+            {
+              "steps": [
+                {
+                  "step": "Upload documents",
+                  "actions": [
+                    {
+                      "action": "Select documents to upload"
+                    },
+                    {
+                      "action": "Click on 'Upload' button"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Admin uploads verified documents to the system",
+              "description": "The admin uploads verified documents to the system, ensuring they are stored securely and accessible for future reference.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        },
+        {
+          "outcome": "Oversee driver management processes",
+          "citations": [
+            {
+              "documentId": "21",
+              "documentName": "Transport Inc. Business Requirement Document.pdf"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Track driver management",
+                  "actions": [
+                    {
+                      "action": "Review driver activities"
+                    },
+                    {
+                      "action": "Generate reports"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Admin monitors driver management activities",
+              "description": "The admin oversees activities related to driver management, ensuring compliance with company policies and regulations.",
+              "metadataShapeName": "ServerA"
+            },
+            {
+              "steps": [
+                {
+                  "step": "Resolve driver management issues",
+                  "actions": [
+                    {
+                      "action": "Identify issues in driver profiles"
+                    },
+                    {
+                      "action": "Implement corrective actions"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Admin addresses issues in driver management",
+              "description": "The admin resolves any issues or discrepancies that arise in the driver management process.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "persona": "Driver",
+      "outcomes": [
+        {
+          "outcome": "View driver profile",
+          "citations": [
+            {
+              "documentId": "21",
+              "documentName": "Transport Inc. Business Requirement Document.pdf"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Access driver profile",
+                  "actions": [
+                    {
+                      "action": "Log in using mobile number"
+                    },
+                    {
+                      "action": "Click on 'View Profile' button"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Driver logs in to view their profile details",
+              "description": "The driver accesses their profile using their registered mobile number to view personal and professional details.",
+              "metadataShapeName": "ServerA"
+            },
+            {
+              "steps": [
+                {
+                  "step": "Review profile details",
+                  "actions": [
+                    {
+                      "action": "Check all sections of the profile"
+                    },
+                    {
+                      "action": "Report any discrepancies"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Driver checks profile for accuracy and completeness",
+              "description": "The driver reviews their profile to ensure all information is accurate and up-to-date.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        },
+        {
+          "outcome": "Add details to driver profile",
+          "citations": [
+            {
+              "documentId": "21",
+              "documentName": "Transport Inc. Business Requirement Document.pdf"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Update certifications",
+                  "actions": [
+                    {
+                      "action": "Enter new certification details"
+                    },
+                    {
+                      "action": "Click on 'Add Certification' button"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Driver adds new certifications to their profile",
+              "description": "The driver updates their profile with new certifications or training programs they have completed.",
+              "metadataShapeName": "ServerA"
+            },
+            {
+              "steps": [
+                {
+                  "step": "Modify medical or license information",
+                  "actions": [
+                    {
+                      "action": "Enter updated medical or license details"
+                    },
+                    {
+                      "action": "Click on 'Update' button"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Driver updates medical or license details",
+              "description": "The driver adds or renews details related to their medical certificates or driving license in their profile.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        },
+        {
+          "outcome": "Check qualification and training files",
+          "citations": [
+            {
+              "documentId": "21",
+              "documentName": "Transport Inc. Business Requirement Document.pdf"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Check qualification file",
+                  "actions": [
+                    {
+                      "action": "Access qualification file section"
+                    },
+                    {
+                      "action": "Review compliance details"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Driver reviews their qualification file for compliance",
+              "description": "The driver checks their qualification file to ensure all necessary documents and certifications are in place.",
+              "metadataShapeName": "ServerA"
+            },
+            {
+              "steps": [
+                {
+                  "step": "View training files",
+                  "actions": [
+                    {
+                      "action": "Navigate to training section"
+                    },
+                    {
+                      "action": "Select upcoming training session"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "21",
+                      "documentName": "Transport Inc. Business Requirement Document.pdf"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Driver accesses training files for upcoming sessions",
+              "description": "The driver views their training files to prepare for upcoming training sessions or refreshers.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        },
+        {
+          "outcome": "Log in to the system",
+          "citations": [
+            {
+              "documentId": "23",
+              "documentName": "driver_daily_workflow.png"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Driver logs in with Mobile/OTP",
+                  "actions": [
+                    {
+                      "action": "Enter mobile number"
+                    },
+                    {
+                      "action": "Receive OTP"
+                    },
+                    {
+                      "action": "Enter OTP"
+                    },
+                    {
+                      "action": "Click login button"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "23",
+                      "documentName": "driver_daily_workflow.png"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Driver logs in using mobile device and OTP",
+              "description": "The driver uses a mobile device to log into the system with a one-time password for secure authentication.",
+              "metadataShapeName": "ServerA"
+            }
+          ]
+        },
+        {
+          "outcome": "View trip dashboard",
+          "citations": [
+            {
+              "documentId": "23",
+              "documentName": "driver_daily_workflow.png"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Driver views Trip Dashboard",
+                  "actions": [
+                    {
+                      "action": "Navigate to dashboard"
+                    },
+                    {
+                      "action": "View available trips"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "23",
+                      "documentName": "driver_daily_workflow.png"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Driver accesses trip dashboard",
+              "description": "After logging in, the driver views a dashboard displaying available trips and relevant information.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        },
+        {
+          "outcome": "Receive trip assignment",
+          "citations": [
+            {
+              "documentId": "23",
+              "documentName": "driver_daily_workflow.png"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Driver receives Trip Assignment",
+                  "actions": [
+                    {
+                      "action": "Receive trip assignment notification"
+                    },
+                    {
+                      "action": "View trip details"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "23",
+                      "documentName": "driver_daily_workflow.png"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "System assigns delivery trip to driver",
+              "description": "The system automatically assigns a specific delivery trip to the driver.",
+              "metadataShapeName": "ServerA"
+            }
+          ]
+        },
+        {
+          "outcome": "Accept or reject delivery job",
+          "citations": [
+            {
+              "documentId": "23",
+              "documentName": "driver_daily_workflow.png"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Driver accepts/rejects Delivery Job",
+                  "actions": [
+                    {
+                      "action": "Click accept button"
+                    },
+                    {
+                      "action": "Click reject button"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "23",
+                      "documentName": "driver_daily_workflow.png"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Driver decides on assigned delivery job",
+              "description": "The driver has the option to accept or reject the delivery job assigned by the system.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        },
+        {
+          "outcome": "Complete vehicle inspection",
+          "citations": [
+            {
+              "documentId": "23",
+              "documentName": "driver_daily_workflow.png"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Driver completes Vehicle Inspection",
+                  "actions": [
+                    {
+                      "action": "Check vehicle condition"
+                    },
+                    {
+                      "action": "Confirm inspection completion"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "23",
+                      "documentName": "driver_daily_workflow.png"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Driver performs vehicle inspection",
+              "description": "Before starting the trip, the driver conducts a vehicle inspection to ensure everything is in order.",
+              "metadataShapeName": "ServerA"
+            }
+          ]
+        },
+        {
+          "outcome": "Start delivery trip",
+          "citations": [
+            {
+              "documentId": "23",
+              "documentName": "driver_daily_workflow.png"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Driver starts Delivery Trip",
+                  "actions": [
+                    {
+                      "action": "Click start trip button"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "23",
+                      "documentName": "driver_daily_workflow.png"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Driver begins the delivery trip",
+              "description": "Once the vehicle inspection is complete, the driver starts the delivery trip.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        },
+        {
+          "outcome": "Navigate to destination",
+          "citations": [
+            {
+              "documentId": "23",
+              "documentName": "driver_daily_workflow.png"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Driver navigates to Destination",
+                  "actions": [
+                    {
+                      "action": "Open navigation app"
+                    },
+                    {
+                      "action": "Input destination address"
+                    },
+                    {
+                      "action": "Start navigation"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "23",
+                      "documentName": "driver_daily_workflow.png"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Driver uses navigation tools",
+              "description": "The driver uses navigation tools to reach the delivery destination.",
+              "metadataShapeName": "ServerA"
+            }
+          ]
+        },
+        {
+          "outcome": "Deliver cargo",
+          "citations": [
+            {
+              "documentId": "23",
+              "documentName": "driver_daily_workflow.png"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Driver delivers Cargo",
+                  "actions": [
+                    {
+                      "action": "Arrive at destination"
+                    },
+                    {
+                      "action": "Unload cargo"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "23",
+                      "documentName": "driver_daily_workflow.png"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Driver delivers cargo at destination",
+              "description": "Upon arrival, the driver delivers the cargo to the specified location.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        },
+        {
+          "outcome": "Upload delivery confirmation",
+          "citations": [
+            {
+              "documentId": "23",
+              "documentName": "driver_daily_workflow.png"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Driver uploads Delivery Confirmation",
+                  "actions": [
+                    {
+                      "action": "Take photo of delivery proof"
+                    },
+                    {
+                      "action": "Upload photo"
+                    },
+                    {
+                      "action": "Submit confirmation"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "23",
+                      "documentName": "driver_daily_workflow.png"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Driver uploads proof of delivery",
+              "description": "After delivery, the driver uploads a confirmation, which may include a signature or photo as proof of delivery.",
+              "metadataShapeName": "ServerA"
+            }
+          ]
+        },
+        {
+          "outcome": "Complete trip report",
+          "citations": [
+            {
+              "documentId": "23",
+              "documentName": "driver_daily_workflow.png"
+            }
+          ],
+          "scenarios": [
+            {
+              "steps": [
+                {
+                  "step": "Driver completes Trip Report",
+                  "actions": [
+                    {
+                      "action": "Fill out trip details"
+                    },
+                    {
+                      "action": "Submit trip report"
+                    }
+                  ],
+                  "citations": [
+                    {
+                      "documentId": "23",
+                      "documentName": "driver_daily_workflow.png"
+                    }
+                  ]
+                }
+              ],
+              "scenario": "Driver completes trip documentation",
+              "description": "Finally, the driver completes a trip report, documenting the details and status of the delivery.",
+              "metadataShapeName": "ServerB"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

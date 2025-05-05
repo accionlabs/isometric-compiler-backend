@@ -28,7 +28,7 @@ export class GeneralQueryAgent {
         this.prompt = __GENERAL_QUERY_PROMPT__;
     }
 
-    public async generalQuery(query: string, currentState: any, uuid: string): Promise<string> {
+    public async generalQuery(query: string, currentState: any, uuid: string): Promise<string | null> {
         const documents = await this.pgVectorService.vectorSearch(query, { uuid });
         let context = documents.map(x => `\n\n---\n${x.pageContent}`).join("");
 

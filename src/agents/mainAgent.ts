@@ -7,7 +7,7 @@ import { GeneralQueryAgent } from './general_query_agent/generalQueryAgent';
 import { DiagramModifierAgent } from './diagram_modifier_agent/diagramModifierAgent';
 import { LoggerService } from '../services/logger.service';
 
-type MainAgentRespone = {
+interface MainAgentRespone {
     feedback: string;
     action: any[];
     result: any;
@@ -16,6 +16,21 @@ type MainAgentRespone = {
     email?: string;
     isGherkinScriptQuery?: boolean;
 };
+
+
+// interface MainAgentResponeMetadata {
+//     isEmailQuery?: boolean;
+//     email?: string;
+//     isGherkinScriptQuery?: boolean;
+//     needFeedback: boolean;
+// };
+
+// export interface AgentResposne<T, R> {
+//     feedback: string;
+//     action?: any[];
+//     result: R;
+//     metadata: T;
+// }
 
 @Service()
 export class MainAgent {
@@ -55,7 +70,7 @@ export class MainAgent {
         return null;
     }
 
-    public async processRequest(question: string, uuid: string, currentState: any = [], file?: Express.Multer.File): Promise<MainAgentRespone> {
+    public async processRequest(question: string, uuid: string, currentState: any = [], userId: number, file?: Express.Multer.File): Promise<MainAgentRespone> {
         const documentDetails = await this.documentService.getDocumentsByUUID(uuid);
         const availableDocuments = documentDetails?.map((doc) => doc.metadata?.filename || '') || [];
         this.loggerService.info(`Processing documents documents ${availableDocuments.join(",")}`)
@@ -67,7 +82,18 @@ export class MainAgent {
             currentState = JSON.parse(currentState);
         }
 
-        let defaultResponse: MainAgentRespone = {
+        if (!classifierResult) {
+            return {
+                feedback: 'Classifier agent failed to process the request.',
+                action: [],
+                result: currentState,
+                needFeedback: true,
+                isEmailQuery: false,
+                isGherkinScriptQuery: false,
+            };
+        }
+
+        let defaultResponse = {
             feedback: classifierResult.feedback,
             action: [],
             result: currentState,
@@ -78,7 +104,9 @@ export class MainAgent {
         };
 
         if (classifierResult.isGherkinScriptQuery) {
-            defaultResponse.result = await this.gherKinAgent.getGherkinScript(uuid, question);
+            const gherkinResponse = await this.gherKinAgent.getGherkinScript(uuid, question);
+            defaultResponse.result = gherkinResponse.result;
+            defaultResponse.feedback = gherkinResponse.feedback;
         } else if (classifierResult.isDiagramCreationQuery) {
             let image = newDocumentUpload ? this.getImage(newDocumentUpload) : this.getImage(classifierResult.documentReferences);
 
@@ -88,15 +116,15 @@ export class MainAgent {
                     ...defaultResponse,
                     needFeedback: !creationResult.isometric,
                     result: creationResult.isometric || defaultResponse.result,
-                    feedback: creationResult.message || '',
+                    feedback: creationResult.message || defaultResponse.feedback || '',
                 };
             } else {
-                const creationResult = await this.diagramGeneratorAgent.generateIsometricJSONFromBlueprint(uuid);
+                const creationResult = await this.diagramGeneratorAgent.getIsometricJSONFromUUId(uuid, userId);
                 defaultResponse = {
                     ...defaultResponse,
                     needFeedback: !creationResult.isometric,
                     result: creationResult.isometric || defaultResponse.result,
-                    feedback: creationResult.message || '',
+                    feedback: creationResult.message || defaultResponse.feedback || '',
                 };
             }
         } else if (classifierResult.isGeneralQuery) {

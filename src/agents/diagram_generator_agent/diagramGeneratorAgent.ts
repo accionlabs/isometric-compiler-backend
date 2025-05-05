@@ -18,6 +18,7 @@ import { SemanticModelService } from '../../services/semanticModel.service';
 import { BreezeExtractorAgent } from '../blueprint_agent/blueprintGenerate';
 import { Document } from '../../entities/document.entity';
 import { DiagramManager } from '../diagramManager';
+import { getCache } from '../cache';
 
 const IMAGE_PROMPT = fs.readFileSync("./src/agents/diagram_generator_agent/DIAGRAM_GENERATOR_AGENT.md", 'utf8');
 const IMAGE_EXTRACTOR_PROMPT = fs.readFileSync("./src/agents/diagram_generator_agent/IMAGE_EXTRACTOR_AGENT.md", 'utf8');
@@ -97,7 +98,8 @@ export class DiagramGeneratorAgent {
         }
     }
 
-    async generateIsometricJSONFromBlueprint(uuid: string): Promise<IsometricJsonAgenResp> {
+    async generateIsometricJSONFromBlueprint(uuid: string, userId: number, filename?: string): Promise<IsometricJsonAgenResp> {
+
         const semanticModel = await this.semanticModelService.findByUuid(uuid);
         const documents = await this.pgVectorService.vectorSearch("", { uuid });
 
@@ -113,15 +115,28 @@ export class DiagramGeneratorAgent {
             return { message: "Unable to fetch blueprint right now!" };
         }
 
-        if (semanticModel?.status === 'active') {
-            this.semanticModelService.saveSemanticModel({ uuid, metadata: { qum: semanticModel?.metadata?.qum, blueprint }, visualModel: [], status: SemanticModelStatus.ACTIVE });
-        }
-
         const diagrmaManger = new DiagramManager()
+        const visualModel = diagrmaManger.convertBlueprintToIsometric(blueprint, semanticModel?.metadata?.qum)
+
+
+        this.semanticModelService.saveSemanticModel({ userId, uuid, metadata: { qum: semanticModel?.metadata?.qum, blueprint }, visualModel: visualModel });
+
+
         return {
             message: semanticModel?.status === 'active' ? "Blueprint is successfully generated!" : "Blueprint generated without mapping functional and design requirements as functional unified artifacts are still under process!",
-            isometric: diagrmaManger.convertBlueprintToIsometric(blueprint, semanticModel?.metadata?.qum)
+            isometric: visualModel
         };
+    }
+
+    async getIsometricJSONFromUUId(uuid: string, userId: number): Promise<IsometricJsonAgenResp> {
+        const semanticModel = await this.semanticModelService.findByUuid(uuid);
+        if (semanticModel?.visualModel?.length) {
+            return {
+                message: semanticModel?.status === 'active' ? "Blueprint is successfully generated!" : "Blueprint generated without mapping functional and design requirements as functional unified artifacts are still under process!",
+                isometric: semanticModel?.visualModel
+            };
+        }
+        return this.generateIsometricJSONFromBlueprint(uuid, userId);
     }
 
     async generateIsometricJSONFromImage(image: string, uuid: string, availableDocuments: Document[]): Promise<IsometricJsonAgenResp> {
@@ -143,6 +158,7 @@ export class DiagramGeneratorAgent {
         const result = this.parseJSON(response);
         const mappedIsometric = await this.mapQumWithIsometricModel(result.result, uuid);
         return {
+            message: "Isometric diagram generated successfully!",
             description: result.description,
             isometric: this.convertFlatToIsometric(mappedIsometric || result.result),
             result: result.result

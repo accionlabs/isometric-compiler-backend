@@ -28,6 +28,4 @@ export class User extends BaseEntity {
   })
   role: UserRole = UserRole.END_USER;
 
-  @OneToMany(() => Diagram, (diag) => diag.author)
-  diagrams: Diagram[];
 }
