@@ -39,15 +39,12 @@ export class MainWorkflow {
             switch (agent) {
                 case Agents.REQUIREMENT_AGENT:
                 case Agents.DESIGN_AGENT:
-                    fileIdexingResp = await this.functionalAgentWorkflowService.fileIndexingWorkflow(uuid, agent, file)
+                case Agents.ATDD_AGENT:
+                    fileIdexingResp = await this.functionalAgentWorkflowService.fileIndexingWorkflow(uuid, agent, file, userId)
                     break;
                 case Agents.ARCHITECTURE_AGENT:
                     fileIdexingResp = await this.architectualAgentWorkflowService.fileIndexingWorkflow(uuid, file)
                     break;
-                case Agents.ATDD_AGENT:
-                    fileIdexingResp = await this.attdAgentworkFlow.fileIndexingWorkflow(uuid, agent, file)
-                    break
-
                 default:
                     fileIdexingResp = await this.functionalAgentWorkflowService.fileIndexingWorkflow(uuid, agent, file)
 
