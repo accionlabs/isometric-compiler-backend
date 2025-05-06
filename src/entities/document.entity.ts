@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
-import { IsEnum, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsString } from 'class-validator';
 import { Agents, UnifiedModelGenerationStatus } from '../enums';
 
 export enum FileType {
@@ -21,6 +21,9 @@ class Metadata {
     @IsString()
     @IsEnum(FileType)
     fileType: FileType
+
+    @IsArray()
+    tags: string[]
 }
 
 @Entity('documents')
