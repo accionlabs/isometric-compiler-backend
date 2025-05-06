@@ -8,7 +8,7 @@ import { AttdAgentWorkflowService } from "./attdAgentWorkflow";
 import { Chat } from "../../entities/chat.entity";
 
 
-type processChatReq = { uuid: string, query: string, agent: Agents, userId: number, currentState: any, file?: Express.Multer.File }
+type processChatReq = { uuid: string, query: string, agent: Agents, userId: number, currentState: any, file?: Express.Multer.File, git?: { url: string, token: string } }
 
 @Service()
 export class MainWorkflow {
@@ -28,11 +28,14 @@ export class MainWorkflow {
     @Inject(() => AttdAgentWorkflowService)
     private readonly attdAgentworkFlow: AttdAgentWorkflowService
 
-    async processChat({ agent = Agents.REQUIREMENT_AGENT, query, file, userId, uuid, currentState }: processChatReq): Promise<[Partial<Chat>, Partial<Chat>]> {
+    async processChat({ agent = Agents.REQUIREMENT_AGENT, query, file, userId, uuid, currentState, git }: processChatReq): Promise<[Partial<Chat>, Partial<Chat>]> {
         let messageType: MessageTypes = !!file ? MessageTypes.FILE : MessageTypes.TEXT;
         let fileIdexingResp
         let result
-        if (!!file) {
+        if (!!git) {
+
+        }
+        else if (!!file) {
             switch (agent) {
                 case Agents.REQUIREMENT_AGENT:
                 case Agents.DESIGN_AGENT:
