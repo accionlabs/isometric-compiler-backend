@@ -5,7 +5,9 @@ import { Agents, UnifiedModelGenerationStatus } from '../enums';
 
 export enum FileType {
     pdf = 'pdf',
-    image = 'image'
+    image = 'image',
+    text = 'text',
+    markdown = 'markdown',
 }
 class Metadata {
 
