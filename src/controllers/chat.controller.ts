@@ -4,19 +4,18 @@ import { Inject, Service } from "typedi";
 import { DiagramGeneratorAgent } from "../agents/diagram_generator_agent/diagramGeneratorAgent";
 import { MainAgent } from "../agents/mainAgent";
 import { ArchitectualAgentWorkflowService } from "../agents/workflows/architecturalAgentWorkflow";
+import { AttdAgentWorkflowService } from "../agents/workflows/attdAgentWorkflow";
 import { FunctionalAgentWorkflowService } from "../agents/workflows/functionalAgentWorkflow";
+import config from "../configs";
 import { Controller, Get, Post } from "../core";
 import { Chat } from "../entities/chat.entity";
 import { Agents, MessageRoles, MessageTypes } from "../enums";
 import { AWSService } from "../services/aws.service";
 import { ChatService } from "../services/chat.service";
 import { DocumentService } from "../services/document.service";
+import { GitInfoService } from "../services/gitInfo.service";
 import ApiError from "../utils/apiError";
 import { ChatGenerateValidation, ChatValidation, GitRepoValidation } from "../validations/chat.validation";
-import { AttdAgentWorkflowService } from "../agents/workflows/attdAgentWorkflow";
-import { RepositoryAnalyzerAgent } from './../agents/git_extractor_agent/gitExtractorAgent';
-import { GitInfoService } from "../services/gitInfo.service";
-import config from "../configs";
 
 class ChatResp {
     uuid: string;
@@ -187,7 +186,7 @@ export default class CategoriesController {
     @Post('/upload-git-repo', GitRepoValidation,
         {
             authorizedRole: 'all',
-            isAuthenticated: true,
+            isAuthenticated: false,
 
         }, ChatResp
     )
