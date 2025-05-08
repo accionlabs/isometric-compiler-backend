@@ -95,7 +95,18 @@ export class SemanticModelService extends BaseService<SemanticModel> {
             await this.semanticModelHistoryService.createSemanticModelHistory(uuid, semanticModelCopy);
 
             // Apply updates
-            Object.assign(semanticModel, data);
+            // Object.assign(semanticModel, data);
+            // Apply updates directly to the found entity
+            if (data.architectural_specs !== undefined) {
+                semanticModel.architectural_specs = data.architectural_specs;
+            }
+            if (data.qum_specs !== undefined) {
+                semanticModel.qum_specs = data.qum_specs;
+            }
+            if (data.userId !== undefined) {
+                semanticModel.userId = data.userId;
+            }
+
             return await repo.save(semanticModel);
         });
     }
