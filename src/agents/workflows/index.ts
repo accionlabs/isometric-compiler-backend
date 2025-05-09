@@ -87,7 +87,8 @@ export class MainWorkflow {
             messageType: messageType,
             agent,
             metadata: {
-                ...fileIdexingResp?.metadata
+                ...fileIdexingResp?.metadata,
+                gitUrl
             },
             role: MessageRoles.USER
         }
