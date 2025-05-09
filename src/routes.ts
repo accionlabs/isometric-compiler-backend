@@ -1,19 +1,20 @@
 import express from 'express'
 // import UserController from './controllers/user.controller'
 import { Container, Token } from 'typedi'
-import { IRoute } from './core'
-import { validateRequest } from './middlewares/validation'
-import { authenticate } from './middlewares/authentication'
-import ShapeController from './controllers/shape.controller'
 import CategoriesController from './controllers/categories.controller'
-import UserController from './controllers/user.controller'
-import DiagramController from './controllers/diagram.controller'
 import ChatController from './controllers/chat.controller'
-import { fileUpload } from './middlewares/fileUpload'
+import DiagramController from './controllers/diagram.controller'
 import { DocumentController } from './controllers/document.controller'
+import ProjectController from './controllers/project.controller'
 import SematicModelController from './controllers/semanticModel.controller'
 import SematicModelHistoryController from './controllers/sematicModelHistory.controller'
-import ProjectController from './controllers/project.controller'
+import ShapeController from './controllers/shape.controller'
+import UserController from './controllers/user.controller'
+import WikiController from './controllers/wiki.controller'
+import { IRoute } from './core'
+import { authenticate } from './middlewares/authentication'
+import { fileUpload } from './middlewares/fileUpload'
+import { validateRequest } from './middlewares/validation'
 
 var router = express.Router();
 
@@ -26,7 +27,8 @@ export const controllers = [
   DocumentController,
   SematicModelController,
   SematicModelHistoryController,
-  ProjectController
+  ProjectController,
+  WikiController
 ]
 
 controllers.forEach(controller => {

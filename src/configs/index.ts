@@ -22,7 +22,7 @@ const config = {
 
     SOURCE_EMAIL_ID: process.env.SOURCE_EMAIL_ID,
     N8N_WEBHOOK_URL: process.env.N8N_WEBHOOK_URL,
-
+    WIKI_URL: process.env.WIKI_URL,
 
 }
 
