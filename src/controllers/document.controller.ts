@@ -65,6 +65,19 @@ export class DocumentController {
         }
     }
 
+    @Get('/:id', {
+        isAuthenticated: true,
+        authorizedRole: 'all'
+    }, Document)
+    async getDocument(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            const { id } = req.params;
+            const document = await this.documentService.findOneById(Number(id));
+            return res.json({ data: document });
+        } catch (e) {
+            next(e);
+        }
+    }
     @Put('/document-metadata/:id', UpdateMetadataDto, {
         isAuthenticated: true,
         authorizedRole: 'all'
