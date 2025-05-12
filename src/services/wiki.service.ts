@@ -5,19 +5,10 @@ import config from "../configs";
 
 @Service()
 export class WikiService {
-    /**
-     * Check if a string is valid XML.
-     * @param data - The string to check.
-     * @returns A boolean indicating if the string is XML.
-     */
-    private isXml(data: string): boolean {
+
+    private async isXml(data: string): Promise<boolean> {
         try {
-            const parser = new xml2js.Parser();
-            parser.parseString(data, (err: Error | null) => {
-                if (err) {
-                    throw new Error("Invalid XML");
-                }
-            });
+            await xml2js.parseStringPromise(data);
             return true;
         } catch {
             return false;
@@ -30,24 +21,44 @@ export class WikiService {
      * @returns A Promise resolving to the JSON representation of the XML.
      */
     private async convertXmlToJson(xmlData: string): Promise<any> {
-        return new Promise((resolve, reject) => {
-            xml2js.parseString(xmlData, { explicitArray: false }, (err: Error | null, result: any) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(result);
-                }
-            });
-        });
+        const result = await xml2js.parseStringPromise(xmlData, { explicitArray: false });
+        interface Page {
+            $?: { id?: string };
+            title?: string;
+            description?: string;
+            importance?: string;
+            relevant_files?: { file_path?: string | string[] };
+            related_pages?: { related?: string | string[] };
+        }
+
+        const structuredJson = {
+            title: result?.wiki_structure?.title,
+            description: result?.wiki_structure?.description,
+            pages: (result?.wiki_structure?.pages?.page as Page[] | undefined)?.map((page) => ({
+                id: page?.$?.id,
+                title: page?.title,
+                description: page?.description,
+                importance: page?.importance,
+                relevant_files: Array.isArray(page?.relevant_files?.file_path)
+                    ? page?.relevant_files?.file_path
+                    : [page?.relevant_files?.file_path].filter(Boolean),
+                related_pages: Array.isArray(page?.related_pages?.related)
+                    ? page?.related_pages?.related
+                    : [page?.related_pages?.related].filter(Boolean),
+            })) || [],
+        };
+
+        console.log(JSON.stringify(structuredJson, null, 2));
+        return structuredJson;
     }
 
     /**
-     * Fetch data from a GitHub repository and process the response.
-     * @param githubUrl - The GitHub repository URL.
-     * @param gitToken - The GitHub personal access token.
-     * @param prompt - Additional prompt or query parameter.
-     * @returns A Promise resolving to the processed API response.
-     */
+    * Fetch data from a GitHub repository and process the response.
+    * @param githubUrl - The GitHub repository URL.
+    * @param gitToken - The GitHub personal access token.
+    * @param prompt - Additional prompt or query parameter.
+    * @returns A Promise resolving to the processed API response.
+    */
     async fetchGitHubWikiData(githubUrl: string, gitToken: string, prompt: string): Promise<any> {
         try {
             const requestBody = {
@@ -62,19 +73,29 @@ export class WikiService {
                     'Content-Type': 'application/json',
                 },
                 data: JSON.stringify(requestBody),
+                responseType: "stream" as const
             };
 
+
             const apiResponse = await axios.request(postConfig);
+
             let data = '';
-            for await (const chunk of apiResponse.data) {
-                data += chunk;
-            }
+            apiResponse.data.on('data', (chunk: Buffer) => {
+                data += chunk.toString(); // Convert the chunk to a string and append it
+            });
+
+            await new Promise((resolve, reject) => {
+                apiResponse.data.on('end', resolve); // Resolve when the stream ends
+                apiResponse.data.on('error', reject); // Reject if there's an error
+            });
             if (data.includes('<wiki_structure>')) {
-                if (this.isXml(data)) {
+                if (await this.isXml(data)) {
                     const jsonData = await this.convertXmlToJson(data);
+                    console.log("Converted JSON data:", jsonData);
                     return jsonData;
                 }
             }
+            console.log("Response data:", data);
             return data;
         } catch (error) {
             if (axios.isAxiosError(error)) {
