@@ -1,4 +1,4 @@
-import { IsArray, IsEmail, IsEnum, IsOptional, IsString } from "class-validator";
+import { IsArray, IsEmail, IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
 import { FileType } from "../entities/document.entity";
 
 export class SendEmailDto {
@@ -32,4 +32,27 @@ export class UpdateMetadataDto {
     @IsOptional()
     @IsString({ each: true }) // ensures each tag in the array is a string
     tags: string[];
+}
+
+export class KmsDocumentIndexDto {
+    @IsString()
+    uuid: string;
+
+    @IsString()
+    agent: string;
+
+}
+
+export class KmsUnifiedModelDto {
+    @IsNumber()
+    document_id: number;
+
+    @IsString()
+    uuid: string;
+
+    @IsString()
+    agent: string;
+
+    @IsNumber()
+    userId: number
 }

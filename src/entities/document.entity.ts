@@ -1,5 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { BaseEntity } from './base.entity';
 import { IsArray, IsEnum, IsString } from 'class-validator';
 import { Agents, UnifiedModelGenerationStatus } from '../enums';
 
@@ -9,6 +8,13 @@ export enum FileType {
     text = 'text',
     markdown = 'markdown',
 }
+
+export enum StatusEnum {
+    none = 'none',
+    inprogress = 'inprogress',
+    done = 'done'
+}
+
 class Metadata {
 
     @IsString()
@@ -47,6 +53,15 @@ export class Document {
 
     @Column({ type: 'varchar', nullable: false, default: Agents.REQUIREMENT_AGENT })
     agent: string
+
+    @Column({ type: 'enum', enum: StatusEnum, default: StatusEnum.none })
+    fileIndexedStatus: StatusEnum
+
+    @Column({ type: 'enum', enum: StatusEnum, default: StatusEnum.none })
+    functionalMetricsGenerated: StatusEnum
+
+    @Column({ type: 'enum', enum: StatusEnum, default: StatusEnum.none })
+    architectureMetricsGenerated: StatusEnum
 
     @Column({ type: 'jsonb', nullable: true })
     metadata?: Metadata;

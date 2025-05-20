@@ -30,7 +30,7 @@ export function validateRequest(validSchema: any) {
   return async function (req: Request, res: Response, next: NextFunction) {
     // Transform the request body into an instance of the validation schema
     const transformedBody = plainToInstance(validSchema, req.body);
-
+    console.log("transformedBody", transformedBody)
     // Validate the transformed object
     validate(transformedBody).then((errs: ValidationError[]) => {
       if (errs.length > 0) {
