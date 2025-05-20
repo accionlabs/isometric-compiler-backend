@@ -3,12 +3,13 @@ import { AWSService } from "../services/aws.service";
 import { Controller, Delete, Get, Post, Put } from "../core";
 import { NextFunction, Request, Response } from 'express';
 import { EmailService } from "../services/email.service";
-import { SendEmailDto, UpdateMetadataDto } from "../validations/document.validation";
+import { KmsDocumentIndexDto, KmsUnifiedModelDto, SendEmailDto, UpdateMetadataDto } from "../validations/document.validation";
 import { DocumentService } from "../services/document.service";
 import { Document } from "../entities/document.entity";
 import ApiError from "../utils/apiError";
 import { FilterUtils } from "../utils/filterUtils";
 import { DocumentDeleteWorkflowService } from "../agents/workflows/documentWorkflow";
+import { KmsWorkflowService } from "../agents/workflows/kmsWorkflow";
 
 @Service()
 @Controller('/documents')
@@ -25,6 +26,9 @@ export class DocumentController {
 
     @Inject(() => DocumentDeleteWorkflowService)
     private readonly documentDeleteWorkflowService: DocumentDeleteWorkflowService
+
+    @Inject(() => KmsWorkflowService)
+    private readonly kmsWorkflowService: KmsWorkflowService;
 
     @Get('/get-document/:uuid', {
         isAuthenticated: true,
@@ -55,7 +59,7 @@ export class DocumentController {
             const sort: Record<string, 1 | -1> = { [sortName as string]: sortOrder === 'asc' ? 1 : -1 };
 
 
-            const allowedFields: (keyof Document)[] = ["uuid", 'agent', "createdAt", "updatedAt", "status"];
+            const allowedFields: (keyof Document)[] = ["uuid", 'agent', "createdAt", "updatedAt", "status", "fileIndexedStatus", "functionalMetricsGenerated", "architectureMetricsGenerated"];
 
             const filters = FilterUtils.buildPostgresFilters<Document>(query, allowedFields);
             const { data, total } = await this.documentService.findWithFilters(filters, parseInt(page as string, 10), parseInt(limit as string, 10), sort);
@@ -176,6 +180,80 @@ export class DocumentController {
             next(e);
         }
     }
+
+    @Post('/kms/index', KmsDocumentIndexDto, {
+        authorizedRole: 'all',
+        isAuthenticated: false,
+        fileUpload: true
+    }, {})
+    async kmsDocumentIndex(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            const { uuid, agent } = req.body;
+            const document = req.file;
+
+            if (!uuid || !agent || !document) {
+                return res.status(400).json({ message: 'Missing required fields: uuid, agent, or document file' });
+            }
+
+            const userId = req.user?._id || 1;
+            const result = await this.kmsWorkflowService.KmsDocumentWorkflow(uuid, agent, document, userId);
+
+            return res.status(200).json(result);
+        } catch (error) {
+            console.error('KMS Document Index Error:', error);
+            return res.status(500).json({ message: 'Internal server error' });
+        }
+    }
+
+    @Get('/kms/generate/architecture-agent', {
+        authorizedRole: 'all',
+        isAuthenticated: false,
+        fileUpload: true
+    }, {})
+    async kmsArchitectureAgentGenerate(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            const { uuid } = req.query;
+
+            if (!uuid || typeof uuid !== 'string') {
+                return res.status(400).json({ message: 'Missing or invalid uuid in query parameters' });
+            }
+
+            const result = await this.kmsWorkflowService.KmsGenerateArchitectureAgent(uuid);
+
+            return res.status(200).json(result);
+        } catch (error) {
+            console.error('KMS Generate architecture agent Error:', error);
+            return res.status(500).json({ message: 'Internal server error' });
+        }
+    }
+
+    @Post('/kms/generate/unified-model', KmsUnifiedModelDto, {
+        authorizedRole: 'all',
+        isAuthenticated: false,
+        fileUpload: false
+    }, {})
+    async kmsGenerateUnifiedModelWithPayload(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            const { document_id, uuid, agent, userId } = req.body;
+
+            if (!document_id || !uuid || !agent || !userId) {
+                return res.status(400).json({ message: 'Missing required fields: document_id, uuid, agent, userId' });
+            }
+
+            const result = await this.kmsWorkflowService.KmsGenerateUnifiedModelWithPayload({
+                document_id,
+                uuid,
+                agent,
+                userId
+            });
+
+            return res.status(200).json(result);
+        } catch (error) {
+            console.error('Unified Model Generation Error:', error);
+            return res.status(500).json({ message: 'Internal server error' });
+        }
+    }
+
 
 
 }
