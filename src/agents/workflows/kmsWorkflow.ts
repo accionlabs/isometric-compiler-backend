@@ -55,14 +55,12 @@ export class KmsWorkflowService {
     }): Promise<any> {
         try {
             const workflowUrl = `${config.N8N_WEBHOOK_URL}/kms/generate/unified-model`;
-            console.log(workflowUrl, 'workflowUrl')
             const response = await axios.post(workflowUrl, payload, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
             });
 
-            console.log('response.data', response.data)
             return response.data;
         } catch (error) {
             console.error('Error calling unified model webhook:', error);

@@ -188,7 +188,6 @@ export class DocumentController {
     }, {})
     async kmsDocumentIndex(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
-            console.log(req.body, req.file, 'req')
             const { uuid, agent } = req.body;
             const document = req.file;
 
