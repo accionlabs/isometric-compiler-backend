@@ -3,7 +3,7 @@ import { AWSService } from "../services/aws.service";
 import { Controller, Delete, Get, Post, Put } from "../core";
 import { NextFunction, Request, Response } from 'express';
 import { EmailService } from "../services/email.service";
-import { KmsDocumentIndexDto, KmsUnifiedModelDto, SendEmailDto, UpdateMetadataDto } from "../validations/document.validation";
+import { KmsArchitectureAgentDto, KmsDocumentIndexDto, KmsUnifiedModelDto, SendEmailDto, UpdateMetadataDto } from "../validations/document.validation";
 import { DocumentService } from "../services/document.service";
 import { Document } from "../entities/document.entity";
 import ApiError from "../utils/apiError";
@@ -183,7 +183,7 @@ export class DocumentController {
 
     @Post('/kms/index', KmsDocumentIndexDto, {
         authorizedRole: 'all',
-        isAuthenticated: false,
+        isAuthenticated: true,
         fileUpload: true
     }, {})
     async kmsDocumentIndex(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
@@ -205,20 +205,20 @@ export class DocumentController {
         }
     }
 
-    @Get('/kms/generate/architecture-agent', {
+    @Post('/kms/generate/architecture-agent', KmsArchitectureAgentDto, {
         authorizedRole: 'all',
-        isAuthenticated: false,
+        isAuthenticated: true,
         fileUpload: true
     }, {})
     async kmsArchitectureAgentGenerate(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
-            const { uuid } = req.query;
+            const { uuid, documentId } = req.body;
 
-            if (!uuid || typeof uuid !== 'string') {
-                return res.status(400).json({ message: 'Missing or invalid uuid in query parameters' });
+            if (!uuid || typeof uuid !== 'string' && !documentId) {
+                return res.status(400).json({ message: 'Missing or invalid uuid/document id in body' });
             }
 
-            const result = await this.kmsWorkflowService.KmsGenerateArchitectureAgent(uuid);
+            const result = await this.kmsWorkflowService.KmsGenerateArchitectureAgent(uuid, documentId);
 
             return res.status(200).json(result);
         } catch (error) {
@@ -229,15 +229,16 @@ export class DocumentController {
 
     @Post('/kms/generate/unified-model', KmsUnifiedModelDto, {
         authorizedRole: 'all',
-        isAuthenticated: false,
+        isAuthenticated: true,
         fileUpload: false
     }, {})
     async kmsGenerateUnifiedModelWithPayload(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
-            const { document_id, uuid, agent, userId } = req.body;
+            const { document_id, uuid, agent } = req.body;
 
-            if (!document_id || !uuid || !agent || !userId) {
-                return res.status(400).json({ message: 'Missing required fields: document_id, uuid, agent, userId' });
+            const userId = req.user?._id
+            if (!userId) {
+                throw new ApiError('user not found', 401)
             }
 
             const result = await this.kmsWorkflowService.KmsGenerateUnifiedModelWithPayload({
