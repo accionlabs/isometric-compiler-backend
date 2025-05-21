@@ -29,10 +29,10 @@ export class KmsWorkflowService {
     }
 
 
-    async KmsGenerateArchitectureAgent(uuid: string) {
+    async KmsGenerateArchitectureAgent(uuid: string, documentId: number) {
         try {
-            const workflowUrl = `${config.N8N_WEBHOOK_URL}/kms/generate/architecture-agent?uuid=${uuid}`;
-            const response = await axios.post(workflowUrl, {
+            const workflowUrl = `${config.N8N_WEBHOOK_URL}/kms/generate/architecture-agent`;
+            const response = await axios.post(workflowUrl, { uuid: uuid, documentId: documentId }, {
                 headers: {
                     'Content-Type': 'application/json'
                 }

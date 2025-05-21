@@ -43,6 +43,15 @@ export class KmsDocumentIndexDto {
 
 }
 
+export class KmsArchitectureAgentDto {
+    @IsString()
+    uuid: string;
+
+    @IsNumber()
+    documentId: number;
+
+}
+
 export class KmsUnifiedModelDto {
     @IsNumber()
     document_id: number;
@@ -51,8 +60,10 @@ export class KmsUnifiedModelDto {
     uuid: string;
 
     @IsString()
+    @IsOptional()
     agent: string;
 
     @IsNumber()
+    @IsOptional()
     userId: number
 }
