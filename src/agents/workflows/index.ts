@@ -39,7 +39,6 @@ export class MainWorkflow {
         if (!!gitUrl) {
             result = await this.gitWorkflowService.gitWorkflow({
                 uuid: uuid,
-                agent: agent,
                 userId: userId,
                 git_url: gitUrl,
                 git_token: gitToken

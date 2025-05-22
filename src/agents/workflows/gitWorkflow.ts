@@ -7,7 +7,6 @@ export class GitWorkflowService {
 
     async gitWorkflow(requestBody: {
         uuid: string,
-        agent: string,
         userId: number,
         git_url: string,
         git_token?: string

@@ -9,6 +9,11 @@ export enum FileType {
     markdown = 'markdown',
 }
 
+export enum MetricsEnum {
+    functional = 'functional',
+    architecture = 'architecture'
+}
+
 export enum StatusEnum {
     none = 'none',
     inprogress = 'inprogress',
