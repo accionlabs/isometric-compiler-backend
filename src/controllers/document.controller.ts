@@ -3,13 +3,14 @@ import { AWSService } from "../services/aws.service";
 import { Controller, Delete, Get, Post, Put } from "../core";
 import { NextFunction, Request, Response } from 'express';
 import { EmailService } from "../services/email.service";
-import { KmsArchitectureAgentDto, KmsDocumentIndexDto, KmsUnifiedModelDto, SendEmailDto, UpdateMetadataDto } from "../validations/document.validation";
+import { KmsDocumentIndexDto, KmsMetricsDto, SendEmailDto, UpdateMetadataDto } from "../validations/document.validation";
 import { DocumentService } from "../services/document.service";
-import { Document } from "../entities/document.entity";
+import { Document, MetricsEnum } from "../entities/document.entity";
 import ApiError from "../utils/apiError";
 import { FilterUtils } from "../utils/filterUtils";
 import { DocumentDeleteWorkflowService } from "../agents/workflows/documentWorkflow";
 import { KmsWorkflowService } from "../agents/workflows/kmsWorkflow";
+import { GitWorkflowService } from "../agents/workflows/gitWorkflow";
 
 @Service()
 @Controller('/documents')
@@ -29,6 +30,9 @@ export class DocumentController {
 
     @Inject(() => KmsWorkflowService)
     private readonly kmsWorkflowService: KmsWorkflowService;
+
+    @Inject(() => GitWorkflowService)
+    private readonly gitWorkflowService: GitWorkflowService
 
     @Get('/get-document/:uuid', {
         isAuthenticated: true,
@@ -181,80 +185,71 @@ export class DocumentController {
         }
     }
 
-    @Post('/kms/index', KmsDocumentIndexDto, {
+    @Post('/upload', KmsDocumentIndexDto, {
         authorizedRole: 'all',
         isAuthenticated: true,
         fileUpload: true
     }, {})
     async kmsDocumentIndex(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
-            const { uuid, agent } = req.body;
+            const { uuid, gitUrl, gitToken } = req.body;
             const document = req.file;
 
-            if (!uuid || !agent || !document) {
-                return res.status(400).json({ message: 'Missing required fields: uuid, agent, or document file' });
+            const userId = req.user?._id || 1;
+            let result;
+            if (!!gitUrl) {
+                result = await this.gitWorkflowService.gitWorkflow({
+                    uuid: uuid,
+                    userId: userId,
+                    git_url: gitUrl,
+                    git_token: gitToken
+                })
+                return res.status(200).json(result);
+
+            } else if (!!document) {
+                result = await this.kmsWorkflowService.KmsDocumentWorkflow(uuid, document, userId);
+                return res.status(200).json(result);
             }
 
-            const userId = req.user?._id || 1;
-            const result = await this.kmsWorkflowService.KmsDocumentWorkflow(uuid, agent, document, userId);
 
-            return res.status(200).json(result);
         } catch (error) {
-            console.error('KMS Document Index Error:', error);
+            console.error('KMS Document/git url Index Error:', error);
             return res.status(500).json({ message: 'Internal server error' });
         }
     }
 
-    @Post('/kms/generate/architecture-agent', KmsArchitectureAgentDto, {
+    @Post('/metrics', KmsMetricsDto, {
         authorizedRole: 'all',
         isAuthenticated: true,
         fileUpload: true
     }, {})
-    async kmsArchitectureAgentGenerate(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    async KmsMetricsUnifiedModel(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
-            const { uuid, documentId } = req.body;
-
-            if (!uuid || typeof uuid !== 'string' && !documentId) {
-                return res.status(400).json({ message: 'Missing or invalid uuid/document id in body' });
-            }
-
-            const result = await this.kmsWorkflowService.KmsGenerateArchitectureAgent(uuid, documentId);
-
-            return res.status(200).json(result);
-        } catch (error) {
-            console.error('KMS Generate architecture agent Error:', error);
-            return res.status(500).json({ message: 'Internal server error' });
-        }
-    }
-
-    @Post('/kms/generate/unified-model', KmsUnifiedModelDto, {
-        authorizedRole: 'all',
-        isAuthenticated: true,
-        fileUpload: false
-    }, {})
-    async kmsGenerateUnifiedModelWithPayload(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
-        try {
-            const { document_id, uuid, agent } = req.body;
-
+            const { uuid, documentId, metrics } = req.body;
             const userId = req.user?._id
             if (!userId) {
                 throw new ApiError('user not found', 401)
             }
 
-            const result = await this.kmsWorkflowService.KmsGenerateUnifiedModelWithPayload({
-                document_id,
-                uuid,
-                agent,
-                userId
-            });
+            if (metrics === MetricsEnum.architecture) {
+                const result = await this.kmsWorkflowService.KmsGenerateArchitectureAgent(uuid, documentId);
 
-            return res.status(200).json(result);
+                return res.status(200).json(result);
+
+
+            } if (metrics === MetricsEnum.functional) {
+                const result = await this.kmsWorkflowService.KmsGenerateUnifiedModelWithPayload({
+                    documentId,
+                    uuid,
+                    userId
+                });
+
+                return res.status(200).json(result);
+            }
         } catch (error) {
-            console.error('Unified Model Generation Error:', error);
+            console.error('KMS metrics Error:', error);
             return res.status(500).json({ message: 'Internal server error' });
         }
     }
-
-
 
 }

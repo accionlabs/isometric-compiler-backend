@@ -7,10 +7,10 @@ export class GitWorkflowService {
 
     async gitWorkflow(requestBody: {
         uuid: string,
-        agent: string,
         userId: number,
         git_url: string,
-        git_token?: string
+        git_token?: string,
+        agent?: string,
     }): Promise<{ feedback: string, documentId: number }> {
         const workflowUrl = `${config.N8N_WEBHOOK_URL}/repository/index`;
         const response = await axios.post(workflowUrl, requestBody, {

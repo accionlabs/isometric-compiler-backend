@@ -1,5 +1,5 @@
-import { IsArray, IsEmail, IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
-import { FileType } from "../entities/document.entity";
+import { IsArray, IsEmail, IsEnum, IsNumber, IsOptional, IsString, Matches } from "class-validator";
+import { FileType, MetricsEnum } from "../entities/document.entity";
 
 export class SendEmailDto {
     @IsEmail()
@@ -39,31 +39,27 @@ export class KmsDocumentIndexDto {
     uuid: string;
 
     @IsString()
-    agent: string;
+    @IsOptional()
+    @Matches(/^https:\/\/github\.com\/[^\/]+\/[^\/]+$/, {
+        message: 'Repository URL must be in the format https://github.com/<user>/<repo>',
+    })
+    gitUrl: string
+
+    @IsString()
+    @IsOptional()
+    gitToken: string
 
 }
 
-export class KmsArchitectureAgentDto {
+export class KmsMetricsDto {
     @IsString()
     uuid: string;
 
     @IsNumber()
     documentId: number;
 
+    @IsEnum(MetricsEnum)
+    metrics: MetricsEnum
+
 }
 
-export class KmsUnifiedModelDto {
-    @IsNumber()
-    document_id: number;
-
-    @IsString()
-    uuid: string;
-
-    @IsString()
-    @IsOptional()
-    agent: string;
-
-    @IsNumber()
-    @IsOptional()
-    userId: number
-}
