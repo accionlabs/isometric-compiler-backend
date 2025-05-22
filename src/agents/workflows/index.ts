@@ -41,7 +41,8 @@ export class MainWorkflow {
                 uuid: uuid,
                 userId: userId,
                 git_url: gitUrl,
-                git_token: gitToken
+                git_token: gitToken,
+                agent: agent
             })
         }
         else if (!!file) {
