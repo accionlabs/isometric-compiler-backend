@@ -56,7 +56,7 @@ export class KmsMetricsDto {
     uuid: string;
 
     @IsNumber()
-    documentId: number;
+    document_id: number;
 
     @IsEnum(MetricsEnum)
     metrics: MetricsEnum

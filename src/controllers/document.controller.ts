@@ -225,27 +225,15 @@ export class DocumentController {
     }, {})
     async KmsMetricsUnifiedModel(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
-            const { uuid, documentId, metrics } = req.body;
+            const { uuid, document_id, metrics } = req.body;
             const userId = req.user?._id
             if (!userId) {
                 throw new ApiError('user not found', 401)
             }
 
-            if (metrics === MetricsEnum.architecture) {
-                const result = await this.kmsWorkflowService.KmsGenerateArchitectureAgent(uuid, documentId);
+            const result = await this.kmsWorkflowService.KmsMetricsGenerateWithPayload({ document_id, uuid, userId, metrics });
+            return res.status(200).json(result);
 
-                return res.status(200).json(result);
-
-
-            } if (metrics === MetricsEnum.functional) {
-                const result = await this.kmsWorkflowService.KmsGenerateUnifiedModelWithPayload({
-                    documentId,
-                    uuid,
-                    userId
-                });
-
-                return res.status(200).json(result);
-            }
         } catch (error) {
             console.error('KMS metrics Error:', error);
             return res.status(500).json({ message: 'Internal server error' });
