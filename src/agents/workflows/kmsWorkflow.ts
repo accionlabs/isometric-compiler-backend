@@ -9,7 +9,7 @@ export class KmsWorkflowService {
 
     async KmsDocumentWorkflow(uuid: string, document: Express.Multer.File, userId: number = 1): Promise<any> {
         try {
-            const workflowUrl = `${config.N8N_WEBHOOK_URL}/kms/document/index`;
+            const workflowUrl = `${config.N8N_WEBHOOK_URL}/document/index`;
 
             const formData = new FormData();
             formData.append('document', document.buffer, {
@@ -27,32 +27,14 @@ export class KmsWorkflowService {
 
     }
 
-
-    async KmsGenerateArchitectureAgent(uuid: string, documentId: number) {
-        try {
-            const workflowUrl = `${config.N8N_WEBHOOK_URL}/kms/generate/architecture-agent`;
-            const response = await axios.post(workflowUrl, { uuid: uuid, documentId: documentId }, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            return response.data;
-
-        } catch (error) {
-            console.log(error)
-            throw error;
-        }
-
-    }
-
-
-    async KmsGenerateUnifiedModelWithPayload(payload: {
-        documentId: number;
+    async KmsMetricsGenerateWithPayload(payload: {
+        document_id: number;
         uuid: string;
         userId: number;
+        metrics: string;
     }): Promise<any> {
         try {
-            const workflowUrl = `${config.N8N_WEBHOOK_URL}/kms/generate/unified-model`;
+            const workflowUrl = `${config.N8N_WEBHOOK_URL}/metrics/generate`;
             const response = await axios.post(workflowUrl, payload, {
                 headers: {
                     'Content-Type': 'application/json'
@@ -61,7 +43,7 @@ export class KmsWorkflowService {
 
             return response.data;
         } catch (error) {
-            console.error('Error calling unified model webhook:', error);
+            console.error('Error calling metrics generated webhook:', error);
             throw error;
         }
     }

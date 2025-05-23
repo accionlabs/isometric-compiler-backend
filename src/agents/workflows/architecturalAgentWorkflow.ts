@@ -3,7 +3,7 @@ import FormData from 'form-data';
 import { Inject, Service } from "typedi";
 import config from "../../configs";
 import shapes from '../../configs/shapesv3.json';
-import { FileType } from "../../entities/document.entity";
+import { FileType, MetricsEnum } from "../../entities/document.entity";
 import { SemanticModelService } from '../../services/semanticModel.service';
 import { DiagramManager } from '../diagramManager';
 import { filterQumByScenarios, getLayerByLength, getShapeDetailsFromMaster, nextPositionOnLayer } from '../helpers';
@@ -32,12 +32,15 @@ export class ArchitectualAgentWorkflowService {
     private readonly semanticModelService: SemanticModelService
 
     async fileIndexingWorkflow(uuid: string, document: Express.Multer.File): Promise<FileIndexingWorkflowResp> {
-        const workflowUrl = `${config.N8N_WEBHOOK_URL}/architecture-agent/document/index?uuid=${uuid}`;
+        const workflowUrl = `${config.N8N_WEBHOOK_URL}/document/index`;
         const formData = new FormData();
         formData.append('document', document.buffer, {
             filename: document.originalname,
             contentType: document.mimetype
         });
+        formData.append('uuid', uuid);
+        formData.append('metrics', MetricsEnum.architecture);
+
         const response = await axios.post(workflowUrl, formData)
         return response.data;
     }
