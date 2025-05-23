@@ -52,6 +52,19 @@ export default class SematicModelController {
         }
     }
 
+    @Get('/get-diff', {
+        isAuthenticated: true,
+        authorizedRole: 'all'
+    }, {})
+    async getDiff(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const result = await this.semanticModelService.getDiff(req.query.uuid as string, Number(req.query.historyId))
+            res.status(200).json(result);
+        } catch (e) {
+            next(e);
+        }
+    }
+
 
 
     @Put('/:uuid', UpdateSemanticModelDto, {

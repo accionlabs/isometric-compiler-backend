@@ -111,6 +111,24 @@ export class SemanticModelService extends BaseService<SemanticModel> {
         });
     }
 
+    async getDiff(uuid: string, historyId: number) {
+        const current = await this.getRepository().findOne({ where: { uuid } });
+        const history = await this.semanticModelHistoryService.findByIdAndUuid(historyId, uuid);
+
+        if (!current || !history) throw new ApiError("Model or history not found", 404);
+
+        return {
+            current: {
+                architectural_specs: current.architectural_specs,
+                qum_specs: current.qum_specs,
+            },
+            history: {
+                architectural_specs: history.architectural_specs,
+                qum_specs: history.qum_specs,
+            }
+        };
+    }
+
 
     async revertToHistory(uuid: string, historyId: number, userId: number): Promise<SemanticModel> {
         const history = await this.semanticModelHistoryService.findByIdAndUuid(historyId, uuid);
