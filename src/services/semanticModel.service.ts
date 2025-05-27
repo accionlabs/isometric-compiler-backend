@@ -95,9 +95,38 @@ export class SemanticModelService extends BaseService<SemanticModel> {
             await this.semanticModelHistoryService.createSemanticModelHistory(uuid, semanticModelCopy);
 
             // Apply updates
-            Object.assign(semanticModel, data);
+            // Object.assign(semanticModel, data);
+            // Apply updates directly to the found entity
+            if (data.architectural_specs !== undefined) {
+                semanticModel.architectural_specs = data.architectural_specs;
+            }
+            if (data.qum_specs !== undefined) {
+                semanticModel.qum_specs = data.qum_specs;
+            }
+            if (data.userId !== undefined) {
+                semanticModel.userId = data.userId;
+            }
+
             return await repo.save(semanticModel);
         });
+    }
+
+    async getDiff(uuid: string, historyId: number) {
+        const current = await this.getRepository().findOne({ where: { uuid } });
+        const history = await this.semanticModelHistoryService.findByIdAndUuid(historyId, uuid);
+
+        if (!current || !history) throw new ApiError("Model or history not found", 404);
+
+        return {
+            current: {
+                architectural_specs: current.architectural_specs,
+                qum_specs: current.qum_specs,
+            },
+            history: {
+                architectural_specs: history.architectural_specs,
+                qum_specs: history.qum_specs,
+            }
+        };
     }
 
 

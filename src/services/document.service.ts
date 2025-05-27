@@ -8,6 +8,8 @@ import { Document as VectorDocument } from "@langchain/core/documents"
 import { UnifiedModelGenerator } from "../agents/unifiedModel";
 import { Agents } from "../enums";
 import { UnifiedModelWorkflow } from "../agents/workflows/unifiedModel";
+import { UpdateMetadataDto } from "../validations/document.validation";
+import ApiError from "../utils/apiError";
 
 @Service()
 export class DocumentService extends BaseService<Document> {
@@ -26,6 +28,23 @@ export class DocumentService extends BaseService<Document> {
 
     @Inject(() => UnifiedModelWorkflow)
     private readonly unifiedModelWorkflow: UnifiedModelWorkflow
+
+    async updateMetadata(id: number, metadataDto: UpdateMetadataDto): Promise<Document> {
+        const document = await this.findOneById(id)
+
+        if (!document) {
+            throw new ApiError("Document not found", 404);
+        }
+
+        // Merge existing metadata with incoming updates
+        const updatedMetadata = {
+            ...document.metadata,
+            ...metadataDto
+        };
+
+        document.metadata = updatedMetadata;
+        return await this.getRepository().save(document);
+    }
 
     async handleImage(file: Express.Multer.File, uuid: string, fileUrl: string, agent: string, userId: number) {
         const result = await this.diagramGeneratorAgent.extractInfoFromImage(file.mimetype, file.buffer);

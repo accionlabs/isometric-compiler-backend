@@ -1,13 +1,16 @@
 import { Inject, Service } from "typedi";
 import { AWSService } from "../services/aws.service";
-import { Controller, Get, Post } from "../core";
+import { Controller, Delete, Get, Post, Put } from "../core";
 import { NextFunction, Request, Response } from 'express';
 import { EmailService } from "../services/email.service";
-import { SendEmailDto } from "../validations/document.validation";
+import { KmsDocumentIndexDto, KmsMetricsDto, SendEmailDto, UpdateMetadataDto } from "../validations/document.validation";
 import { DocumentService } from "../services/document.service";
-import { Document } from "../entities/document.entity";
+import { Document, MetricsEnum } from "../entities/document.entity";
 import ApiError from "../utils/apiError";
 import { FilterUtils } from "../utils/filterUtils";
+import { DocumentDeleteWorkflowService } from "../agents/workflows/documentWorkflow";
+import { KmsWorkflowService } from "../agents/workflows/kmsWorkflow";
+import { GitWorkflowService } from "../agents/workflows/gitWorkflow";
 
 @Service()
 @Controller('/documents')
@@ -21,6 +24,15 @@ export class DocumentController {
 
     @Inject(() => EmailService)
     private readonly emailService: EmailService
+
+    @Inject(() => DocumentDeleteWorkflowService)
+    private readonly documentDeleteWorkflowService: DocumentDeleteWorkflowService
+
+    @Inject(() => KmsWorkflowService)
+    private readonly kmsWorkflowService: KmsWorkflowService;
+
+    @Inject(() => GitWorkflowService)
+    private readonly gitWorkflowService: GitWorkflowService
 
     @Get('/get-document/:uuid', {
         isAuthenticated: true,
@@ -51,7 +63,7 @@ export class DocumentController {
             const sort: Record<string, 1 | -1> = { [sortName as string]: sortOrder === 'asc' ? 1 : -1 };
 
 
-            const allowedFields: (keyof Document)[] = ["uuid", 'agent', "createdAt", "updatedAt", "status"];
+            const allowedFields: (keyof Document)[] = ["uuid", 'agent', "createdAt", "updatedAt", "status", "fileIndexedStatus", "functionalMetricsGenerated", "architectureMetricsGenerated"];
 
             const filters = FilterUtils.buildPostgresFilters<Document>(query, allowedFields);
             const { data, total } = await this.documentService.findWithFilters(filters, parseInt(page as string, 10), parseInt(limit as string, 10), sort);
@@ -59,6 +71,52 @@ export class DocumentController {
         } catch (e) {
             next(e);
         }
+    }
+
+    @Get('/:id', {
+        isAuthenticated: true,
+        authorizedRole: 'all'
+    }, Document)
+    async getDocument(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            const { id } = req.params;
+            const document = await this.documentService.findOneById(Number(id));
+            return res.json({ data: document });
+        } catch (e) {
+            next(e);
+        }
+    }
+    @Put('/document-metadata/:id', UpdateMetadataDto, {
+        isAuthenticated: true,
+        authorizedRole: 'all'
+    }, Document)
+    async updateDocumentMetadata(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            const id = parseInt(req.params.id, 10);
+
+            const metadata = req.body;
+
+            const updatedDoc = await this.documentService.updateMetadata(id, metadata);
+
+            return res.status(200).json({
+                message: 'Metadata updated successfully',
+                document: updatedDoc,
+            });
+        } catch (error) {
+            return next(error);
+        }
+
+    }
+
+    @Delete('/:id', {
+        isAuthenticated: true,
+        authorizedRole: 'all'
+    },
+        Document)
+    async deleteDocumentById(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        const id = parseInt(req.params.id, 10);
+        const deleteDocumentResp = await this.documentDeleteWorkflowService.documentDeleteWorkflow(id)
+        return res.status(200).json(deleteDocumentResp)
     }
 
 
@@ -127,5 +185,59 @@ export class DocumentController {
         }
     }
 
+    @Post('/upload', KmsDocumentIndexDto, {
+        authorizedRole: 'all',
+        isAuthenticated: true,
+        fileUpload: true
+    }, {})
+    async kmsDocumentIndex(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            const { uuid, gitUrl, gitToken } = req.body;
+            const document = req.file;
+
+            const userId = req.user?._id || 1;
+            let result;
+            if (!!gitUrl) {
+                result = await this.gitWorkflowService.gitWorkflow({
+                    uuid: uuid,
+                    userId: userId,
+                    git_url: gitUrl,
+                    git_token: gitToken
+                })
+                return res.status(200).json(result);
+
+            } else if (!!document) {
+                result = await this.kmsWorkflowService.KmsDocumentWorkflow(uuid, document, userId);
+                return res.status(200).json(result);
+            }
+
+
+        } catch (error) {
+            console.error('KMS Document/git url Index Error:', error);
+            return res.status(500).json({ message: 'Internal server error' });
+        }
+    }
+
+    @Post('/metrics', KmsMetricsDto, {
+        authorizedRole: 'all',
+        isAuthenticated: true,
+        fileUpload: true
+    }, {})
+    async KmsMetricsUnifiedModel(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            const { uuid, document_id, metrics } = req.body;
+            const userId = req.user?._id
+            if (!userId) {
+                throw new ApiError('user not found', 401)
+            }
+
+            const result = await this.kmsWorkflowService.KmsMetricsGenerateWithPayload({ document_id, uuid, userId, metrics });
+            return res.status(200).json(result);
+
+        } catch (error) {
+            console.error('KMS metrics Error:', error);
+            return res.status(500).json({ message: 'Internal server error' });
+        }
+    }
 
 }

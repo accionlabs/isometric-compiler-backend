@@ -60,6 +60,7 @@ export class SemanticModelHistoryService extends BaseService<SemanticModelHistor
             }
         }
 
+        delete data.updatedAt;
         const semanticModelHistory = this.getRepository().create({ uuid, ...data });
         const result = await this.getRepository().save(semanticModelHistory);
         return result

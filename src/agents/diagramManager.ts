@@ -83,7 +83,10 @@ export class DiagramManager {
         this.manager.addShape(currentLayer.id, 'Event Based Orchestration', "COMPONENT", "Event Queue", 'top-c1', null, metadata, true)
     }
 
-    public convertBlueprintToIsometric(blueprint: BlueprintResp, qum: PersonaResp[]): IShape[] {
+    public convertBlueprintToIsometric(blueprint: BlueprintResp | null, qum: PersonaResp[]): IShape[] | undefined {
+        if (!blueprint) {
+            return
+        }
         this.attachDefaultPlatformServicesLayer();
         this.attachDefaultDataLakeLayer(blueprint)
         this.attachEventQueueLayer(blueprint)
