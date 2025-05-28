@@ -48,20 +48,19 @@ export class SemanticModelHistoryService extends BaseService<SemanticModelHistor
     }
 
 
-    async createSemanticModelHistory(uuid: string, data: Partial<SemanticModelHistory>): Promise<SemanticModelHistory> {
+    async createSemanticModelHistory(uuid: string, data: Partial<SemanticModelHistory>, editedByUserId: number): Promise<SemanticModelHistory> {
         if (!uuid) {
             throw new Error("uuid is required");
         }
-        if (data.userId) {
-            const userExists = await this.userRepository.findOne({ where: { _id: data.userId } });
+        if (editedByUserId) {
+            const userExists = await this.userRepository.findOne({ where: { _id: editedByUserId } });
 
             if (!userExists) {
-                throw new ApiError(`User with ID ${data.userId} does not exist`, 400);
+                throw new ApiError(`User with ID ${editedByUserId} does not exist`, 400);
             }
         }
-
-        delete data.updatedAt;
-        const semanticModelHistory = this.getRepository().create({ uuid, ...data });
+        delete data.userId;
+        const semanticModelHistory = this.getRepository().create({ uuid, userId: editedByUserId, ...data });
         const result = await this.getRepository().save(semanticModelHistory);
         return result
     }

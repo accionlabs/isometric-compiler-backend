@@ -41,7 +41,7 @@ export class SemanticModelService extends BaseService<SemanticModel> {
                 const semanticModelCopy = JSON.parse(JSON.stringify(semanticModel)); // Deep copy to avoid mutation
                 if (semanticModelCopy.qum_specs || semanticModelCopy.architectural_specs?.length) {
                     if (!semanticModelCopy.userId) semanticModelCopy.userId = data.userId
-                    await this.semanticModelHistoryService.createSemanticModelHistory(semanticModelCopy.uuid, semanticModelCopy);
+                    await this.semanticModelHistoryService.createSemanticModelHistory(semanticModelCopy.uuid, semanticModelCopy, semanticModelCopy.userId);
                 }
                 if (data.qum_specs && semanticModel.qum_specs) {
                     semanticModel.qum_specs = this.mergeJsons(semanticModel.qum_specs as Qum | undefined, data.qum_specs as Qum);
@@ -91,8 +91,12 @@ export class SemanticModelService extends BaseService<SemanticModel> {
             const semanticModelCopy = JSON.parse(JSON.stringify(semanticModel));
             if (!semanticModelCopy.userId) semanticModelCopy.userId = data.userId
 
+            if (!data.userId) {
+                throw new ApiError('EditedBy (userId) is required', 401)
+            }
+
             // Save previous state to history
-            await this.semanticModelHistoryService.createSemanticModelHistory(uuid, semanticModelCopy);
+            await this.semanticModelHistoryService.createSemanticModelHistory(uuid, semanticModelCopy, data.userId);
 
             // Apply updates
             // Object.assign(semanticModel, data);
