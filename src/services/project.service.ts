@@ -1,8 +1,9 @@
 import { Service } from 'typedi';
-import { Repository } from 'typeorm';
+import { Repository, DeepPartial, ILike } from 'typeorm';
 import { AppDataSource } from '../configs/database';
 import { Project } from '../entities/project.entity';
 import { BaseService } from './base.service';
+import ApiError from '../utils/apiError';
 
 @Service()
 export class ProjectService extends BaseService<Project> {
@@ -36,6 +37,36 @@ export class ProjectService extends BaseService<Project> {
         }
 
         return result[0].uuid;
+    }
+    
+    async create(data: DeepPartial<Project>): Promise<Project> {
+        const version = data.version ?? '1.0.0';
+        const name = (data.name ?? '').trim();
+        const existing = await this.getRepository().findOne({
+            where: { name: ILike(name), version }
+        });
+        if (existing) {
+            throw new ApiError(`Project with name "${data.name}" already exists`, 409);
+        }
+        return super.create({ ...data, version });
+    }
+
+    async update(id: number, data: DeepPartial<Project>): Promise<Project> {
+        if (data.name) {
+            const version = data.version ?? '1.0.0';
+            const name = data.name.trim();
+            const existing = await this.getRepository().findOne({
+                where: { name: ILike(name), version }
+            });
+            if (existing && existing._id !== id) {
+                throw new ApiError(`Project with name "${data.name}" already exists`, 409);
+            }
+        }
+        const updated = await super.update(id, data);
+        if (!updated) {
+            throw new ApiError('Project not found', 404);
+        }
+        return updated;
     }
 
 }
