@@ -26,7 +26,7 @@ class Metadata {
     mimetype: string;
 
     @IsString()
-    filename: string;
+    fileName: string;
 
     @IsString()
     fileUrl: string;

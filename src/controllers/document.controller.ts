@@ -5,7 +5,7 @@ import { NextFunction, Request, Response } from 'express';
 import { EmailService } from "../services/email.service";
 import { KmsDocumentIndexDto, KmsMetricsDto, SendEmailDto, UpdateMetadataDto } from "../validations/document.validation";
 import { DocumentService } from "../services/document.service";
-import { Document, MetricsEnum } from "../entities/document.entity";
+import { Document } from "../entities/document.entity";
 import ApiError from "../utils/apiError";
 import { FilterUtils } from "../utils/filterUtils";
 import { DocumentDeleteWorkflowService } from "../agents/workflows/documentWorkflow";
@@ -237,6 +237,38 @@ export class DocumentController {
         } catch (error) {
             console.error('KMS metrics Error:', error);
             return res.status(500).json({ message: 'Internal server error' });
+        }
+    }
+
+    @Get('/search/:text', {
+        isAuthenticated: true,
+        authorizedRole: 'all'
+    }, {
+        data: Array<Document>,
+        total: Number
+    })
+    async searchDocuments(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { text } = req.params;
+            const { page = 1, limit = 1000 } = req.query;
+            if (!text || typeof text !== 'string') {
+                throw new ApiError("Query parameter 'text' is required.", 400);
+            }
+
+            const allowedFields: (keyof Document)[] = ['uuid', 'agent', 'fileIndexedStatus', 'status', 'metadata'];
+
+            const filters = FilterUtils.buildPostgresFilters<Document>(req.query, allowedFields);
+            if (!filters.uuid) {
+                throw new ApiError("Filter for uuid is required (filters[uuid][$eq]=<uuid>)", 400);
+            }
+            const { data, total } = await this.documentService.search(text as string, {
+                filters,
+                limit: parseInt(limit as string, 10),
+                page: parseInt(page as string, 10)
+            });
+            res.status(200).json({ data, total });
+        } catch (e) {
+            next(e);
         }
     }
 

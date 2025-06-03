@@ -18,7 +18,7 @@ export class UpdateMetadataDto {
 
     @IsString()
     @IsOptional()
-    filename: string;
+    fileName: string;
 
     @IsString()
     @IsOptional()
