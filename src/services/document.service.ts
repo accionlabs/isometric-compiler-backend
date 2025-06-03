@@ -1,4 +1,5 @@
 import { Inject, Service } from "typedi";
+import { Brackets, FindOptionsWhere, ILike } from "typeorm";
 import { AppDataSource } from "../configs/database";
 import { BaseService } from "./base.service";
 import { Document, FileType } from "../entities/document.entity";
@@ -75,7 +76,7 @@ export class DocumentService extends BaseService<Document> {
             content: fileContent.map((content) => content.pageContent).join('\n'), // result from above
             agent,
             metadata: {
-                filename: file.originalname,
+                fileName: file.originalname,
                 fileType: FileType.image,
                 fileUrl,
                 mimetype: file.mimetype
@@ -103,4 +104,43 @@ export class DocumentService extends BaseService<Document> {
     async getDocumentsByUUID(uuid: string) {
         return this.getRepository().find({ where: { uuid } });
     }
+
+    async search(query: string, { page = 1, limit = 10, filters }: {
+        filters?: FindOptionsWhere<Document>,
+        page?: number;
+        limit?: number;
+    }): Promise<{ data: Document[]; total: number; }> {
+        const skip = limit * (page - 1)
+        const repository = this.getRepository()
+        const qb = repository
+            .createQueryBuilder("document")
+            .where(`
+                to_tsvector('english', coalesce(
+            (
+                SELECT string_agg(tag, ' ')
+                FROM jsonb_array_elements_text(document.metadata->'tags') AS tag
+            ), ''
+        )) ||
+                to_tsvector('english', coalesce(document.metadata->>'fileName', '')) ||
+                to_tsvector('english', coalesce(document.metadata->>'fileType', ''))
+                @@ plainto_tsquery(:query)
+            `, { query });
+
+        if (filters) {
+            qb.andWhere(filters);
+        }
+
+        const total = await qb.getCount();
+
+        if (skip) {
+            qb.skip(skip);
+        }
+        if (limit) {
+            qb.take(limit);
+        }
+
+        const data = await qb.getMany();
+        return { data, total };
+    }
+
 }

@@ -27,7 +27,7 @@ export default class SematicModelController {
         try {
             const sematicModel = await this.semanticModelService.findByUuid(req.params.uuid);
             if (!sematicModel) {
-                throw new ApiError('semantic model not found', 404)
+                throw new ApiError('semantic model not found', 200)
             }
             res.status(200).json({
                 ...sematicModel

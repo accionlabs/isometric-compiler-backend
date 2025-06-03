@@ -75,7 +75,7 @@ export class UnifiedModelGenerator {
             if (!context) {
                 throw new Error("No content found for the given filename");
             }
-            context = `${context}\n\n---\n documentName: ${document?.metadata?.filename} documentId: ${document?._id}`;
+            context = `${context}\n\n---\n documentName: ${document?.metadata?.fileName} documentId: ${document?._id}`;
             await this.semanticModelService.saveSemanticModel({
                 uuid,
                 status: SemanticModelStatus.GENERATING_BUSINESS_SPEC,

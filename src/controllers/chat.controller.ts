@@ -147,7 +147,7 @@ export default class CategoriesController {
                     throw new ApiError("Document not found", 404)
                 }
 
-                const resp = await this.architectualAgentWorkflowService.generateIsometricFromDocment(uuid, doc.data, document?.metadata?.mimetype || 'image/png', document?.metadata?.filename || 'image.png')
+                const resp = await this.architectualAgentWorkflowService.generateIsometricFromDocment(uuid, doc.data, document?.metadata?.mimetype || 'image/png', document?.metadata?.fileName || 'image.png')
                 return res.status(200).json({
                     uuid,
                     message: "Diagram generated successfully",

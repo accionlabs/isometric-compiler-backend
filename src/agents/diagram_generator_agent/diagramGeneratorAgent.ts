@@ -140,7 +140,7 @@ export class DiagramGeneratorAgent {
     }
 
     async generateIsometricJSONFromImage(image: string, uuid: string, availableDocuments: Document[]): Promise<IsometricJsonAgenResp> {
-        const docImage = availableDocuments.find(doc => doc.metadata?.filename === image);
+        const docImage = availableDocuments.find(doc => doc.metadata?.fileName === image);
         if (!docImage) {
             return { message: "Please provide a valid image!" };
         }

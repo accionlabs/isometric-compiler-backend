@@ -72,7 +72,7 @@ export class MainAgent {
 
     public async processRequest(question: string, uuid: string, currentState: any = [], userId: number, file?: Express.Multer.File): Promise<MainAgentRespone> {
         const documentDetails = await this.documentService.getDocumentsByUUID(uuid);
-        const availableDocuments = documentDetails?.map((doc) => doc.metadata?.filename || '') || [];
+        const availableDocuments = documentDetails?.map((doc) => doc.metadata?.fileName || '') || [];
         this.loggerService.info(`Processing documents documents ${availableDocuments.join(",")}`)
         const newDocumentUpload = file?.originalname || null;
         const classifierResult = await this.classifierAgent.processClassifierAgent(question, availableDocuments, newDocumentUpload || '', `classifier_${uuid}`);
