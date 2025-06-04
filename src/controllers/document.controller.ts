@@ -64,7 +64,7 @@ export class DocumentController {
             const sort: Record<string, 1 | -1> = { [sortName as string]: sortOrder === 'asc' ? 1 : -1 };
 
 
-            const allowedFields: (keyof Document)[] = ["uuid", 'agent', "createdAt", "updatedAt", "status", "fileIndexedStatus", "functionalMetricsGenerated", "architectureMetricsGenerated"];
+            const allowedFields: (keyof Document)[] = ["uuid", 'agent', "createdAt", "updatedAt", "status", "fileIndexedStatus", "functionalMetricsGenerated", "architectureMetricsGenerated", "_id"];
             let select: any;
             if (selectFields && typeof selectFields === 'string') {
                 const fields = selectFields.split(',').map(field => field.trim()) as (keyof Document)[];
