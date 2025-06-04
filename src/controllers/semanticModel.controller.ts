@@ -92,7 +92,7 @@ export default class SematicModelController {
     }, SemanticModel)
     async revertSemanticModelVersion(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { uuid, historyId } = req.body;
+            const { uuid, historyId, type } = req.body;
             const userId = req?.user?._id;
 
             if (!uuid || !historyId) {
@@ -103,7 +103,7 @@ export default class SematicModelController {
                 throw new ApiError('User not found', 401);
             }
 
-            const reverted = await this.semanticModelService.revertToHistory(uuid, historyId, userId);
+            const reverted = await this.semanticModelService.revertToHistory(uuid, historyId, userId, type);
             res.status(200).json(reverted);
         } catch (e) {
             next(e);

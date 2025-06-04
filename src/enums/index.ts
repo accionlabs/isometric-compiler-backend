@@ -45,5 +45,9 @@ export enum UnifiedModelGenerationStatus {
   INACTIVE = 'inactive',
   PROCESSING = 'processing',
   ERROR = 'error',
+}
 
+export enum SemancticModelType {
+  ARCHITECTURAL = 'architectural_specs',
+  QUM = 'qum_specs',
 }

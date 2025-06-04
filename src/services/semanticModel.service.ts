@@ -6,6 +6,7 @@ import { Agents, SemanticModelStatus } from "../enums";
 import { PersonaResp } from "../agents/qum_agent/qumAgent";
 import ApiError from "../utils/apiError";
 import { SemanticModelHistoryService } from "./semanticModelHistory.service";
+import { EntityHistoryService } from "./entity_history.service";
 
 type Qum = {
     unified_model: PersonaResp[];
@@ -14,8 +15,8 @@ type Qum = {
 @Service()
 export class SemanticModelService extends BaseService<SemanticModel> {
 
-    @Inject(() => SemanticModelHistoryService)
-    private readonly semanticModelHistoryService: SemanticModelHistoryService
+    @Inject(() => EntityHistoryService)
+    private readonly entityHistoryService: EntityHistoryService
 
     constructor() {
         super(AppDataSource.getRepository(SemanticModel));
@@ -41,7 +42,16 @@ export class SemanticModelService extends BaseService<SemanticModel> {
                 const semanticModelCopy = JSON.parse(JSON.stringify(semanticModel)); // Deep copy to avoid mutation
                 if (semanticModelCopy.qum_specs || semanticModelCopy.architectural_specs?.length) {
                     if (!semanticModelCopy.userId) semanticModelCopy.userId = data.userId
-                    await this.semanticModelHistoryService.createSemanticModelHistory(semanticModelCopy.uuid, semanticModelCopy, semanticModelCopy.userId);
+                    await this.entityHistoryService.createEntityHistory({
+                        entityId: semanticModelCopy._id,
+                        entityType: "semantic_model",
+                        data: {
+                            architectural_specs: semanticModelCopy.architectural_specs,
+                            qum_specs: semanticModelCopy.qum_specs,
+                        },
+                        editedByUserId: data.userId ?? semanticModelCopy.userId,
+                    });
+                    // await this.semanticModelHistoryService.createSemanticModelHistory(semanticModelCopy.uuid, semanticModelCopy, semanticModelCopy.userId);
                 }
                 if (data.qum_specs && semanticModel.qum_specs) {
                     semanticModel.qum_specs = this.mergeJsons(semanticModel.qum_specs as Qum | undefined, data.qum_specs as Qum);
@@ -96,7 +106,16 @@ export class SemanticModelService extends BaseService<SemanticModel> {
             }
 
             // Save previous state to history
-            await this.semanticModelHistoryService.createSemanticModelHistory(uuid, semanticModelCopy, data.userId);
+            await this.entityHistoryService.createEntityHistory({
+                entityId: semanticModelCopy._id,
+                entityType: "semantic_model",
+                data: {
+                    architectural_specs: semanticModelCopy.architectural_specs,
+                    qum_specs: semanticModelCopy.qum_specs,
+                },
+                editedByUserId: data.userId ?? semanticModelCopy.userId,
+            });
+            // await this.semanticModelHistoryService.createSemanticModelHistory(uuid, semanticModelCopy, data.userId);
 
             // Apply updates
             // Object.assign(semanticModel, data);
@@ -117,7 +136,8 @@ export class SemanticModelService extends BaseService<SemanticModel> {
 
     async getDiff(uuid: string, historyId: number) {
         const current = await this.getRepository().findOne({ where: { uuid } });
-        const history = await this.semanticModelHistoryService.findByIdAndUuid(historyId, uuid);
+        const history = await this.entityHistoryService.findOneById(historyId);
+        // const history = await this.semanticModelHistoryService.findByIdAndUuid(historyId, uuid);
 
         if (!current || !history) throw new ApiError("Model or history not found", 404);
 
@@ -127,22 +147,22 @@ export class SemanticModelService extends BaseService<SemanticModel> {
                 qum_specs: current.qum_specs,
             },
             history: {
-                architectural_specs: history.architectural_specs,
-                qum_specs: history.qum_specs,
+                architectural_specs: history.entityData?.architectural_specs,
+                qum_specs: history.entityData?.qum_specs,
             }
         };
     }
 
 
-    async revertToHistory(uuid: string, historyId: number, userId: number): Promise<SemanticModel> {
-        const history = await this.semanticModelHistoryService.findByIdAndUuid(historyId, uuid);
+    async revertToHistory(uuid: string, historyId: number, userId: number, type: 'qum_specs' | 'architectural_specs'): Promise<SemanticModel> {
+        const history = await this.entityHistoryService.findOneById(historyId);
         if (!history) {
             throw new ApiError("Semantic model history not found for given UUID", 404);
         }
 
         // - save current version to history
         return this.updateSemanticModel(uuid, {
-            ...history,
+            [type]: history.entityData?.[type],
             userId,
         });
     }

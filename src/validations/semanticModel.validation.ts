@@ -1,6 +1,6 @@
 import { IsArray, IsEnum, IsNotEmpty, IsObject, IsOptional, IsString, IsUUID, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
-import { SemanticModelStatus } from "../enums";
+import { SemancticModelType, SemanticModelStatus } from "../enums";
 
 
 export class CitationRespDto {
@@ -139,6 +139,10 @@ export class SemanticModelDto {
 
     @IsString()
     historyId: string;
+
+    @IsEnum(SemancticModelType)
+    type: SemancticModelType;
+
 }
 
 
