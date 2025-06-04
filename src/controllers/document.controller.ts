@@ -11,6 +11,7 @@ import { FilterUtils } from "../utils/filterUtils";
 import { DocumentDeleteWorkflowService } from "../agents/workflows/documentWorkflow";
 import { KmsWorkflowService } from "../agents/workflows/kmsWorkflow";
 import { GitWorkflowService } from "../agents/workflows/gitWorkflow";
+import { FindOptionsSelect } from "typeorm";
 
 @Service()
 @Controller('/documents')
@@ -59,14 +60,22 @@ export class DocumentController {
     }, Array<Document>)
     async getDocuments(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
-            const { page = 1, limit = 1000, sortName = 'createdAt', sortOrder = 'asc', ...query } = req.query
+            const { page = 1, limit = 1000, sortName = 'createdAt', sortOrder = 'asc', selectFields, ...query } = req.query
             const sort: Record<string, 1 | -1> = { [sortName as string]: sortOrder === 'asc' ? 1 : -1 };
 
 
             const allowedFields: (keyof Document)[] = ["uuid", 'agent', "createdAt", "updatedAt", "status", "fileIndexedStatus", "functionalMetricsGenerated", "architectureMetricsGenerated"];
+            let select: any;
+            if (selectFields && typeof selectFields === 'string') {
+                const fields = selectFields.split(',').map(field => field.trim()) as (keyof Document)[];
+                select = fields.reduce((acc, field) => {
+                    if (allowedFields.includes(field)) acc[field] = true;
+                    return acc;
+                }, {} as FindOptionsSelect<Document>);
+            }
 
             const filters = FilterUtils.buildPostgresFilters<Document>(query, allowedFields);
-            const { data, total } = await this.documentService.findWithFilters(filters, parseInt(page as string, 10), parseInt(limit as string, 10), sort);
+            const { data, total } = await this.documentService.findWithFilters(filters, parseInt(page as string, 10), parseInt(limit as string, 10), sort, undefined, select);
             return res.json({ data, total });
         } catch (e) {
             next(e);
