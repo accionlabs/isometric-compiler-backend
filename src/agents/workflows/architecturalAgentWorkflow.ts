@@ -39,7 +39,6 @@ export class ArchitectualAgentWorkflowService {
             contentType: document.mimetype
         });
         formData.append('uuid', uuid);
-        formData.append('metrics', MetricsEnum.architecture);
 
         const response = await axios.post(workflowUrl, formData)
         return response.data;

@@ -37,7 +37,6 @@ export class FunctionalAgentWorkflowService {
             });
             formData.append('uuid', uuid);
             formData.append('userId', userId)
-            formData.append('metrics', MetricsEnum.functional);
 
             const response = await axios.post(workflowUrl, formData)
             return response.data;
