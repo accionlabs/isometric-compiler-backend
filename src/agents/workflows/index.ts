@@ -108,7 +108,7 @@ export class MainWorkflow {
                 isPdfUploaded: fileIdexingResp?.metadata.fileType === 'pdf' ? true : false,
                 isGherkinScriptQuery: result?.isGherkinScriptQuery,
                 isGitQuery: !!gitUrl ? true : false,
-                uploadedType: fileIdexingResp?.metadata.fileType || 'git',
+                uploadedType: !!gitUrl ? 'git' : fileIdexingResp?.metadata.fileType,
             },
             role: MessageRoles.SYSTEM
         }
