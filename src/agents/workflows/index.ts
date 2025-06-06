@@ -104,10 +104,11 @@ export class MainWorkflow {
                 needFeedback: result?.needFeedback,
                 isEmailQuery: result?.isEmailQuery,
                 emailId: result?.email,
-                documentId: result?.documentId,
+                documentId: result?.documentId ? result?.documentId : fileIdexingResp?.metadata.documentId,
                 isPdfUploaded: fileIdexingResp?.metadata.fileType === 'pdf' ? true : false,
                 isGherkinScriptQuery: result?.isGherkinScriptQuery,
                 isGitQuery: !!gitUrl ? true : false,
+                uploadedType: fileIdexingResp?.metadata.fileType || 'git',
             },
             role: MessageRoles.SYSTEM
         }
