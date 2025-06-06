@@ -213,6 +213,9 @@ export class DocumentController {
                     git_url: gitUrl,
                     git_token: gitToken
                 })
+                if (result.feedback === 'git url is not correct') {
+                    return res.status(400).json({ message: 'git url is not correct' });
+                }
                 return res.status(200).json(result);
 
             } else if (!!document) {

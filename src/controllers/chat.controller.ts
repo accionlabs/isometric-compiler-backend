@@ -64,7 +64,9 @@ export default class CategoriesController {
                 throw new ApiError('user not found', 401)
             }
             const [userChat, systemChat] = await this.mainWorkFlow.processChat({ ...req.body, file, userId })
-
+            if (systemChat.message === 'git url is not correct') {
+                return res.status(400).json(systemChat);
+            }
             await this.chatService.create(userChat)
             await this.chatService.create(systemChat)
             return res.status(200).json(systemChat);
